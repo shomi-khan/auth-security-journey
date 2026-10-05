@@ -1,115 +1,127 @@
 # KenaKata
 
-KenaKata (কেনাকাটা, “shopping”) is a fictional SaaS commerce platform for small businesses. It is the only product in this series. Chapters may show it at an earlier stage, but they may not describe a different product.
+এই ফাইল chapter নয়। লেখার সময় মিলিয়ে নেওয়ার জন্য।
 
-This file is a writing reference, not a chapter.
+## KenaKata কী?
 
-## Product overview
+KenaKata একটা fictional SaaS commerce platform। নামটা কেনাকাটা থেকে।
 
-A small business uses KenaKata to run its shop: products, customers, and orders, then staff, billing, and connected applications. People who sign in are the business owner and staff. A shopper is a customer record, not a user account.
+ছোট ব্যবসা এখানে নিজেদের দোকান চালায়:
 
-The story starts with one shop and ends as a multi-tenant SaaS platform with a web application, a single-page application, and a mobile application.
+- Product manage করে
+- Order manage করে
+- Customer manage করে
+- Team member যোগ করে
+- Organization manage করে
+- External application connect করে
 
-## Initial product
+শুরুতে এটা একটা সাধারণ e-commerce application। তারপর ধীরে ধীরে multi-tenant SaaS platform হয়। শেষে web application, একটা SPA, আর একটা mobile application থাকে।
 
-At the start there is one online shop and one server-rendered web application. The shop can list products, keep customer records, and take orders.
+যারা login করে তারা দোকানের মালিক আর কর্মী। ক্রেতা মানে customer record। এই সিরিজে ক্রেতার login নেই।
 
-There is no organization model, no roles, no mobile app, no SPA, no Google login, no connected third-party application, no MFA, and no microservice split. Those arrive only at the stages in [`timeline.md`](timeline.md).
+আরিফ এটা বানায়। নীরা ব্যবসার দাবি আনে। রাফি প্রথম দোকানদার। চরিত্রের বিস্তারিত [characters.md](characters.md)-এ।
 
-Rafi’s clothing business is that first shop. It is not named as a separate brand.
+## শুরুর product
 
-## Target users
+একটা দোকান, একটা server-rendered web application। Product, customer, আর order আছে।
 
-- A small-business owner who needs the shop to run without building software. Rafi is the concrete case.
-- Staff who help that owner with products and orders.
-- Later, more than one business on the same platform, each isolated as an organization.
+এখনো নেই: organization, role, mobile app, SPA, Google login, বাইরের application, MFA, আলাদা আলাদা service। এগুলো কখন আসে, সেটা [timeline.md](timeline.md)-এ।
 
-Shoppers do not get KenaKata accounts in this series.
+রাফির পোশাকের দোকানটাই এই প্রথম দোকান। আলাদা ব্র্যান্ডের নাম নেই।
 
-## Business model
+## কাদের জন্য
 
-KenaKata starts as the application for a single shop. It becomes a subscription product sold to organizations. Billing is part of the product and is treated as a sensitive operation.
+- ছোট ব্যবসার মালিক, যে নিজে সফটওয়্যার বানায় না। রাফি সেই মানুষ।
+- দোকানের কর্মী, যারা product আর order সামলায়।
+- পরে আরও ব্যবসা। প্রত্যেকটা আলাদা organization। অন্যের data দেখে না।
 
-This document does not fix prices, plan names, or currency. A chapter that needs a number should treat it as a scene detail, not as a new canonical price list.
+## ব্যবসায়িক মডেল
 
-## Core features
+প্রথমে এক দোকানের অ্যাপ। পরে organization-কে subscription হিসেবে বিক্রি হয়। Billing product-এর অংশ, আর সেটা সংবেদনশীল কাজ।
 
-These are the product’s features across the whole series. The timeline says when each one is available.
+দাম, প্ল্যানের নাম, বা মুদ্রা এখানে ধরা নেই। কোনো অধ্যায়ে অঙ্ক লাগলে সেটা দৃশ্যের অংশ। নতুন দামের তালিকা বানিয়ে ফেলবে না।
 
-- Manage products
-- Manage customers
-- Manage orders
-- Create teams
-- Manage organization members
-- Perform billing-related operations
-- Connect external applications
-- Use web and mobile applications
+## যা যা করতে পারে
 
-## Product evolution
+নিচের কাজগুলো পুরো সিরিজ জুড়ে আসে। কোনটা কোন ধাপে, সেটা timeline বলে।
 
-The shop gains a sign-in, then a cookie session, then tokens because a mobile client appears. A browser SPA follows. The single shop then becomes one organization among many, with membership and roles. Google login comes next, then external applications connected through OAuth. Sensitive operations gain MFA and step-up. The backend later splits into services behind an API gateway.
+- Product manage করা
+- Customer manage করা
+- Order manage করা
+- Team বানানো
+- Organization-এর member সামলানো
+- Billing-এর কাজ
+- External application connect করা
+- Web আর mobile application ব্যবহার করা
 
-Details and the “not yet” line for each stage are in [`timeline.md`](timeline.md). The end state is in [`architecture.md`](architecture.md).
+## কীভাবে বদলায়
+
+এক দোকান থেকে শুরু। তারপর email আর password, তারপর cookie-তে session। Mobile এলে access token আর refresh token। তারপর SPA। তারপর এক দোকান একটা organization হয়, role আসে। তারপর Google login, তারপর বাইরের application। সংবেদনশীল কাজে MFA। শেষে backend কয়েকটা service-এ ভাগ হয়।
+
+ধাপের বিস্তারিত [timeline.md](timeline.md)। শেষ চেহারা [architecture.md](architecture.md)।
 
 ## Web application
 
-The first interface is a server-rendered web application. Sign-in is a browser session held by a cookie. This is the application in the early chapters.
+প্রথম interface। Server-rendered website। Login থাকলে browser cookie-তে session থাকে। শুরুর অধ্যায় এই অ্যাপ নিয়ে।
 
-The server-rendered application can remain after the SPA exists. The series does not require it to be removed.
+SPA আসার পরও এই website থাকতে পারে। সিরিজ এটাকে মুছে ফেলতে বলে না।
 
 ## SPA
 
-A single-page application is added later as another browser client for the same business. It is a separate interface from the first server-rendered app. Where its tokens live is a browser problem, which is why it has its own chapter.
+পরে আসা আরেকটা browser client, একই ব্যবসার জন্য। প্রথম website-এর থেকে আলাদা। Token browser-এ কোথায় থাকবে, সেটা আলাদা অধ্যায়ের বিষয়। এখানে সমাধান লেখা নেই।
 
 ## Mobile application
 
-The mobile application is for the owner and staff. It is added when a browser cookie is no longer the only way someone uses KenaKata. It is the reason the product grows access tokens and refresh tokens.
+মালিক আর কর্মীদের ফোন। ক্রেতার অ্যাপ নয়। Browser cookie আর একমাত্র রাস্তা না হলে token-এর কথা ওঠে।
 
-## Organizations
+## Organization
 
-An organization is one small business on the platform. Its products, customers, orders, members, teams, billing, and connected applications belong to that organization.
+একটা ছোট ব্যবসা। তার product, customer, order, member, team, billing, আর connected application এই organization-এর।
 
-Before this stage, the story has one shop. After it, Rafi’s clothing business is one organization, and another business can join without seeing Rafi’s data. A person can be a member of more than one organization.
+এর আগে গল্পে একটাই দোকান। পরে রাফির দোকান একটা organization। অন্য ব্যবসা তার data দেখে না। একজন মানুষ একাধিক organization-এর member হতে পারে।
 
-## Teams
+## Team
 
-A team is a group of members inside one organization, used to organize work such as who handles orders. A team does not have its own role system. What a person may do comes from their membership role.
+এক organization-এর ভিতরে মানুষের দল। যেমন কারা order সামলায়। Team আলাদা role দেয় না। কে কী করতে পারবে, সেটা membership-এর role। Role-এর ছক [domain-model.md](domain-model.md)-এ।
 
-## Third-party integrations
+## বাইরের application
 
-An organization can connect an external application so that application can act on the organization’s data. That external application is an OAuth client, and KenaKata is the authorization server.
+Organization একটা external application connect করতে পারে, যাতে ওই app তার data নিয়ে কাজ করতে পারে। ওই app একটা OAuth client। এই সম্পর্কে KenaKata authorization server।
 
-This is a different relationship from Google login. For Google login, Google is the identity provider and KenaKata is the client.
+Google login উল্টো দিক। সেখানে Google identity provider, KenaKata client।
 
-## Sensitive operations
+## যে কাজগুলো সংবেদনশীল
 
-These actions are dangerous enough that a normal signed-in session is not treated as sufficient once the product reaches the MFA stage:
+MFA-র ধাপ আসার পর শুধু login থাকা যথেষ্ট ধরা হয় না। তার আগের অধ্যায়ে এগুলো সাধারণ request হতে পারে।
 
-- Change billing or a payment method
-- Invite or remove a member, or change a member’s role
-- Transfer ownership
-- Connect or disconnect an external application
-- Delete an organization, or export its data
+- Billing বা payment method বদলানো
+- Member যোগ করা, বাদ দেওয়া, বা role বদলানো
+- Ownership হস্তান্তর
+- External application connect বা disconnect করা
+- Organization মুছে ফেলা, বা data বের করে নেওয়া
+- Refund
 
-Earlier chapters may show these actions as ordinary requests. They become step-up actions only when the timeline says MFA exists.
+কোন উপায়ে দ্বিতীয় ধাপ হবে — TOTP, passkey, বা অন্য কিছু — এখানে ধরা নেই। অধ্যায় একটা উপায় বেছে নিলে বলবে, এটা ওই দৃশ্যের পছন্দ।
 
-## Admin functionality
+## Admin
 
-Administration is an organization role, not a separate KenaKata staff product. The Owner holds the organization. An Admin runs day-to-day management, including members and connected apps, and does not transfer ownership. The role sketch is in [`domain-model.md`](domain-model.md).
+Admin organization-এর একটা role। আলাদা KenaKata-স্টাফের পণ্য নয়।
 
-There is no platform-superadmin character. Do not add one without a decision-log entry.
+Owner organization ধরে রাখে। Admin দৈনন্দিন কাজ চালায়: member, connected app, refund। Ownership হস্তান্তর Owner-এর কাজ।
 
-## Final product state
+আলাদা platform-admin চরিত্র নেই। দরকার হলে আগে decision log-এ লিখতে হবে।
 
-At the end of the series, KenaKata is a multi-tenant SaaS platform:
+## শেষ অবস্থা
 
-- Web, SPA, and mobile clients for owners and staff
-- Organizations, memberships, roles, and teams
-- Products, customers, and orders isolated per organization
-- Google as an external identity provider
-- External applications connected with OAuth
-- MFA and step-up on sensitive operations
-- An API gateway in front of separate user, order, billing, and notification services
-- An authorization layer in front of the protected action
+সিরিজের শেষে KenaKata একটা multi-tenant SaaS:
 
-That end state is drawn in [`architecture.md`](architecture.md). Chapters 1–24 may use only the part of it that the timeline has already introduced.
+- মালিক আর কর্মীদের জন্য web, SPA, আর mobile
+- Organization, membership, role, আর team
+- Product, customer, আর order প্রতিটা organization-এ আলাদা
+- Google একটা external identity provider
+- বাইরের application OAuth দিয়ে connected
+- সংবেদনশীল কাজে MFA আর step-up
+- API gateway-এর পিছনে user, order, billing, আর notification service
+- Protected কাজের আগে একটা authorization layer
+
+এই ছবি [architecture.md](architecture.md)-এ। অধ্যায় ২৪-এর আগে পুরো ছবিটাকে বর্তমান system ধরে নেওয়া যাবে না।

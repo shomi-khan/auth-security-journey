@@ -1,19 +1,12 @@
----
-chapter: 8
-season: 1
-title: "Token"
-status: draft
----
+# Token কেন দরকার?
 
-# Token
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+রাফি ফোন থেকে দোকান দেখতে চাইলে শুধু browser cookie আর যথেষ্ট হয় না। এই অধ্যায়ে token কেন দরকার হয়।
 
-This chapter will explain what a token is and why the KenaKata mobile client changes the sign-in model.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

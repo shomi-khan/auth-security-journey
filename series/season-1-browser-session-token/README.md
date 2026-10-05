@@ -1,38 +1,52 @@
-# Season 1 — The Browser, the Session & the Token
+# Season 1 — Browser, Session এবং Token
 
-Chapters 1–15. None of these chapters are written yet.
+অধ্যায় ১–১৫। একটাও এখনো লেখা হয়নি।
 
-## Purpose
+Product-এর তথ্য [product/](../../product/README.md)-এ। কোন অধ্যায়ে কী আগে থেকে আছে, সেটা [timeline](../../product/timeline.md)-এ।
 
-Follow KenaKata from a simple shop to a browser sign-in, then through the failures of that cookie session, and into access tokens and refresh tokens. Organizations and authorization close the season, after the reader has something worth authorizing.
+## এই Season কেন পড়ব?
 
-The product background is in [`../../product/README.md`](../../product/README.md). What may already exist in a given chapter is in [`../../product/timeline.md`](../../product/timeline.md).
+KenaKata একটা ছোট দোকানের website। কেউ login করল। পরের request-টাও তার, সেটা server কীভাবে বুঝবে?
 
-## Chapters
+এই season সেই প্রশ্ন থেকে শুরু করে। Cookie-তে session, সেই session ভাঙলে কী হয়, mobile এলে কেন token লাগে, আর শেষে “login করা আছে” মানেই সব resource-এ access নয়।
 
-1. [কেন Authentication দরকার?](01-why-authentication/README.md) — Why authentication is necessary, and the initial KenaKata application.
-2. [Authentication বনাম Authorization](02-authentication-vs-authorization/README.md) — Authentication and authorization as different questions.
-3. [Password-এর নিরাপত্তা](03-password-security/README.md) — Storing and checking passwords.
-4. [Session ও Cookie](04-session-and-cookie/README.md) — The server session and the browser cookie.
-5. [Session Hijacking ও Session Fixation](05-session-hijacking-fixation/README.md) — Hijacking and fixation of that session.
-6. [CSRF](06-csrf/README.md) — Cross-site request forgery.
-7. [XSS ও HttpOnly](07-xss-and-httponly/README.md) — Cross-site scripting and the HttpOnly flag.
-8. [Token](08-tokens/README.md) — Tokens, and why the mobile client needs them.
-9. [JWT](09-jwt/README.md) — JWT as a token format.
-10. [SPA-তে Token রাখা](10-spa-token-storage/README.md) — Where a single-page app keeps tokens.
-11. [Token Expiration ও Replay](11-token-expiration-replay/README.md) — Expiration and replay.
-12. [Refresh Token](12-refresh-token/README.md) — Refresh tokens.
-13. [Refresh Token Rotation](13-refresh-token-rotation/README.md) — Rotation and reuse detection.
-14. [Logout ও Revocation](14-logout-revocation/README.md) — Logout and revocation.
-15. [IDOR, BOLA ও Authorization](15-idor-bola-authorization/README.md) — IDOR, BOLA, and authorization.
+## কী কী সমস্যা solve করব?
 
-## After this season
+- Login-এর পর password বারবার না দিয়ে একই মানুষকে চেনা
+- Cookie অন্যের হাতে গেলে, বা অন্য সাইট থেকে request এলে কী হয়
+- Mobile আর SPA এলে শুধু browser cookie আর যথেষ্ট না হওয়া
+- Logout করলে কী বাতিল হয়
+- রাফির দোকানের order অন্য দোকান দেখে ফেলা
 
-The reader should be able to:
+সমাধানগুলো শেষ কথা নয়। প্রতিটা সমাধানের পর trade-off থাকবে।
 
-- Say what authentication establishes, and what authorization still has to decide
-- Describe a cookie-backed session and the distinct failures of theft, fixation, CSRF, and XSS
-- Describe an access token and a refresh token, including storage, expiry, rotation, and revocation
-- Explain why a signed-in user, or a role string, is not yet permission to touch a particular resource
+## কোন concepts শিখব?
 
-[Series index](../../README.md)
+Authentication, Authorization, Password, Session, Cookie, CSRF, XSS, Token, JWT, Access Token, Refresh Token, Revocation, IDOR/BOLA।
+
+## Chapter list
+
+1. [কেন Authentication দরকার?](01-why-authentication/README.md)
+2. [Authentication বনাম Authorization](02-authentication-vs-authorization/README.md)
+3. [প্রথম Login System এবং Password Security](03-password-security/README.md)
+4. [Session এবং Cookie](04-session-and-cookie/README.md)
+5. [Session Hijacking এবং Session Fixation](05-session-hijacking-fixation/README.md)
+6. [CSRF](06-csrf/README.md)
+7. [XSS এবং HttpOnly-এর সীমাবদ্ধতা](07-xss-and-httponly/README.md)
+8. [Token কেন দরকার?](08-tokens/README.md)
+9. [JWT আসলে কী?](09-jwt/README.md)
+10. [SPA-তে Token কোথায় রাখব?](10-spa-token-storage/README.md)
+11. [Token Expiration এবং Replay Window](11-token-expiration-replay/README.md)
+12. [Refresh Token কেন?](12-refresh-token/README.md)
+13. [Refresh Token Rotation এবং Reuse Detection](13-refresh-token-rotation/README.md)
+14. [Logout এবং Revocation](14-logout-revocation/README.md)
+15. [IDOR/BOLA এবং Authorization Design](15-idor-bola-authorization/README.md)
+
+## Season শেষে reader কী বুঝতে পারবে?
+
+- Authentication আর Authorization আলাদা প্রশ্ন
+- Cookie-তে রাখা session কী, আর সেটা কীভাবে ভাঙতে পারে — চুরি, fixation, CSRF, XSS এক জিনিস নয়
+- Access token আর refresh token আলাদা। রাখা, মেয়াদ, rotation, আর বাতিল করা আলাদা আলাদা প্রশ্ন
+- Login থাকা, বা token-এ role লেখা থাকা, মানেই ওই resource-এ access আছে — এটা ধরে নেওয়া যাবে না
+
+[সিরিজের সূচি](../../README.md)

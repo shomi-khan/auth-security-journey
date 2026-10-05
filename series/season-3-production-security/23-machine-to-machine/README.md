@@ -1,19 +1,12 @@
----
-chapter: 23
-season: 3
-title: "Machine-to-Machine Authentication"
-status: draft
----
-
 # Machine-to-Machine Authentication
 
-> Status: Not written yet.
+> অবস্থা: এখনও লেখা হয়নি।
 
-This chapter will explain machine-to-machine authentication for KenaKata services.
+KenaKata-র এক service যখন আরেক service-কে ডাকে, সেখানে রাফির browser session কাজ করে না। এই অধ্যায়ে machine-to-machine authentication।
 
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

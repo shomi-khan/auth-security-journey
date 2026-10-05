@@ -1,19 +1,12 @@
----
-chapter: 1
-season: 1
-title: "কেন Authentication দরকার?"
-status: draft
----
-
 # কেন Authentication দরকার?
 
-> Status: Not written yet.
+> অবস্থা: এখনও লেখা হয়নি।
 
-This chapter will explain why authentication is necessary and introduce the initial KenaKata application.
+এই অধ্যায়ে আমরা KenaKata-এর প্রথম version-এর মাধ্যমে বুঝব কেন Authentication দরকার, এবং login-এর পর server কীভাবে বুঝবে যে পরের request-টিও একই user-এর।
 
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

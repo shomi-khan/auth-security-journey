@@ -1,19 +1,12 @@
----
-chapter: 11
-season: 1
-title: "Token Expiration ও Replay"
-status: draft
----
+# Token Expiration এবং Replay Window
 
-# Token Expiration ও Replay
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Token-এর মেয়াদ শেষ হলে কী হয়। মেয়াদ শেষ হওয়ার আগে একই token আবার এলে কী প্রশ্ন ওঠে। এই অধ্যায়ে expiration আর replay window।
 
-This chapter will explain token expiration and token replay.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

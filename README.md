@@ -1,155 +1,231 @@
 # Auth Security Journey
 
-A story-driven Bengali technical series on authentication, authorization, OAuth, OIDC, and production security.
+বাংলাভাষী Software Engineer-দের জন্য Authentication, Authorization এবং Web Security শেখার একটি গল্পভিত্তিক যাত্রা।
 
-## What this repository is
+## এই repository কী?
 
-This is a 25-chapter Bengali technical series. It follows one fictional product, **KenaKata**, from a simple online shop to a multi-tenant SaaS platform.
+এটা ২৫ অধ্যায়ের বাংলা technical series।
 
-The chapters are the series. The files under [`product/`](product/README.md) keep that story consistent. Nothing in the chapter index is written yet. A checkbox stays open until that chapter is actually published.
+গল্পে একটা fictional product আছে, নাম **KenaKata**। ছোট একটা দোকানের অ্যাপ থেকে সেটা ধীরে ধীরে SaaS platform হয়। সেই পথ ধরে Authentication, Authorization, আর Web/API Security শেখা হবে।
 
-## Learning philosophy
+এখনো কোনো অধ্যায় লেখা হয়নি। নিচের তালিকায় সব জায়গায় “লেখা হয়নি” আছে। অধ্যায় প্রকাশিত হলে তবেই সেটা বদলাবে।
 
-Each chapter starts from a problem inside KenaKata:
+KenaKata সম্পর্কে যে তথ্য পুরো সিরিজে মিলিয়ে চলতে হবে, সেটা এখানে: [product/](product/README.md)।
+
+## কার জন্য?
+
+এই সিরিজ বাংলাভাষী junior software engineer-দের জন্য।
+
+বিশেষ করে:
+
+- Junior Software Engineer
+- Backend Developer
+- Frontend Developer
+- যারা Web Security শিখতে চান
+- যারা Authentication, OAuth, JWT দেখে confused হন
+
+তুমি programming-এর বেসিক জানো। HTTP আর REST API চেনো। Backend বা frontend-এ কিছু কাজ করেছ। Authentication, Authorization, OAuth, OIDC, JWT, Session, CSRF, XSS আলাদা আলাদা শুনেছ। একটা আরেকটার সঙ্গে কীভাবে জোড়া লাগে, সেটা এখনো পরিষ্কার নয়।
+
+তোমাকে নতুন করে programming শেখানো হবে না। আবার বিষয়গুলোকে ছোট করে এমন সরল করা হবে না, যেটা পরে কাজে লাগে না।
+
+## কীভাবে শেখানো হবে?
+
+প্রতিটা অধ্যায় KenaKata-র একটা সমস্যা দিয়ে শুরু হয়।
 
 ```text
-Problem
+সমস্যা
   ↓
-Naive Solution
+সহজ সমাধান
   ↓
-Failure
+সমাধান ভেঙে গেল
   ↓
-Threat
+Security Problem
   ↓
-Better Solution
+ভালো সমাধান
   ↓
 Trade-off
 ```
 
-A control is introduced because the previous design failed, and the chapter stops at the trade-off. It does not treat the new control as a final answer.
+আরিফ প্রথমে যেটা সহজ মনে হয় সেটা বানায়। সেটা ভাঙে। তখন আসল সমস্যা দেখা যায়। তারপর একটা ভালো সমাধান, আর সেই সমাধানের দাম। নতুন জিনিসটাকে শেষ কথা বানানো হবে না।
 
-## Seasons
+## Learning Goal
 
-### Season 1 — The Browser, the Session & the Token
+> লক্ষ্য শুধু JWT, OAuth বা Session-এর definition মুখস্থ করানো নয়। লক্ষ্য হলো এমন একটি mental model তৈরি করা, যাতে একজন junior engineer নতুন application-এর authentication এবং authorization architecture নিয়ে নিজে reasoning করতে পারে।
 
-Chapters 1–15. A browser sign-in, a cookie session, the attacks on that session, and the move to access tokens and refresh tokens.
+## Season 1
 
-[Season 1](series/season-1-browser-session-token/README.md)
+### Browser, Session এবং Token
 
-### Season 2 — OAuth, OIDC & Delegated Identity
+অধ্যায় ১–১৫। [Season 1](series/season-1-browser-session-token/README.md)
 
-Chapters 16–21. Delegated access, OpenID Connect, and Google login.
+এই season-এ শেখা হবে:
 
-[Season 2](series/season-2-oauth-oidc/README.md)
+- Authentication
+- Authorization
+- Password
+- Session
+- Cookie
+- CSRF
+- XSS
+- Token
+- JWT
+- Access Token
+- Refresh Token
+- Revocation
+- IDOR/BOLA
+
+## Season 2
+
+### OAuth, OIDC এবং Delegated Identity
+
+অধ্যায় ১৬–২১। [Season 2](series/season-2-oauth-oidc/README.md)
+
+এই season-এ শেখা হবে:
+
+- OAuth
+- Authorization Code
+- state
+- redirect URI
+- PKCE
+- OIDC
+- ID Token
+- Access Token
+- Google Login
+
+## Season 3
+
+### Production Security
+
+অধ্যায় ২২–২৫। [Season 3](series/season-3-production-security/README.md)
+
+এই season-এ শেখা হবে:
+
+- MFA
+- Step-up Authentication
+- Machine-to-Machine Authentication
+- Architecture decision
+- Complete production architecture
+
+## অধ্যায়সূচি
+
+`লেখা হয়নি` মানে অধ্যায়ের আর্টিকেল এখনো নেই। নামের উপর ক্লিক করলে placeholder-এ যাবে।
+
+### Season 1 — Browser, Session এবং Token
+
+## [অধ্যায় ১ — কেন Authentication দরকার?](series/season-1-browser-session-token/01-why-authentication/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ২ — Authentication বনাম Authorization](series/season-1-browser-session-token/02-authentication-vs-authorization/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৩ — প্রথম Login System এবং Password Security](series/season-1-browser-session-token/03-password-security/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৪ — Session এবং Cookie](series/season-1-browser-session-token/04-session-and-cookie/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৫ — Session Hijacking এবং Session Fixation](series/season-1-browser-session-token/05-session-hijacking-fixation/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৬ — CSRF](series/season-1-browser-session-token/06-csrf/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৭ — XSS এবং HttpOnly-এর সীমাবদ্ধতা](series/season-1-browser-session-token/07-xss-and-httponly/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৮ — Token কেন দরকার?](series/season-1-browser-session-token/08-tokens/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ৯ — JWT আসলে কী?](series/season-1-browser-session-token/09-jwt/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১০ — SPA-তে Token কোথায় রাখব?](series/season-1-browser-session-token/10-spa-token-storage/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১১ — Token Expiration এবং Replay Window](series/season-1-browser-session-token/11-token-expiration-replay/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১২ — Refresh Token কেন?](series/season-1-browser-session-token/12-refresh-token/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১৩ — Refresh Token Rotation এবং Reuse Detection](series/season-1-browser-session-token/13-refresh-token-rotation/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১৪ — Logout এবং Revocation](series/season-1-browser-session-token/14-logout-revocation/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১৫ — IDOR/BOLA এবং Authorization Design](series/season-1-browser-session-token/15-idor-bola-authorization/README.md)
+
+- [ ] লেখা হয়নি
+
+### Season 2 — OAuth, OIDC এবং Delegated Identity
+
+## [অধ্যায় ১৬ — OAuth 2.0 কেন?](series/season-2-oauth-oidc/16-oauth/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১৭ — Authorization Code Flow এবং `state`](series/season-2-oauth-oidc/17-authorization-code-state/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১৮ — Redirect URI এবং Authorization Code Theft](series/season-2-oauth-oidc/18-redirect-uri-code-theft/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ১৯ — PKCE](series/season-2-oauth-oidc/19-pkce/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ২০ — OIDC](series/season-2-oauth-oidc/20-oidc/README.md)
+
+- [ ] লেখা হয়নি
+
+## [অধ্যায় ২১ — Google Login এবং ID Token বনাম Access Token](series/season-2-oauth-oidc/21-google-login/README.md)
+
+- [ ] লেখা হয়নি
 
 ### Season 3 — Production Security
 
-Chapters 22–25. MFA, machine-to-machine authentication, and the production architecture.
+## [অধ্যায় ২২ — MFA এবং Step-up Authentication](series/season-3-production-security/22-mfa-step-up/README.md)
 
-[Season 3](series/season-3-production-security/README.md)
+- [ ] লেখা হয়নি
 
-## Product
+## [অধ্যায় ২৩ — Machine-to-Machine Authentication](series/season-3-production-security/23-machine-to-machine/README.md)
 
-KenaKata’s overview, characters, domain model, timeline, and final architecture:
+- [ ] লেখা হয়নি
 
-[product/](product/README.md)
+## [অধ্যায় ২৪ — Context বদলালে Architecture কেন বদলায়?](series/season-3-production-security/24-context-and-architecture/README.md)
 
-## Chapter index
+- [ ] লেখা হয়নি
 
-`[ ]` means the chapter has not been written.
+## [অধ্যায় ২৫ — Capstone: পুরো KenaKata Security Architecture](series/season-3-production-security/25-capstone/README.md)
 
-### Season 1 — The Browser, the Session & the Token
+- [ ] লেখা হয়নি
 
-- [ ] [01. কেন Authentication দরকার?](series/season-1-browser-session-token/01-why-authentication/README.md)
-- [ ] [02. Authentication বনাম Authorization](series/season-1-browser-session-token/02-authentication-vs-authorization/README.md)
-- [ ] [03. Password-এর নিরাপত্তা](series/season-1-browser-session-token/03-password-security/README.md)
-- [ ] [04. Session ও Cookie](series/season-1-browser-session-token/04-session-and-cookie/README.md)
-- [ ] [05. Session Hijacking ও Session Fixation](series/season-1-browser-session-token/05-session-hijacking-fixation/README.md)
-- [ ] [06. CSRF](series/season-1-browser-session-token/06-csrf/README.md)
-- [ ] [07. XSS ও HttpOnly](series/season-1-browser-session-token/07-xss-and-httponly/README.md)
-- [ ] [08. Token](series/season-1-browser-session-token/08-tokens/README.md)
-- [ ] [09. JWT](series/season-1-browser-session-token/09-jwt/README.md)
-- [ ] [10. SPA-তে Token রাখা](series/season-1-browser-session-token/10-spa-token-storage/README.md)
-- [ ] [11. Token Expiration ও Replay](series/season-1-browser-session-token/11-token-expiration-replay/README.md)
-- [ ] [12. Refresh Token](series/season-1-browser-session-token/12-refresh-token/README.md)
-- [ ] [13. Refresh Token Rotation](series/season-1-browser-session-token/13-refresh-token-rotation/README.md)
-- [ ] [14. Logout ও Revocation](series/season-1-browser-session-token/14-logout-revocation/README.md)
-- [ ] [15. IDOR, BOLA ও Authorization](series/season-1-browser-session-token/15-idor-bola-authorization/README.md)
+## বাকি ডিরেক্টরি
 
-### Season 2 — OAuth, OIDC & Delegated Identity
-
-- [ ] [16. OAuth 2.0](series/season-2-oauth-oidc/16-oauth/README.md)
-- [ ] [17. Authorization Code ও state](series/season-2-oauth-oidc/17-authorization-code-state/README.md)
-- [ ] [18. Redirect URI ও Code Theft](series/season-2-oauth-oidc/18-redirect-uri-code-theft/README.md)
-- [ ] [19. PKCE](series/season-2-oauth-oidc/19-pkce/README.md)
-- [ ] [20. OpenID Connect](series/season-2-oauth-oidc/20-oidc/README.md)
-- [ ] [21. Google Login](series/season-2-oauth-oidc/21-google-login/README.md)
-
-### Season 3 — Production Security
-
-- [ ] [22. MFA ও Step-up Authentication](series/season-3-production-security/22-mfa-step-up/README.md)
-- [ ] [23. Machine-to-Machine Authentication](series/season-3-production-security/23-machine-to-machine/README.md)
-- [ ] [24. Security Context ও Architecture](series/season-3-production-security/24-context-and-architecture/README.md)
-- [ ] [25. Capstone](series/season-3-production-security/25-capstone/README.md)
-
-## Writing rules
-
-### Language
-
-Primary language: Bengali.
-
-Technical terms can remain in English when that is clearer.
-
-### Style
-
-- narrative-driven
-- problem-first
-- technically rigorous
-- beginner-accessible
-- production-aware
-- occasional subtle humor
-- no meme-heavy writing
-
-### Security
-
-Never use unexplained absolute claims such as “JWT is secure.”
-
-Always explain:
-
-- threat model
-- security property
-- limitation
-- trade-off
-
-### Major concepts
-
-Every major security technology should explain:
-
-- what it is
-- why it exists
-- what problem it solves
-- what it does not solve
-- where it lives
-- how it can be attacked
-- damage if compromised
-- lifetime
-- revocation
-- alternatives
-- production trade-offs
-
-The working rules for adding a chapter are in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Repository map
-
-| Path | Purpose |
+| জায়গা | কী আছে |
 | --- | --- |
-| [series/](series/) | Season and chapter manuscripts. [Season 1](series/season-1-browser-session-token/README.md), [Season 2](series/season-2-oauth-oidc/README.md), [Season 3](series/season-3-production-security/README.md) |
-| [`product/`](product/README.md) | KenaKata continuity |
-| [`references/`](references/README.md) | Authoritative sources to check before a claim |
-| [`diagrams/`](diagrams/authentication/) | Reusable diagrams, added only when a chapter needs one |
-| [`examples/go/`](examples/go/authentication/) | Small Go examples, added only when a chapter needs one |
-| [`notes/`](notes/glossary.md) | Glossary, misconceptions, and editorial decisions |
+| [product/](product/README.md) | KenaKata-র তথ্য। Chapter লেখার আগে এটা পড়তে হবে |
+| [references/](references/README.md) | Spec আর cheat sheet-এর তালিকা। দাবি লেখার আগে এখান থেকে মিলিয়ে নিতে হবে |
+| [notes/](notes/glossary.md) | Glossary, ভুল ধারণা, আর সিদ্ধান্তের খাতা |
+| [diagrams/](diagrams/authentication/) | আঁকা ছবির জায়গা। এখন খালি। দরকার হলে chapter-এর সঙ্গে যোগ হবে |
+| [examples/go/](examples/go/authentication/) | ছোট Go উদাহরণের জায়গা। এখন খালি। পুরো backend এখানে বানানো হবে না |
 
-## License
+লেখার নিয়ম: [CONTRIBUTING.md](CONTRIBUTING.md)।
 
-[LICENSE](LICENSE)
+লাইসেন্স MIT। Copyright-এর নাম এখনো বসানো হয়নি, ফাইলে `[COPYRIGHT HOLDER]` লেখা আছে। দেখো [LICENSE](LICENSE)।

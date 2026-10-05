@@ -1,19 +1,12 @@
----
-chapter: 20
-season: 2
-title: "OpenID Connect"
-status: draft
----
+# OIDC
 
-# OpenID Connect
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Access দেওয়া আর user কে সেটা জানানো একই কথা কি না। এই অধ্যায়ে OIDC।
 
-This chapter will explain OpenID Connect as an identity layer on OAuth 2.0.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

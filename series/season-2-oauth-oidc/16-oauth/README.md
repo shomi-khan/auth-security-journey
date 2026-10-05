@@ -1,19 +1,12 @@
----
-chapter: 16
-season: 2
-title: "OAuth 2.0"
-status: draft
----
+# OAuth 2.0 কেন?
 
-# OAuth 2.0
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+কোনো app-কে দোকানের password না দিয়ে সীমিত access দিতে হলে কী করা যায়। এই অধ্যায়ে OAuth 2.0 কেন আছে।
 
-This chapter will explain OAuth 2.0 as delegated access.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

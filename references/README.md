@@ -1,14 +1,16 @@
 # References
 
-Curated pointers for writers. Do not copy specifications into this repository.
+লেখার সময় যে সোর্সগুলো খুলতে হবে, সেগুলোর তালিকা। Specification এখানে কপি করা হয়নি।
 
-Before a chapter states a security property, open the source below and check the current text, including errata. These pages are updated. A claim in an old blog does not outrank them.
+কোনো অধ্যায়ে security নিয়ে কথা বলার আগে নিচের সোর্স খুলে বর্তমান লেখা দেখে নাও। Errata থাকলে সেটাও। এই পাতাগুলো বদলায়। পুরনো ব্লগের কথা এগুলোর উপরে বসবে না।
 
-| File | Sources |
+| ফাইল | কী আছে |
 | --- | --- |
-| [rfc.md](rfc.md) | IETF RFCs for OAuth, PKCE, JWT, and related token documents |
-| [oidc.md](oidc.md) | OpenID Foundation specifications |
-| [owasp.md](owasp.md) | OWASP cheat sheets and the API Security Top 10 |
-| [browser-security.md](browser-security.md) | Cookies, site boundaries, and CORS |
+| [rfc.md](rfc.md) | OAuth, PKCE, JWT, আর কাছাকাছি token RFC |
+| [oidc.md](oidc.md) | OpenID Foundation-এর স্পেসিফিকেশন |
+| [owasp.md](owasp.md) | OWASP cheat sheet আর API Security Top 10 |
+| [browser-security.md](browser-security.md) | Cookie, site-এর সীমানা, আর CORS |
 
-If a newer RFC or a new edition of an OWASP list replaces one of these, update the link here and do not leave the chapter citing the retired document as current.
+কোনো নতুন RFC বা OWASP-এর নতুন সংস্করণ পুরনোটাকে সরিয়ে দিলে এখানকার লিংক বদলাবে। অধ্যায় যেন পুরনো ডকুমেন্টকে বর্তমান বলে না বসায়।
+
+সোর্স কী সুপারিশ করে, সেই সিদ্ধান্ত এই ফাইলে লিখে রাখা হয়নি। অধ্যায় লেখার সময় সোর্স পড়ে নিতে হবে।

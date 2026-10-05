@@ -1,19 +1,12 @@
----
-chapter: 19
-season: 2
-title: "PKCE"
-status: draft
----
-
 # PKCE
 
-> Status: Not written yet.
+> অবস্থা: এখনও লেখা হয়নি।
 
-This chapter will explain PKCE and why a public client needs it.
+Mobile বা SPA-র মতো client নিজে secret লুকিয়ে রাখতে পারে না। এই অধ্যায়ে PKCE, আর ওই client-এর ক্ষেত্রে সেটা কোন সমস্যায় লাগে।
 
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

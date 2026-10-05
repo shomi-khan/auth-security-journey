@@ -1,29 +1,31 @@
-# Decision log
+# সিদ্ধান্তের খাতা
 
-Major editorial and product decisions. Add a dated entry when a later chapter needs to change the universe, the language, or the structure.
+বড় সম্পাদনার বা product-এর সিদ্ধান্ত এখানে। পরে কোনো অধ্যায় গল্প, ভাষা, বা কাঠামো বদলালে তারিখ দিয়ে নতুন এন্ট্রি যোগ করো। পুরনো এন্ট্রি মুছে দিয়ো না।
 
-## 2026-10-05 — Repository foundation
+## 2026-10-05 — শুরুর সিদ্ধান্ত
 
-- Repository name: `auth-security-journey`
-- Fictional product: `KenaKata`
-- 25 chapters
-- 3 seasons
-- Problem-first narrative
-- Bengali primary language for chapters
-- Go examples where useful
-- Security claims must use authoritative sources
-- Chapter-by-chapter development
+- Repository: `auth-security-journey`
+- Target audience: বাংলাভাষী junior software engineer
+- Primary language: বাংলা। পাঠকের জন্য README, season, chapter, `product/`, `references/`, আর `notes/` বাংলা
+- Technical terminology: ইংরেজি। “প্রমাণীকরণ” বা “অনুমোদন”-এর মতো জোর করা অনুবাদ নয়
+- Fictional product: KenaKata
+- Total chapters: 25
+- Seasons: 3
+- Teaching style: আগে সমস্যা, তারপর সমাধান
+- Narrative style: একটা product-এর যাত্রা
+- Examples: দরকার হলে Go। ছোট, একটা ধারণা। পুরো backend নয়
+- Security claims: authoritative source দেখে যাচাই করতে হবে। সোর্স কী বলছে, সেটা এই খাতায় তুলে রাখা হয়নি
+- Chapters: একবারে একটি করে লেখা হবে
 
-Related choices made so the foundation stays internally consistent:
+গল্প যাতে না ভাঙে, সেই জন্য আরও কয়েকটা সিদ্ধান্ত:
 
-- Guides outside `series/` are in English. Chapter titles are Bengali, and chapter bodies will be Bengali.
-- Shoppers are customer records and do not sign in. Users are owners and staff.
-- Roles are Owner, Admin, Member, and Viewer, and they live on membership. Teams group people and do not grant a second role.
-- An organization has one Owner in the simplified model.
-- There is no platform-superadmin character.
-- The recurring cast is Arif, Nira, and Rafi.
-- [`product/timeline.md`](../product/timeline.md) is the product chronology and overrides chapter order when they differ.
-- [`product/architecture.md`](../product/architecture.md) is the final state only.
-- The MFA factor type is not fixed.
-- Prices and plan names are not fixed.
-- The license is MIT, with `[COPYRIGHT HOLDER]` left as a placeholder because no copyright owner was specified.
+- ক্রেতা customer record। এই সিরিজে ক্রেতা login করে না। User মানে মালিক আর কর্মী।
+- Role চারটা: Owner, Admin, Member, Viewer। Role থাকে membership-এ। Team মানুষকে দল করে, দ্বিতীয় role-ব্যবস্থা নয়।
+- সরল মডেলে একটা organization-এ একজন Owner।
+- আলাদা platform-superadmin চরিত্র নেই।
+- নিয়মিত চরিত্র: আরিফ, নীরা, রাফি।
+- [timeline](../product/timeline.md) product-এর কালক্রম। Feature আছে কি না, সেই প্রশ্নে অধ্যায়ের ক্রমের উপরে এই ফাইল।
+- [architecture](../product/architecture.md) শুধু শেষ অবস্থা।
+- MFA কোন উপায়ে হবে, সেটা ধরা নেই।
+- দাম আর প্ল্যানের নাম ধরা নেই।
+- লাইসেন্স MIT। Copyright-এর জায়গায় `[COPYRIGHT HOLDER]`, কারণ মালিকের নাম দেওয়া হয়নি।

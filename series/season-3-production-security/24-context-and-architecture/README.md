@@ -1,19 +1,12 @@
----
-chapter: 24
-season: 3
-title: "Security Context ও Architecture"
-status: draft
----
+# Context বদলালে Architecture কেন বদলায়?
 
-# Security Context ও Architecture
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+একটা দোকানের login যেভাবে চলে, অনেক organization-এর SaaS সেভাবে চলে না। এই অধ্যায়ে context বদলালে architecture কেন বদলায়।
 
-This chapter will put the earlier controls into KenaKata’s security context and architecture.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

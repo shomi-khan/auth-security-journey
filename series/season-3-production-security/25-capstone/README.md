@@ -1,19 +1,12 @@
----
-chapter: 25
-season: 3
-title: "Capstone"
-status: draft
----
+# Capstone: পুরো KenaKata Security Architecture
 
-# Capstone
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+এতদিনের সিদ্ধান্ত এক জায়গায় এনে দেখা। এই অধ্যায় সিরিজের শেষ। পুরো KenaKata-র security architecture এখানে একসঙ্গে বসবে।
 
-This chapter will close the series by walking through KenaKata’s production security as one system.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

@@ -1,15 +1,27 @@
-# Characters
+# চরিত্র
 
-Three people recur. Keep them in these roles. Add another recurring person only through [`../notes/decision-log.md`](../notes/decision-log.md).
+নিয়মিত চরিত্র তিনজন। এদের ভূমিকা বদলাবে না। নতুন নিয়মিত মানুষ লাগলে আগে [`../notes/decision-log.md`](../notes/decision-log.md)।
 
-## Arif
+## আরিফ
 
-Arif is a new software engineer building KenaKata. He can build the backend. His security mental model is still forming. He is the technical protagonist: when a design is naive, it is usually his first design.
+আরিফ নতুন software engineer। সে KenaKata বানায়।
 
-## Nira
+Backend development জানে। Security সম্পর্কে basic knowledge আছে, কিন্তু এখনো গভীর mental model তৈরি হয়নি। নতুন একটা সিস্টেম দেখে নিজে থেকে threat আর trade-off বের করতে পারে না। সহজ কিন্তু ভাঙা সমাধানগুলো সাধারণত তার প্রথম চেষ্টা।
 
-Nira is Arif’s product and business counterpart. She asks for the next real requirement: a mobile app, a second employee, Google login, a connected application, billing controls. Those requests are what create the next security problem. She does not work for Rafi.
+## নীরা
 
-## Rafi
+নীরা product আর business-এর মানুষ। আরিফের সঙ্গে KenaKata বানায়। রাফির কর্মচারী নয়।
 
-Rafi is an early KenaKata customer and runs a small online clothing business. His shop is the first shop in the story. He is how the series makes organizations, teams, roles, resource ownership, and third-party integrations concrete.
+সে এমন দাবি আনে, যেগুলো পরে নতুন security সমস্যা হয়। যেমন:
+
+> “User যেন Google দিয়ে login করতে পারে।”
+
+> “Team member যোগ করতে হবে।”
+
+> “Admin যেন refund করতে পারে।”
+
+## রাফি
+
+রাফি KenaKata-এর early customer। একটা ছোট online পোশাকের দোকান চালায়।
+
+শুরুতে ওই একটা দোকানই পুরো অ্যাপ। পরে ওই দোকান একটা organization হয়। Organization, team, role, resource কার, আর third-party integration — এসব তার দোকানের দরকার থেকে আসে।

@@ -1,19 +1,12 @@
----
-chapter: 7
-season: 1
-title: "XSS ও HttpOnly"
-status: draft
----
+# XSS এবং HttpOnly-এর সীমাবদ্ধতা
 
-# XSS ও HttpOnly
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Page-এ যদি অন্যের script চলে, cookie আর page-এর data-র কী হয়। এই অধ্যায়ে XSS, আর HttpOnly flag কোথায় কাজে লাগে, কোথায় লাগে না।
 
-This chapter will explain cross-site scripting, and what the HttpOnly cookie flag does and does not do.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

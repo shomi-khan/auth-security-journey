@@ -1,19 +1,12 @@
----
-chapter: 6
-season: 1
-title: "CSRF"
-status: draft
----
-
 # CSRF
 
-> Status: Not written yet.
+> অবস্থা: এখনও লেখা হয়নি।
 
-This chapter will explain cross-site request forgery against a signed-in browser.
+User login করা আছে, কিন্তু request সে নিজে পাঠায়নি। এই অধ্যায়ে CSRF, KenaKata-র cookie session-এর উপর।
 
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

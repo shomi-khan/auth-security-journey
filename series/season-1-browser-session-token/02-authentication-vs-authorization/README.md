@@ -1,19 +1,12 @@
----
-chapter: 2
-season: 1
-title: "Authentication বনাম Authorization"
-status: draft
----
-
 # Authentication বনাম Authorization
 
-> Status: Not written yet.
+> অবস্থা: এখনও লেখা হয়নি।
 
-This chapter will separate authentication from authorization in the early KenaKata shop.
+Login করা আর কোনো resource-এ access পাওয়া এক জিনিস নয়। এই অধ্যায়ে KenaKata-র প্রথম দোকান দিয়ে এই দুটো প্রশ্ন আলাদা করব।
 
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

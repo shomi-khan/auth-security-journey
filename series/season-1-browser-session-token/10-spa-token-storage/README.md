@@ -1,19 +1,12 @@
----
-chapter: 10
-season: 1
-title: "SPA-তে Token রাখা"
-status: draft
----
+# SPA-তে Token কোথায় রাখব?
 
-# SPA-তে Token রাখা
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+SPA browser-এ চলে। Token সেখানে কোথায় থাকবে, আরিফকে সেই সিদ্ধান্ত নিতে হবে। এই অধ্যায়ে জায়গাগুলো আর তাদের trade-off।
 
-This chapter will explain where a single-page app can keep tokens, and the trade-off of each place.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

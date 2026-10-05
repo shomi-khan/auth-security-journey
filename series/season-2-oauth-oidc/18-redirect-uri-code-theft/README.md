@@ -1,19 +1,12 @@
----
-chapter: 18
-season: 2
-title: "Redirect URI ও Code Theft"
-status: draft
----
+# Redirect URI এবং Authorization Code Theft
 
-# Redirect URI ও Code Theft
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Code যে ঠিকানায় ফেরত যায়, সেই ঠিকানা ভুল হলে code অন্যের কাছে চলে যেতে পারে। এই অধ্যায়ে redirect URI আর authorization code theft।
 
-This chapter will explain redirect URI checking and authorization code theft.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

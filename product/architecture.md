@@ -1,10 +1,12 @@
 # Architecture
 
-This document describes the **final-state architecture**. It is what KenaKata looks like at the end of the series. The service split arrives with the microservices stage in chapter 23. Chapters 24 and 25 are where this picture is the current system. Earlier chapters must not treat it as the system they are already running, except when a chapter is explicitly looking ahead.
+এটা **শেষ অবস্থার architecture**। সিরিজের শেষে KenaKata দেখতে এমন।
 
-The diagram is conceptual. It is not an implementation, a deployment, or a request path with headers and status codes.
+Service-গুলো ভাগ হয় অধ্যায় ২৩-এ, microservice-এর ধাপে। অধ্যায় ২৪ আর ২৫-এ এই ছবিটাই বর্তমান system। তার আগের অধ্যায় এই ছবিকে “এখন যা চলছে” ধরে নেবে না। সামনে কী আসবে সেটা বলতে চাইলে স্পষ্ট করে বলবে, এটা এখনো আসেনি।
 
-## Final picture
+ছবিটা conceptual। Implementation, deployment, বা header দিয়ে request-এর পথ এখানে নেই।
+
+## শেষ ছবি
 
 ```text
 Web / SPA
@@ -22,37 +24,37 @@ API Gateway
 Authorization Layer
 ```
 
-Clients talk to the API gateway. The gateway routes to the service that owns the data. The authorization layer is how a protected action is allowed or refused. In this conceptual picture it sits on the path of the protected action. A chapter does not need to turn it into a specific library or a sidecar.
+Client API gateway-এর সঙ্গে কথা বলে। Gateway সেই service-এ পাঠায়, যে ডেটার মালিক। Authorization layer বলে এই protected কাজ চলবে কি না। এই ছবিতে সেটা ওই কাজের পথে। কোনো অধ্যায়কে এটাকে নির্দিষ্ট লাইব্রেরি বা আলাদা সার্ভিস বানাতে হবে না।
 
-The product catalog is not a separate service. Catalog data stays with the commerce side of the model.
+Product catalog-এর আলাদা service নেই। ক্যাটালগের ডেটা commerce-এর দিকেই থাকে।
 
-| Piece | Role in the final system |
+| অংশ | শেষ system-এ কী করে |
 | --- | --- |
-| Web / SPA | Browser clients for owners and staff. The original server-rendered app and the later SPA may both exist |
-| Mobile App | Client for owners and staff, using tokens |
-| API Gateway | The front door for client traffic after the split |
-| User Service | Accounts, sign-in, sessions, and external identities |
-| Order Service | Orders for an organization |
-| Billing Service | Billing-related operations |
-| Notification Service | Messages the product sends, such as mail |
-| Authorization Layer | The decision that this identity may perform this action on this resource |
+| Web / SPA | মালিক আর কর্মীদের browser client। পুরনো server-rendered অ্যাপ আর পরের SPA দুটোই থাকতে পারে |
+| Mobile App | মালিক আর কর্মীদের client। Token ব্যবহার করে |
+| API Gateway | Backend ভাগ হওয়ার পর client-এর সামনের দরজা |
+| User Service | অ্যাকাউন্ট, login, session, আর external identity |
+| Order Service | একটা organization-এর order |
+| Billing Service | Billing-এর কাজ |
+| Notification Service | Product যে বার্তা পাঠায়, যেমন মেইল |
+| Authorization Layer | এই identity এই resource-এ এই কাজ করতে পারবে কি না |
 
-## Google as an external identity provider
+## Google
 
-Google is an identity provider. KenaKata is the relying party. A successful Google login creates or matches a `User` and stores an `ExternalIdentity`. Google is not the place KenaKata stores orders, and a Google account is not an organization role.
+Google একটা identity provider। KenaKata relying party। Google login সফল হলে একজন `User` মেলে বা নতুন হয়, আর একটা `ExternalIdentity` থাকে। Order Google-এর কাছে থাকে না। Google অ্যাকাউন্ট নিজে থেকে organization-এর role নয়।
 
-## OAuth-based external applications
+## OAuth আর বাইরের application
 
-An organization can connect an external application. That application is an `OAuthClient`. It calls KenaKata for the organization’s resources, and KenaKata is the authorization server for that call. This is the opposite direction from Google login.
+Organization বাইরের একটা application connect করতে পারে। সেই application একটা `OAuthClient`। সে KenaKata-কে ডাকে organization-এর resource-এর জন্য। এই ডাকে KenaKata authorization server। দিকটা Google login-এর উল্টো।
 
-## Service-to-service communication
+## Service-to-service
 
-After the microservice split, services call each other. Those calls authenticate the calling service. They do not reuse a person’s browser session or a person’s refresh token. Machine-to-machine authentication is the subject of chapter 23.
+Microservice-এ ভাগ হওয়ার পর service একে অপরকে ডাকে। ওই ডাকে ডাকা service-এর পরিচয় থাকে। মানুষের browser session বা মানুষের refresh token সেখানে ব্যবহার হয় না। এই বিষয় অধ্যায় ২৩। কীভাবে সেই পরিচয় প্রমাণ হয়, সেই বিস্তারিত এখানে নেই।
 
-## MFA for sensitive operations
+## MFA
 
-Sensitive operations, listed in [`product.md`](product.md), require step-up even when the caller already has a session or an access token. MFA is part of that final control. It is not shown as a sixth business service in the diagram.
+[product.md](product.md)-এ যে কাজগুলো সংবেদনশীল, সেখানে session বা access token থাকলেও step-up লাগে। MFA সেই শেষ নিয়ন্ত্রণের অংশ। ছবিতে এটাকে ষষ্ঠ business service বানানো হয়নি।
 
-## What this picture leaves out
+## যা এই ছবিতে নেই
 
-There is no message bus, service mesh, cloud account, or platform-admin console in the series architecture. Do not add one in a chapter unless the decision log takes it on.
+Message bus, service mesh, ক্লাউড অ্যাকাউন্ট, বা platform-admin-এর কনসোল এই সিরিজের architecture-এ নেই। Decision log-এ না নিলে অধ্যায়ে যোগ করবে না।

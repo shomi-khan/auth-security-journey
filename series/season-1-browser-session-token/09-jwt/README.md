@@ -1,19 +1,12 @@
----
-chapter: 9
-season: 1
-title: "JWT"
-status: draft
----
+# JWT আসলে কী?
 
-# JWT
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+JWT একটা token-এর format। এই অধ্যায়ে দেখব এই format আসলে কী, আর নাম শুনে যে ধারণাগুলো হয় সেগুলো কতদূর ঠিক।
 
-This chapter will explain JSON Web Tokens as a token format, including what a JWT does not guarantee.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

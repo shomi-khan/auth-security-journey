@@ -1,29 +1,40 @@
-# Season 2 — OAuth, OIDC & Delegated Identity
+# Season 2 — OAuth, OIDC এবং Delegated Identity
 
-Chapters 16–21. None of these chapters are written yet.
+অধ্যায় ১৬–২১। একটাও এখনো লেখা হয়নি।
 
-## Purpose
+Product-এর তথ্য [product/](../../product/README.md)-এ। Google login আর বাইরের application কখন চালু হয়, সেটা [timeline](../../product/timeline.md)-এ। এই season-এর শুরুতে দুটোই এখনো দাবি, চালু feature নয়।
 
-Move from “KenaKata checks its own password” to delegated access and federated sign-in. OAuth 2.0 is how an application gets limited access. OpenID Connect is how a provider tells KenaKata who signed in. Google login is that design applied to a real identity provider, not a separate kind of login.
+## এই Season কেন পড়ব?
 
-The product background is in [`../../product/README.md`](../../product/README.md). Google login and connected applications ship only at the stages in [`../../product/timeline.md`](../../product/timeline.md).
+Season 1-এ KenaKata নিজের password আর নিজের token সামলায়। এবার অন্য প্রশ্ন। কোনো app-কে দোকানের password না দিয়ে সীমিত access দিতে হয়। আবার user চায় Google দিয়ে ঢুকতে।
 
-## Chapters
+OAuth 2.0 আর OIDC এই দুই দাবির ভাষা। Google login আলাদা জাদু নয়। ওই ডিজাইনের একটা ব্যবহার।
 
-16. [OAuth 2.0](16-oauth/README.md) — OAuth 2.0 as delegated access.
-17. [Authorization Code ও state](17-authorization-code-state/README.md) — The authorization code flow and `state`.
-18. [Redirect URI ও Code Theft](18-redirect-uri-code-theft/README.md) — Redirect URI checking and authorization code theft.
-19. [PKCE](19-pkce/README.md) — PKCE for a public client.
-20. [OpenID Connect](20-oidc/README.md) — OpenID Connect as an identity layer.
-21. [Google Login](21-google-login/README.md) — Google login for KenaKata.
+## কী কী সমস্যা solve করব?
 
-## After this season
+- Password না দিয়ে অন্য app-কে access দেওয়া
+- মাঝপথে code চুরি হওয়া, আর redirect ঠিকানা ভুল হওয়া
+- Mobile বা SPA-র মতো client, যে নিজে secret লুকিয়ে রাখতে পারে না
+- Access পাওয়া আর user কে সেটা জানা — দুটোকে এক করে ফেলা
 
-The reader should be able to:
+## কোন concepts শিখব?
 
-- Explain OAuth 2.0 as delegated authorization, and say what it does not establish by itself
-- Explain why `state`, redirect URI checking, and PKCE exist
-- Explain what an ID token adds, and how that differs from an access token
-- Place Google as an external identity provider, and a connected application as an OAuth client of KenaKata
+OAuth, Authorization Code, `state`, redirect URI, PKCE, OIDC, ID Token, Access Token, Google Login।
 
-[Series index](../../README.md)
+## Chapter list
+
+16. [OAuth 2.0 কেন?](16-oauth/README.md)
+17. [Authorization Code Flow এবং `state`](17-authorization-code-state/README.md)
+18. [Redirect URI এবং Authorization Code Theft](18-redirect-uri-code-theft/README.md)
+19. [PKCE](19-pkce/README.md)
+20. [OIDC](20-oidc/README.md)
+21. [Google Login এবং ID Token বনাম Access Token](21-google-login/README.md)
+
+## Season শেষে reader কী বুঝতে পারবে?
+
+- OAuth 2.0 দিয়ে সীমিত access দেওয়া যায়। এটা একা “user কে” বলে দেয় না
+- `state`, redirect URI, আর PKCE কেন আলাদা আলাদা সমস্যার জন্য
+- ID token কী যোগ করে, আর access token থেকে সেটা আলাদা কোথায়
+- Google একটা external identity provider। বাইরের application KenaKata-র OAuth client
+
+[সিরিজের সূচি](../../README.md)

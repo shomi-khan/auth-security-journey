@@ -1,19 +1,12 @@
----
-chapter: 3
-season: 1
-title: "Password-এর নিরাপত্তা"
-status: draft
----
+# প্রথম Login System এবং Password Security
 
-# Password-এর নিরাপত্তা
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+আরিফ email আর password দিয়ে প্রথম login বানাবে। এই অধ্যায়ে দেখব password server-এ রাখার সময় কী ভাবা দরকার, আর password মিলিয়ে দেওয়াটা কোন সমস্যার সমাধান করে না।
 
-This chapter will explain how KenaKata should store and check passwords, and what that does not protect.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

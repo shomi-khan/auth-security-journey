@@ -1,57 +1,59 @@
 # Domain model
 
-This is a simplified conceptual model for the blog series, not a production database schema. Chapters may sketch a table when it helps a threat, but they should not grow a canonical schema here.
+এটা blog series-এর conceptual model। এটা production database schema নয়।
 
-Names below are concepts. Fields are the minimum a chapter needs in order to stay consistent.
+অধ্যায় কোনো threat বোঝাতে একটা ছক আঁকতে পারে। সেই ছককে এখানকার canonical schema বানিয়ে ফেলবে না। নিচের নামগুলো ধারণা। Field শুধু সেইটুকু, যেটুকু না থাকলে অধ্যায়গুলো পরস্পরের সঙ্গে মিল হারায়।
 
-## Concepts
+## ধারণাগুলো
 
-| Concept | What it is |
+| নাম | কী |
 | --- | --- |
-| User | A person who can sign in: an owner or a staff member |
-| Customer | A shopper record kept by a business. Customers do not sign in |
-| Organization | One small business on the platform, and the isolation boundary for its data |
-| Membership | The link between a user and an organization, including that user’s role |
-| Team | A named group of members inside one organization. Teams do not grant roles |
-| Product | An item the organization sells |
-| Order | A purchase recorded for that organization |
-| Session | The server-side sign-in record introduced with browser cookies |
-| OAuthClient | An external application authorized to act on an organization’s resources |
-| ExternalIdentity | The link between a user and an account at an external identity provider |
+| User | যে login করতে পারে। মালিক বা কর্মী |
+| Customer | দোকানের ক্রেতার রেকর্ড। ক্রেতা login করে না |
+| Organization | প্ল্যাটফর্মের একটা ছোট ব্যবসা। তার data-র সীমানা |
+| Membership | একজন user আর একটা organization-এর যোগ। এখানে role থাকে |
+| Team | এক organization-এর ভিতরে মানুষের দল। Team role দেয় না |
+| Product | organization যা বিক্রি করে |
+| Order | ওই organization-এর একটা বিক্রি |
+| Session | Cookie-র সময়ে server যে login-এর রেকর্ড রাখে |
+| OAuthClient | বাইরের সেই application, যে organization-এর resource নিয়ে কাজ করতে পারে |
+| ExternalIdentity | একজন user-এর সঙ্গে বাইরের identity provider-এর অ্যাকাউন্টের যোগ |
 
-`Session`, `OAuthClient`, and `ExternalIdentity` are part of the model so later chapters have stable names. They are not implemented at the start. [`timeline.md`](timeline.md) says when each one appears.
+Customer আর Team এই তালিকায় আছে, কারণ দোকান ক্রেতা রাখে আর পরে দল বানায়। বাকি নামগুলো সিরিজের মূল মডেল।
 
-## Relationships
+`Session`, `OAuthClient`, আর `ExternalIdentity` পরে দরকার হবে বলে নামগুলো আগে থেকেই ধরা। শুরুতে এগুলো বানানো নেই। কখন আসে, সেটা [timeline.md](timeline.md)।
+
+## সম্পর্ক
 
 ```text
 User
   |
   +---- Membership ---- Organization
   |                         |
-  |                         +---- Teams
-  |                         +---- Products
-  |                         +---- Customers
-  |                         +---- Orders
-  |                         +---- OAuthClients
+  |                         +---- Team
+  |                         +---- Product
+  |                         +---- Customer
+  |                         +---- Order
+  |                         +---- OAuthClient
   |
-  +---- Sessions
+  +---- Session
   |
-  +---- ExternalIdentities
+  +---- ExternalIdentity
 ```
 
-A user can have a membership in more than one organization. A membership belongs to one user and one organization.
+একজন user একাধিক organization-এর member হতে পারে। একটা membership একজন user আর একটা organization-এর।
 
-Products, customers, orders, teams, and connected clients belong to one organization. Before organizations exist, those business records belong to the single shop, which later becomes Rafi’s organization.
+Product, customer, order, team, আর connected client একটা organization-এর। Organization আসার আগে এই ব্যবসার রেকর্ড একটাই দোকানের। পরে সেই দোকান রাফির organization হয়।
 
-A team contains users who already have a membership in that organization.
+Team-এ এমন user থাকে, যার ওই organization-এ membership আগে থেকেই আছে।
 
-A session belongs to one user. An external identity belongs to one user. An OAuth client is connected in the context of one organization.
+Session একজন user-এর। External identity-ও একজন user-এর। OAuth client একটা organization-এর প্রসঙ্গে connected।
 
-An order may refer to products and to a customer. Those links are ordinary commerce data. They are not an authorization rule.
+Order কোন product আর কোন customer-কে ধরে, সেটা সাধারণ দোকানের তথ্য। সেটা নিজে থেকে authorization-এর নিয়ম নয়।
 
-## Role model
+## Role
 
-Roles live on `Membership`. They do not live on the team, and they are not a second system inside the token.
+Role থাকে `Membership`-এ। Team-এ নয়। Token-এর ভিতরের একটা লেখাও আলাদা role-ব্যবস্থা নয়।
 
 ```text
 Owner
@@ -60,15 +62,15 @@ Member
 Viewer
 ```
 
-An organization has one Owner in this simplified model. Ownership can be transferred. That transfer is a sensitive operation.
+এই সরল মডেলে একটা organization-এ একজন Owner। Ownership হস্তান্তর করা যায়। সেই হস্তান্তর সংবেদনশীল কাজ।
 
-| Role | May do |
+| Role | কী করতে পারে |
 | --- | --- |
-| Owner | Everything an Admin may do, plus ownership transfer and the organization’s existence |
-| Admin | Day-to-day management: members, roles except ownership, settings, connected applications, billing operations the product exposes to admins |
-| Member | Create and update products, customers, and orders |
-| Viewer | Read the organization’s data |
+| Owner | Admin যা পারে তার সব, আর ownership হস্তান্তর, আর organization রাখা বা মুছে ফেলা |
+| Admin | দৈনন্দিন ব্যবস্থাপনা: member, Owner বাদে role বদল, setting, connected application, refund |
+| Member | Product, customer, আর order তৈরি ও বদল |
+| Viewer | Organization-এর তথ্য শুধু দেখে |
 
-This table is a sketch so chapters do not contradict each other. A chapter may show one finer check, such as “only an Admin can invite a member,” without inventing a new role. Permission order stays Owner, then Admin, then Member, then Viewer.
+এই ছক যাতে অধ্যায়গুলো পরস্পরের উল্টো না বলে। কোনো অধ্যায় একটা সূক্ষ্ম নিয়ম দেখাতে পারে, যেমন “member দিতে পারে শুধু Admin”। নতুন role বানাবে না। ক্ষমতার ক্রম Owner, তারপর Admin, তারপর Member, তারপর Viewer।
 
-A role string stored in a token is a hint about membership. It is not, by itself, the authorization decision. The resource still has to belong to the organization the membership is for.
+Token-এ role লেখা থাকলে সেটা membership-এর ইঙ্গিত হতে পারে। সেই লেখাই শেষ সিদ্ধান্ত নয়। Resource যেন ওই membership-এর organization-এর হয়, সেটা আলাদা করে দেখতে হয়। এই পার্থক্য অধ্যায় ১৫-এর বিষয়। এখানে নিয়মটা শুধু মিল রাখার জন্য।

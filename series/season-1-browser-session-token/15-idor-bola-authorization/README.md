@@ -1,19 +1,12 @@
----
-chapter: 15
-season: 1
-title: "IDOR, BOLA ও Authorization"
-status: draft
----
+# IDOR/BOLA এবং Authorization Design
 
-# IDOR, BOLA ও Authorization
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+রাফির দোকানের order অন্য দোকান দেখতে পেলে চলবে না। Login থাকাটাই সেই প্রশ্নের উত্তর নয়। এই অধ্যায়ে IDOR, BOLA, আর authorization design।
 
-This chapter will explain IDOR and BOLA, and why a signed-in user is not the same as permission to touch a resource.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

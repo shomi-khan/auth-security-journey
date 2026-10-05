@@ -1,19 +1,12 @@
----
-chapter: 21
-season: 2
-title: "Google Login"
-status: draft
----
+# Google Login এবং ID Token বনাম Access Token
 
-# Google Login
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+নীরা চায় user Google দিয়ে login করুক। এই অধ্যায়ে Google login, আর ID token আর access token কেন এক জিনিস নয়।
 
-This chapter will explain Google login for KenaKata.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

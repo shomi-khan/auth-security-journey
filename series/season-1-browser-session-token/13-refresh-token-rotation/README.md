@@ -1,19 +1,12 @@
----
-chapter: 13
-season: 1
-title: "Refresh Token Rotation"
-status: draft
----
+# Refresh Token Rotation এবং Reuse Detection
 
-# Refresh Token Rotation
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+একবার ব্যবহার হওয়া refresh token যদি আবার আসে, server কী বুঝতে পারে। এই অধ্যায়ে rotation আর reuse detection।
 
-This chapter will explain refresh token rotation and detection of a reused refresh token.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

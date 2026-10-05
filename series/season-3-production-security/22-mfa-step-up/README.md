@@ -1,19 +1,12 @@
----
-chapter: 22
-season: 3
-title: "MFA ও Step-up Authentication"
-status: draft
----
+# MFA এবং Step-up Authentication
 
-# MFA ও Step-up Authentication
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Refund বা billing-এর মতো কাজে শুধু একবার login থাকা যথেষ্ট কি না। এই অধ্যায়ে MFA আর step-up authentication।
 
-This chapter will explain MFA and step-up authentication for sensitive KenaKata operations.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

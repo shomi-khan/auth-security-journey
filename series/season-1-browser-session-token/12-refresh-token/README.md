@@ -1,19 +1,12 @@
----
-chapter: 12
-season: 1
-title: "Refresh Token"
-status: draft
----
+# Refresh Token কেন?
 
-# Refresh Token
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Access token-এর মেয়াদ ছোট রাখলে user বারবার login করবে। Refresh token সেই ফাঁক পূরণ করতে আসে। এই অধ্যায়ে কেন সেটাকে আলাদা করে ভাবতে হয়।
 
-This chapter will explain refresh tokens and the risk of a long-lived silent sign-in.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

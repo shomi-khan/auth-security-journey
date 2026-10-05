@@ -1,19 +1,12 @@
----
-chapter: 4
-season: 1
-title: "Session ও Cookie"
-status: draft
----
+# Session এবং Cookie
 
-# Session ও Cookie
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Login-এর পর user প্রতিবার password দেয় না। এই অধ্যায়ে session আর cookie দিয়ে KenaKata কীভাবে একই browser-কে চিনে রাখে।
 
-This chapter will explain how a server session and a browser cookie keep someone signed in.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

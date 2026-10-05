@@ -1,19 +1,12 @@
----
-chapter: 14
-season: 1
-title: "Logout ও Revocation"
-status: draft
----
+# Logout এবং Revocation
 
-# Logout ও Revocation
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+রাফি logout করল। কোন credential তখন বাতিল হয়, আর কোনটা নিজে থেকে বাতিল হয় না। এই অধ্যায়ে logout আর revocation।
 
-This chapter will explain logout and revocation, including what signing out does not automatically erase.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published

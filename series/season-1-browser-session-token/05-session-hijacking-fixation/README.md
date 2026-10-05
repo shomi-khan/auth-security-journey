@@ -1,19 +1,12 @@
----
-chapter: 5
-season: 1
-title: "Session Hijacking ও Session Fixation"
-status: draft
----
+# Session Hijacking এবং Session Fixation
 
-# Session Hijacking ও Session Fixation
+> অবস্থা: এখনও লেখা হয়নি।
 
-> Status: Not written yet.
+Session cookie অন্যের হাতে গেলে, বা আগে থেকে বসানো session ব্যবহার হলে, কী হয়। এই অধ্যায়ে session hijacking আর session fixation।
 
-This chapter will explain session hijacking and session fixation against KenaKata’s cookie session.
-
-## Status
+## লেখার অবস্থা
 
 - [ ] Draft
-- [ ] Technical review
-- [ ] Security review
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published
