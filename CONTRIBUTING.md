@@ -37,7 +37,7 @@
 ৫. **Chapter লেখা।** ওই অধ্যায়ের `README.md`-এ placeholder সরাও। ভাষা বাংলা। Technical term ইংরেজিতে থাকবে।
 ৬. **Technical accuracy।** নাম, প্রবাহ, আর “এটা কী করে” — [`references/`](references/README.md)-এর সোর্স খুলে মিলাও। ব্লগের কথাকে spec-এর উপরে বসাবে না।
 ৭. **Security accuracy।** একই সোর্স। “JWT secure” এই ধরনের কথা লিখবে না, যদি না সঙ্গে থাকে কোন threat, কোন property, কোথায় সীমা, কী trade-off। নতুন ভুল ধারণা ধরা পড়লে ছোট করে [misconceptions](notes/misconceptions.md)-এ যোগ করো। ব্যাখ্যা অধ্যায়েই থাকবে।
-৮. **Diagram বা code।** লাগলে যোগ করো। না লাগলে যোগ করবে না। ছোট ASCII ছবি অধ্যায়ের ভিতরেই ভালো। বারবার লাগলে [diagrams/](diagrams/authentication/)-এ রাখো। Go উদাহরণ [examples/go/](examples/go/authentication/)-এ: ছোট, একটা ধারণা, একা পড়লে বোঝা যায়। KenaKata-র পুরো backend এখানে বানাবে না।
+৮. **Diagram বা code।** লাগলে যোগ করো। না লাগলে যোগ করবে না। ছোট Mermaid ছবি অধ্যায়ের ভিতরেই ভালো। বারবার লাগলে [diagrams/](diagrams/authentication/)-এ রাখো। Go উদাহরণ [examples/go/](examples/go/authentication/)-এ: ছোট, একটা ধারণা, একা পড়লে বোঝা যায়। KenaKata-র পুরো backend এখানে বানাবে না।
 ৯. **Chapter status।** নিচের বাক্সে টিক তখনই, যখন সেই ধাপ সত্যি শেষ। `Published`-এ টিক মানে অধ্যায় প্রকাশিত।
 ১০. **Season README আর root README।** অধ্যায় প্রকাশিত না হওয়া পর্যন্ত সূচিপত্রে `[ ] লেখা হয়নি` থাকবে। প্রকাশিত হলে `[x]` করো, আর “লেখা হয়নি” সরিয়ে দাও।
 
