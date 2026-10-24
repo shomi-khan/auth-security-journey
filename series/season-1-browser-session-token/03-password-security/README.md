@@ -113,7 +113,7 @@ flowchart LR
     end
 ```
 
-ডানদিকের বাক্সে আমাদের কোনো নিয়ন্ত্রণ নেই। Rate limit সেখানে পৌঁছায় না, MFA-ও না। সেখানে server-এর rate limit বা MFA সরাসরি কাজ করে না। আক্রমণকারীর কাজ কঠিন করতে দুটো বিষয় গুরুত্বপূর্ণ: password অনুমান করা কতটা কঠিন, এবং প্রতিটি অনুমান করতে কত খরচ হয়। এই অধ্যায়ে আমরা password guessing-এর খরচ বাড়ানোর পাশাপাশি online আক্রমণের জন্য আলাদা প্রতিরক্ষাও দেখব।
+ডানদিকের বাক্সে server-side rate limit, CAPTCHA বা login monitoring আক্রমণকারীর অনুমানগুলোকে নিয়ন্ত্রণ করতে পারে না, কারণ সেগুলো server-এর বাইরে চলছে। MFA hash cracking-এর খরচ বাড়ায় না, তবে চুরি হওয়া বা অনুমান করা password দিয়ে account-এ ঢোকা কঠিন করতে পারে। Offline আক্রমণের বিরুদ্ধে দুটি গুরুত্বপূর্ণ বিষয় হলো password অনুমান করা কতটা কঠিন, এবং প্রতিটি অনুমান করতে কত খরচ হয়।
 
 ---
 
@@ -284,7 +284,7 @@ Hash ঠিক হলো। কিন্তু `/login` নিজেই আক�
 
 **বার্তায় তথ্য ফাঁস।** Login ব্যর্থ হলে আরিফ যদি লেখে "এই email-এ কোনো account নেই", আর password ভুল হলে লেখে "password ভুল", তাহলে আক্রমণকারী এই বার্তা দেখেই বুঝে নেয় কোন email আমাদের user। OWASP-র নির্দেশনা: password ভুল না user ভুল, দুই ক্ষেত্রেই একই, সাধারণ বার্তা, আর HTTP status-ও এক। এর দাম আছে। বৈধ user এতে বিভ্রান্ত হতে পারে, কারণ সে জানতে পারে না কোথায় ভুল। এটা একটা UX ছাড় যা মেনে নিতে হয়।
 
-**সময়ে তথ্য ফাঁস।** বার্তা এক রাখলেও আরেকটা সংকেত থেকে যায়: সময়। Email না পাওয়া গেলে server যদি সঙ্গে সঙ্গে ফিরে যায় (৫ ms), আর পাওয়া গেলে ৪০ ms ধরে Argon2id চালায়, তাহলে বার্তা এক হলেও response-এর সময় আলাদা। আক্রমণকারী হাজার request পাঠিয়ে গড় মেপে বলে দিতে পারে কোন email আছে। OWASP-র সমাধান: email না পেলেও একই পরিমাণ কাজ করো, যেমন একটা নকল (dummy) hash-এর সঙ্গে মিলিয়ে দেখো।
+**সময়ে তথ্য ফাঁস।** বার্তা এক রাখলেও আরেকটা সংকেত থেকে যায়: সময়। Account না পাওয়া গেলে server যদি সঙ্গে সঙ্গে ফিরে যায়, আর account পাওয়া গেলে password hash যাচাই করে, তাহলে একই error message দিলেও response time আলাদা হতে পারে। অনেক অনুরোধের সময় তুলনা করে আক্রমণকারী account আছে কি না অনুমান করতে পারে। OWASP-এর পরামর্শ হলো failure path-এও কাছাকাছি ধরনের কাজ করা, যেমন আগে থেকে তৈরি dummy hash যাচাই করা। এতে timing-এর পার্থক্য কমে, কিন্তু সব timing signal পুরোপুরি দূর হয়েছে এমন নিশ্চয়তা নয়।
 
 এই flow-তে দুটো সূক্ষ্ম বিষয় আছে। প্রথমত, dummy hash-এর সঙ্গে password মিলে গেলেও account না পাওয়া গেলে login সফল হবে না। দ্বিতীয়ত, password যাচাই সফল হলে পুরোনো parameter-এ তৈরি hash-কে বর্তমান policy অনুযায়ী rehash করার সুযোগ থাকে।
 
@@ -341,10 +341,10 @@ sequenceDiagram
 
 NIST-এর SP 800-63B-4, যা আগের SP 800-63B-কে প্রতিস্থাপন করেছে, password নিয়ে কিছু নির্দেশ দেয় যেগুলো অনেকের পুরোনো অভ্যাসের উল্টো:
 
-- **দৈর্ঘ্য:** শুধু password-ই যে একমাত্র factor, তার ন্যূনতম ১৫ অক্ষর। MFA-র অংশ হিসেবে শুধু ব্যবহার হলে ন্যূনতম ৮। সর্বোচ্চ সীমা কমপক্ষে ৬৪ অক্ষর হওয়া উচিত।
+- **দৈর্ঘ্য:** NIST SP 800-63B-4 অনুযায়ী password-ই একমাত্র factor হলে ন্যূনতম ১৫ অক্ষর; MFA-র অংশ হিসেবে ব্যবহার হলে ন্যূনতম ৮। সর্বোচ্চ দৈর্ঘ্য কমপক্ষে ৬৪ অক্ষর সমর্থন করা উচিত। এটি ওই standard-এর নির্দেশনা, সব service-এর জন্য স্বয়ংক্রিয়ভাবে প্রয়োগ করা policy নয়।
 - **কোনো composition rule নয়:** "বড় হাতের অক্ষর আর সংখ্যা লাগবেই" ধরনের শর্ত চাপানো নিষিদ্ধ (SHALL NOT)।
 - **নিয়মিত বদল নয়:** ৯০ দিন পরপর password বদলাতে বাধ্য করা চলবে না। তবে compromise-এর প্রমাণ থাকলে বদলাতে বাধ্য করতে হবে।
-- **Blocklist:** নতুন password পরিচিত, ফাঁস-হওয়া, অভিধানের শব্দ, বা প্রসঙ্গ-নির্দিষ্ট শব্দ (service-এর নাম, username) হলে প্রত্যাখ্যান। পুরো password মেলাতে হবে, শুধু অংশ নয়। প্রত্যাখ্যান করলে কারণ আর ভালো password বাছার পরামর্শ দিতে হবে।
+- **Blocklist:** পরিচিত বা ফাঁস-হওয়া password এবং service-সংশ্লিষ্ট অনুমানযোগ্য password প্রত্যাখ্যান করো। Blocklist-এ পুরো password মিলিয়ে দেখো, কেবল তার কোনো অংশ মিলে গেল বলে নয়। প্রত্যাখ্যান করলে কারণ ও ভালো password বাছার পরামর্শ দাও।
 - **সুবিধা:** password manager আর autofill অনুমোদন (SHALL), paste অনুমোদন (SHOULD), আর password দেখানোর বিকল্প (SHOULD)।
 - **নিষিদ্ধ:** password hint আর security question ("প্রথম পোষা প্রাণীর নাম কী?")।
 
@@ -487,7 +487,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 **"Salt গোপন রাখতে হবে।"** না। Salt hash-এর পাশেই থাকে। গোপন রাখার মতো জিনিস হলো pepper।
 
-**"Salt থাকলে password ভাঙা যায় না।"** Salt আগেভাগে বানানো তালিকা আর একসঙ্গে ভাঙা বন্ধ করে। একটা নির্দিষ্ট দুর্বল password অনুমান করা সহজই থাকে।
+**"Salt থাকলে password ভাঙা যায় না।"** Salt আগে থেকে তৈরি table-এর সুবিধা কমায় এবং একই password-এর hash-গুলোকে আলাদা করে। একটা নির্দিষ্ট দুর্বল password অনুমান করা সহজই থাকে।
 
 **"bcrypt বা Argon2id দিলে দুর্বল password-ও চলে।"** Hash সময় কেনে। দুর্বল password-এ সেই সময় কম লাগে।
 
@@ -562,13 +562,13 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 নিজের উত্তরের পাশে সংশ্লিষ্ট flowchart-এর security invariant লিখে দেখো। বাস্তব benchmark বা code চালানো এই অধ্যায়ের শেখার শর্ত নয়।
 ```
 
-বাস্তব system-এ Argon2id parameter বাছাই করতে hardware ও concurrent login load অনুযায়ী benchmark দরকার। এই সিরিজে আমরা implementation code না লিখে এই trade-off-এর কারণ শিখছি।
+বাস্তব system-এ password-hashing configuration বেছে নিতে target hardware ও concurrent login load বিবেচনা করতে হয়। এই সিরিজে নির্দিষ্ট configuration শেখার বদলে সেই trade-off-এর কারণ বোঝাই লক্ষ্য।
 
 **দুই।** কাল্পনিক একটি database dump-এ `password` column দেখলে কী প্রশ্ন করবে? সেখানে plaintext password আছে, নাকি password-guessing কঠিন করার জন্য তৈরি hash আছে? এরপর log-এ password বা credential-সংক্রান্ত তথ্য থাকার ঝুঁকি ব্যাখ্যা করো।
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
-ধরে নিলাম আরিফ এবার সব ঠিকঠাক করল। Password Argon2id-তে, salt আছে, policy আছে, dummy hash আছে। রাফি login করল, আর server সফলভাবে তাকে চিনল। Password যাচাই ইচ্ছাকৃতভাবেই সাধারণ hash-এর চেয়ে বেশি resource ব্যবহার করে।
+ধরে নিলাম আরিফ এবার password storage, salt, policy আর login failure-এর মৌলিক নিয়মগুলো ঠিক করল। রাফি login করল, আর server সফলভাবে তাকে চিনল। Password যাচাই ইচ্ছাকৃতভাবে resource-intensive, তাই প্রতিটি পরের request-এ একই কাজ আবার করা অকার্যকর হবে।
 
 এবার রাফির dashboard একটা পেজ খুলতে পাঠায় দশটা request। প্রতিটায় এই খরচ দিয়ে password যাচাই করা যাবে না। অধ্যায় ১-এর সেই "প্রতি request-এ password" নকশা এখন শুধু অনিরাপদ নয়, অচল। আবার যাচাই না করলে server কীসের ভরসায় বলবে, "এই request-টাও রাফির"?
 
@@ -597,6 +597,6 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 ## লেখার অবস্থা
 
 - [x] Draft
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (conceptual claims ও authoritative references পর্যালোচিত; implementation audit নয়)
+- [x] Security Review (threat model, limitations ও গুরুত্বপূর্ণ failure path পর্যালোচিত; production certification নয়)
 - [ ] Published
