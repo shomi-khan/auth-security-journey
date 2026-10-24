@@ -6,7 +6,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 
 এই নোটটি review-এর অগ্রগতি ধরে রাখে। এটি security certification নয়। নিচের সংশোধনগুলো branch-এ করা হয়েছে, কিন্তু এই review-তে chapter-এর সব code snippet একত্র করে compile করা, automated test চালানো, বা বাস্তব browser-এ পরীক্ষা করা হয়নি। তাই পাঁচটি অধ্যায়ের `Technical Review` ও `Security Review` checkbox এখনো অসম্পূর্ণ থাকবে।
 
-## এই review-তে করা সংশোধন
+## পূর্ববর্তী code-oriented draft-এ করা সংশোধন (historical)
 
 ### Chapter 3: Password Security
 
@@ -51,7 +51,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 
 The Chapter 3 bullets above that mention Go, `norm.NFC`, `checkPolicy`, parser tests, and prior compile/test history describe an earlier implementation-code revision. The current Chapter 3 teaching draft has been converted to Mermaid diagrams and language-neutral examples; those implementation-specific findings are historical and should not be read as claims about the current chapter content.
 
-The current draft has not been granted Technical Review or Security Review sign-off. Future review should focus on password-storage concepts, Argon2id parameter claims, PHC string validation invariants, Unicode normalization consistency, account-enumeration mitigations, online/offline threat boundaries, and the accuracy of diagrams and source references. No code tests were run for this diagram-first update.
+The current draft has not been granted Technical Review or Security Review sign-off. Future review should focus on password-storage concepts, account-enumeration mitigations, online/offline threat boundaries, meaningful limitations and trade-offs, and the accuracy of diagrams and source references. Tool-specific parameter parsing and PHC-format validation are outside the teaching draft's scope unless needed to explain a core security property. No code tests were run for this diagram-first update.
 
 
 ## 2026-10-25 — Review scope updated to theory-first
