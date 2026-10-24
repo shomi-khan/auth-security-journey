@@ -518,7 +518,7 @@ OWASP একটা সম্পূরক বুদ্ধিও দেয়: log
 
 ### আর যদি রাস্তা বন্ধ করা যায়?
 
-WSTG আরেকটা পথ বলে: cookie-র **অখণ্ডতা** নিশ্চিত করা। নেটওয়ার্ক আক্রমণকারীর বিরুদ্ধে পুরো HSTS (subdomain সহ) বা `__Host-` আর `__Secure-` prefix থাকলে আক্রমণকারী cookie বসাতেই পারে না, তাই fixation-এর একটা পথ বন্ধ। আমাদের অধ্যায় ৪-এর `__Host-id` এটা করেছে। কিন্তু একই browser-এ বসা কেউ (shared কম্পিউটার) এই বেড়া টপকে যায়। Rotate-ই একমাত্র সমাধান, যেটা **পৌঁছানোর পথ যা-ই হোক** কাজ করে। OWASP-ও এটা বলে: ID নবায়ন HTTP বা HTTPS নির্বিশেষে fixation ঠেকায়, আর XSS বা response splitting দিয়ে fixation হলেও।
+WSTG আরেকটা পথ বলে: cookie-র **অখণ্ডতা** নিশ্চিত করা। HTTPS-only cookie আর HSTS নেটওয়ার্কের কিছু আক্রমণ ঠেকায়। `__Secure-` prefix browser-কে `Secure` attribute চাইতে বাধ্য করে, কিন্তু cookie-তে `Domain` সেট করা নিষিদ্ধ করে না, তাই sibling subdomain-এর cookie-injection-এর সব পথ বন্ধ করে না। `__Host-` আরও শক্ত শর্ত দেয়: `Secure` থাকতে হবে, `Domain` থাকতে পারবে না, আর `Path=/` হতে হবে। আমাদের অধ্যায় ৪-এর `__Host-id` এই শর্তগুলো ব্যবহার করেছে। কিন্তু একই browser-এ বসা কেউ (shared কম্পিউটার) এই বেড়া টপকে যেতে পারে। Login-এ session ID rotate করাই fixation প্রতিরোধের মূল নিয়ম; cookie integrity অতিরিক্ত প্রতিরক্ষা। OWASP-ও বলে, ID নবায়ন HTTP বা HTTPS নির্বিশেষে fixation-এর বিরুদ্ধে সাহায্য করে, এমনকি XSS বা response splitting দিয়ে ID বসানোর পথ থাকলেও।
 
 ---
 
