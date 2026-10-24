@@ -121,6 +121,18 @@
 - Chapter 4-এর session expiry অংশে সাধারণ নীতি ও KenaKata-র নির্দিষ্ট policy আলাদা করা হয়েছে। Chapter 5-এর illustrative policy: anonymous session ৩০ মিনিট, authenticated idle timeout ৩০ মিনিট, absolute timeout login থেকে ৮ ঘণ্টা। এগুলো KenaKata-র গল্পের সিদ্ধান্ত, সব application-এর universal default নয়।
 - Chapter 5 থেকে Go implementation ও shell command tutorial সরানো হয়েছে। Timeout, revocation, context-signal, fixation এবং rotation-এর mechanism Mermaid diagram, language-neutral explanation ও conceptual review question-এ রূপান্তরিত হয়েছে। পুরোনো implementation-test চালানো হয়েছে বলে এই সংস্করণকে দাবি করা হচ্ছে না।
 - Chapter 5-এর implementation-specific function/field reference যতটা সম্ভব সাধারণ ধারণায় বদলানো হয়েছে; proxy header, session context, safe redirect destination এবং rotation failure-এর গুরুত্বপূর্ণ security boundary রাখা হয়েছে।
-- Chapter 5-এর OWASP WSTG fixation-testing reference-এর path repository-র browser-security reference-এর সঙ্গে এক করা হয়েছে। Cookie Theft Mitigation source ইতিমধ্যেই references/owasp.md-তে আছে; chapter-এর পুরোনো “এখনো নেই” নোট সরানো হয়েছে।
-- Chapter 5-এর Technical Review ও Security Review checkbox unchecked রাখা হয়েছে। এই পরিবর্তনটি theory-first consistency pass; Chapter 5-এর full source-based Technical/Security Review আলাদা ধাপ।
+- Chapter 5-এ OWASP WSTG fixation-testing-এর latest development guide এবং stable v4.2 guide আলাদা করে চিহ্নিত করা হয়েছে। Cookie Theft Mitigation source references/owasp.md-তে আছে; chapter-এর পুরোনো “এখনো নেই” নোট সরানো হয়েছে.
+- Chapter 5-এর source-based Technical Review ও Security Review সম্পন্ন হয়েছে এবং chapter checkbox update করা হয়েছে। এটি conceptual claims, authoritative references, threat model, control boundaries ও failure paths-এর review; implementation audit, automated test বা production security certification নয়.
 - PR open রাখা হয়েছে; merge করা হয়নি। Application code execute বা automated tests চালানো হয়নি।
+
+## 2026-10-25 — Chapter 5 source-based Technical and Security Review
+
+- Chapter 5-এর সংজ্ঞা, session hijacking বনাম fixation-এর পার্থক্য, timeout model, revocation, context signal, session rotation এবং DBSC-সংক্রান্ত মূল দাবিগুলো OWASP Session Management Cheat Sheet, OWASP Cookie Theft Mitigation Cheat Sheet, OWASP WSTG, NIST SP 800-63B-4 এবং cookie standard-এর সঙ্গে মিলিয়ে পর্যালোচনা করা হয়েছে।
+- Cookie standard-এর ক্ষেত্রে RFC 10025 (July 2026) বর্তমান standard; RFC 6265-কে historical context হিসেবে রাখা হয়েছে। RFC 10025-এর Security Considerations-এ cookie signing/encryption থাকলেও cookie transplant ও replay আটকায় না, এবং session fixation-এর তিন ধাপের ব্যাখ্যাও আছে।
+- Log-এ session ID-র প্রথম আট অক্ষরের মতো ছোট correlation value-কে নিরাপদ ধরে নেওয়ার ইঙ্গিত সরানো হয়েছে। উদাহরণে raw session ID-এর বদলে keyed HMAC-ভিত্তিক দীর্ঘ correlation value ব্যবহার করার নীতি লেখা হয়েছে; বাস্তব log design-এ secret management, retention ও access control আলাদাভাবে দরকার।
+- Renewal timeout-এর ব্যাখ্যা সংশোধন করা হয়েছে: পুরোনো ID অনির্দিষ্টভাবে বৈধ রাখা নিরাপদ সমাধান নয়; concurrent in-flight request-এর কারণে retry বা reauthentication লাগতে পারে।
+- Password change-এর failure path স্পষ্ট করা হয়েছে: বর্তমান session rotate হবে, অন্য session বাতিল হবে; rotation/revocation state নিশ্চিত না হলে পুরোনো session সচল না রেখে সব session invalidate করে নতুন login চাইতে হবে।
+- NIST-এর overall reauthentication timeout ও application-এর absolute session timeout এক জিনিস নয়, এই পার্থক্য যোগ করা হয়েছে। DBSC-র hardware protection-কে platform-dependent হিসেবে qualify করা হয়েছে; এটিকে ongoing compromised-device protection হিসেবে দেখানো হয়নি।
+- OWASP WSTG-এর latest development guide এবং versioned stable v4.2 guide আলাদা করা হয়েছে। RFC ও OWASP-এর বর্তমান reference path মিলিয়ে নেওয়া হয়েছে।
+- Review conceptual/source-based। Application code, automated tests, browser matrix বা production configuration execute/verify করা হয়নি; তাই এই review production security certification নয়।
+
