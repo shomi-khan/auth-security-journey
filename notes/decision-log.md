@@ -85,7 +85,7 @@
 
 - Chapter 3 থেকে Go implementation snippet, SQL snippet এবং runnable benchmark সরানো হয়েছে। Password storage, fast hash বনাম Argon2id, bcrypt-এর ৭২-byte সীমা, salt, PHC string, dummy-hash login flow এবং password policy Mermaid diagram বা language-neutral illustrative text দিয়ে বোঝানো হয়েছে।
 - বাস্তব implementation-এর ফল হিসেবে কোনো benchmark বা code test দাবি করা হচ্ছে না। Hardware-dependent Argon2id tuning-এর জন্য বাস্তব system-এ benchmark প্রয়োজন, কিন্তু এই learning series-এর উদাহরণগুলো runnable implementation নয়।
-- Chapter 3-এর Technical Review ও Security Review checkbox এখনো unchecked। Diagram-first update technical/security sign-off নয়।
+- এই entry লেখার সময় Chapter 3-এর Technical Review ও Security Review checkbox unchecked ছিল। পরবর্তী source-based review entry-তে এগুলোর বর্তমান অর্থ ও অবস্থা নথিভুক্ত হয়েছে.
 
 
 ## 2026-10-25 — Theory-first security teaching
@@ -103,7 +103,7 @@
 - Chapter 4-এ Go implementation snippets ও executable shell commands বাদ দিয়ে Mermaid flowchart/sequence diagram এবং language-neutral HTTP examples ব্যবহার করা হবে।
 - মূল teaching objective: authentication সফল হওয়ার পর session কীভাবে continuity ধরে রাখে; cookie কীভাবে browser-এ credential বহন করে; server-side session state কীভাবে lookup, expiry ও revocation সমর্থন করে; cookie attributes কী ঝুঁকি কমায় এবং কোন ঝুঁকি থেকে যায়।
 - Framework-specific code, exact library API, compile/test history ও implementation-only cleanup detail chapter-এর teaching content নয়। এগুলো দরকার হলে আলাদা implementation guide-এ রাখা যাবে।
-- Security claims-এর review-তে cookie attributes, session ID entropy, replay, fixation, expiry, logout, session store leakage এবং browser-vs-server responsibility যাচাই করতে হবে। Chapter 4-এর Technical Review ও Security Review এখনো unchecked থাকবে যতক্ষণ source-based review সম্পন্ন না হয়।
+- Security claims-এর review-তে cookie attributes, session ID entropy, replay, fixation, expiry, logout, session store leakage এবং browser-vs-server responsibility যাচাই করতে হবে। এই entry-র পরের Chapter 3 ও 4 discrepancy review-তে Chapter 4-এর source-based review-এর ফল নথিভুক্ত হয়েছে.
 
 ## 2026-10-25 — Chapter 3 ও 4 discrepancy review
 
@@ -112,5 +112,15 @@
 - Chapter 4-এর session ID entropy/CSPRNG, session store-এ verifier hash, cookie বনাম session, replay ও browser/server responsibility-র মূল দাবিগুলো OWASP Session Management Cheat Sheet এবং RFC/MDN-এ বর্ণিত cookie behavior-এর সঙ্গে মিলিয়ে দেখা হয়েছে।
 - Chapter 4-এ কয়েকটি ভাষাগত/ধারণাগত discrepancy ঠিক করা হয়েছে: Argon2id latency-কে সর্বজনীন benchmark হিসেবে না দেখানো, language-specific random-generator নামের বদলে CSPRNG বলা, এবং hashed session verifier-সহ read-only store disclosure-কে “শূন্য ক্ষতি” না বলা।
 - Chapter 3 ও 4-এর Technical Review ও Security Review checkbox-কে conceptual/source-based review-এর অর্থে রাখা হয়েছে। এগুলো implementation audit, automated test, বা production security certification বোঝায় না।
-- এই review-তে কোনো application code execute বা implementation test করা হয়নি। পরবর্তী অধ্যায়ে যাওয়ার আগে chapter cross-reference ও review notes পুনরায় দেখা হবে।
+- এই review-তে কোনো application code execute বা implementation test করা হয়নি। পরবর্তী cross-chapter review-তে Chapter 1-এর credential/session revocation wording, Chapter 4 ও 5-এর timeout policy, Chapter 5-এর language-specific code এবং stale test/implementation claims পরীক্ষা ও সংশোধন করা হয়েছে.
 
+
+## 2026-10-25 — Cross-chapter consistency review (Chapters 1–5)
+
+- Chapter 1-এর comparison table-এ password বদলানো মানেই সব চালু session স্বয়ংক্রিয়ভাবে বাতিল হয়, এমন অতিরঞ্জিত ধারণা সরানো হয়েছে। Credential পরিবর্তন এবং authentication state/session revocation আলাদা policy decision হিসেবে স্পষ্ট করা হয়েছে।
+- Chapter 4-এর session expiry অংশে সাধারণ নীতি ও KenaKata-র নির্দিষ্ট policy আলাদা করা হয়েছে। Chapter 5-এর illustrative policy: anonymous session ৩০ মিনিট, authenticated idle timeout ৩০ মিনিট, absolute timeout login থেকে ৮ ঘণ্টা। এগুলো KenaKata-র গল্পের সিদ্ধান্ত, সব application-এর universal default নয়।
+- Chapter 5 থেকে Go implementation ও shell command tutorial সরানো হয়েছে। Timeout, revocation, context-signal, fixation এবং rotation-এর mechanism Mermaid diagram, language-neutral explanation ও conceptual review question-এ রূপান্তরিত হয়েছে। পুরোনো implementation-test চালানো হয়েছে বলে এই সংস্করণকে দাবি করা হচ্ছে না।
+- Chapter 5-এর implementation-specific function/field reference যতটা সম্ভব সাধারণ ধারণায় বদলানো হয়েছে; proxy header, session context, safe redirect destination এবং rotation failure-এর গুরুত্বপূর্ণ security boundary রাখা হয়েছে।
+- Chapter 5-এর OWASP WSTG fixation-testing reference-এর path repository-র browser-security reference-এর সঙ্গে এক করা হয়েছে। Cookie Theft Mitigation source ইতিমধ্যেই references/owasp.md-তে আছে; chapter-এর পুরোনো “এখনো নেই” নোট সরানো হয়েছে।
+- Chapter 5-এর Technical Review ও Security Review checkbox unchecked রাখা হয়েছে। এই পরিবর্তনটি theory-first consistency pass; Chapter 5-এর full source-based Technical/Security Review আলাদা ধাপ।
+- PR open রাখা হয়েছে; merge করা হয়নি। Application code execute বা automated tests চালানো হয়নি।
