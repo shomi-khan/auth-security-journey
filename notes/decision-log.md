@@ -148,3 +148,13 @@
 - Browser credential behavior, browser compatibility matrix, proxy behavior, application implementation, automated tests বা production configuration পরীক্ষা করা হয়নি। এগুলো manual follow-up হিসেবে রাখা হয়েছে, source-based review-কে runtime verification হিসেবে দেখানো হবে না।
 - Chapter 6-এর 06-repo-notes.md-এর সব actionable item chapter, shared glossary/misconception/reference docs অথবা এই decision/review record-এ resolve করা হয়েছে; notes file-টি delete করা হয়েছে। Chapter Published চিহ্নিত করা হয়নি.
 
+
+
+## 2026-10-25 — Chapter 8: token অধ্যায়ের scope
+
+- Chapter 8-এর কেন্দ্রীয় সমস্যা: KenaKata-র first-party mobile app API request-এ credential কীভাবে বহন করবে। পুরোনো server-rendered web app-এর cookie session থাকবে; mobile আসার কারণে সেটি সরানো হবে না।
+- Chapter 8-এ access-token ও cookie-session model তুলনা করা হবে, কিন্তু mobile app cookie ব্যবহার করতে পারে না বা token নিজে থেকেই বেশি নিরাপদ — এমন absolute claim করা হবে না।
+- Bearer-token example-এ Authorization header, HTTPS, token disclosure/replay risk এবং token validation বনাম resource authorization-এর পার্থক্য থাকবে। Token URL/query string-এ দেখানো হবে না।
+- KenaKata-র first-party mobile login-কে OAuth flow বলা হবে না। OAuth/PKCE/OIDC অধ্যায় ১৬–২১-এ থাকবে; JWT অধ্যায় ৯, SPA token storage অধ্যায় ১০, expiry/replay অধ্যায় ১১, refresh-token lifecycle অধ্যায় ১২–১৪-এ থাকবে।
+- RFC 6750 Chapter 8-এ bearer-token model বোঝাতে ব্যবহার হবে, তবে OAuth-specific semantics-কে KenaKata-র বর্তমান architecture-এর সত্য হিসেবে আগেভাগে প্রয়োগ করা হবে না।
+- Chapter 8-এর scope ও source plan series/season-1-browser-session-token/08-tokens/08-repo-notes.md-এ আছে। এই এন্ট্রি সিদ্ধান্তের রেকর্ড; chapter draft বা review সম্পন্ন হওয়ার দাবি নয়.
