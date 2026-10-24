@@ -13,7 +13,7 @@
 - Seasons: 3
 - Teaching style: আগে সমস্যা, তারপর সমাধান
 - Narrative style: একটা product-এর যাত্রা
-- Examples: দরকার হলে Go। ছোট, একটা ধারণা। পুরো backend নয়
+- Examples: Mermaid flowchart/sequence diagram প্রধান; pseudocode শুধু প্রয়োজন হলে। Go code বা অন্য language-specific implementation code নয়। বিস্তারিত [উদাহরণ ও Diagram লেখার নীতি](../docs/code-example-policy.md)।
 - Security claims: authoritative source দেখে যাচাই করতে হবে। সোর্স কী বলছে, সেটা এই খাতায় তুলে রাখা হয়নি
 - Chapters: একবারে একটি করে লেখা হবে
 
@@ -41,3 +41,15 @@
 - Session record-এ login-এর সময়ের User-Agent ও network prefix রাখা হবে। বদলকে risk signal হিসেবে ধরা হবে, পরিচয়ের প্রমাণ হিসেবে নয়; KenaKata-র ছোট দোকানের দৃশ্যের বাইরে এই policy পুনর্বিবেচনা করতে হবে।
 - Session store-এর `Lookup` পুরো record ফেরত দেবে, যাতে authentication state, timeout ও context signal যাচাই করা যায়।
 - শুভর session কীভাবে চুরি হয়েছে তা গল্পে নির্দিষ্ট করা হবে না; কারণ চুরির পথ জানা না থাকলেও incident response ও ক্ষতি সীমিত করার ব্যবস্থা দরকার।
+
+
+## 2026-10-25 — উদাহরণ ও Diagram-এর নীতি
+
+- সিরিজটি কোনো নির্দিষ্ট programming language শেখানোর জন্য নয়; Go code এবং অন্য language-specific implementation code বাদ থাকবে।
+- Mermaid flowchart হবে process ও security decision বোঝানোর প্রধান মাধ্যম; actor-দের interaction ও token exchange বোঝাতে Mermaid sequence diagram ব্যবহার করা হবে।
+- Pseudocode কেবল তখনই ব্যবহার করা যাবে, যখন diagram দিয়ে গুরুত্বপূর্ণ logic বা condition পরিষ্কার করা কঠিন।
+- Security-sensitive উদাহরণে প্রাসঙ্গিক failure path ও security invariant স্পষ্ট করতে হবে।
+- Diagram ও pseudocode শিক্ষামূলক মডেল, production-ready implementation নয়।
+- Protocol ও security claim authoritative source দিয়ে যাচাই করতে হবে।
+- পুরোনো অধ্যায়ের code একবারে সব বদলানো হবে না; chapter-by-chapter আপডেট করা হবে।
+- বিস্তারিত নিয়ম: [উদাহরণ ও Diagram লেখার নীতি](../docs/code-example-policy.md)।
