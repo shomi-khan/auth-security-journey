@@ -29,6 +29,8 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 - Chapter 4: Cookie শুধু বাহক; server-side session record revocation সম্ভব করে। `HttpOnly` cookie পড়া কঠিন করে, কিন্তু browser-কে সেই cookie-সহ request পাঠানো থেকে আটকায় না। `SameSite=Lax` একা CSRF সমাধান নয়।
 - Chapter 5: Idle timeout সক্রিয় attacker-কে থামায় না; absolute timeout ও revocation আলাদা ভূমিকা রাখে। IP/User-Agent risk signal, পরিচয়ের প্রমাণ নয়। Login-এ session ID rotate করতে হবে এবং পুরোনো ID অকার্যকর করতে হবে।
 
+- **Chapter 2 route method:** Refund handler-এর উদাহরণে এখন method-specific `POST /manage/orders/{id}/refund` route registration স্পষ্ট করা হয়েছে। `POST` ব্যবহার করলেও CSRF প্রতিরক্ষা আলাদা, এবং route-level integration test এখনো দরকার।
+
 ## বাকি যাচাই ও সীমাবদ্ধতা
 
 1. **Chapter 1 ও 4-এর HTTP 401 উদাহরণ:** RFC 9110 অনুযায়ী 401 response-এ `WWW-Authenticate` challenge থাকা দরকার। Chapter 4 নিজেই স্বীকার করে যে cookie-session উদাহরণে challenge অনুপস্থিত। এটি একটি নথিভুক্ত standards caveat; এই review-তে কোনো ভুয়া বা বিভ্রান্তিকর challenge যোগ করা হয়নি। API contract স্থির করার সময় এটি আলাদা করে সমাধান করতে হবে।
