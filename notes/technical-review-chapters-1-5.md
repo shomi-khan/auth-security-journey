@@ -18,6 +18,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 ### Chapter 5: Session Hijacking এবং Session Fixation
 
 - **[Medium] `__Secure-` prefix-এর ক্ষমতা অতিরঞ্জিত ছিল।** এখন স্পষ্ট করা হয়েছে যে এটি `Secure` attribute বাধ্যতামূলক করে, কিন্তু `Domain` নিষিদ্ধ করে না। `__Host-` prefix-এর `Secure`, no-`Domain`, `Path=/` শর্ত আলাদা করে ব্যাখ্যা করা হয়েছে। Session ID rotate করাই fixation প্রতিরোধের মূল নিয়ম; cookie integrity অতিরিক্ত প্রতিরক্ষা।
+- **Password-change flow-তে session rotation error উপেক্ষা করা হচ্ছিল।** উদাহরণে cookie অনুপস্থিত থাকলে এখন `401`, আর rotation ব্যর্থ হলে `500` ফেরত দেওয়া হয়। Rotation সফল হওয়ার পর নতুন session-টি রেখে বাকি session বাতিল করা হয়। এটি documentation-level code correction; runnable test-এ এখনো পুনরায় যাচাই করা হয়নি।
 
 ## Review-তে নিশ্চিত করা গুরুত্বপূর্ণ নীতি
 
