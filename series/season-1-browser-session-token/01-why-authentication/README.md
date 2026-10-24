@@ -259,8 +259,9 @@ sequenceDiagram
 
     Staff->>S: Protected request + Basic credential
     S->>S: Credential থেকে user/password যাচাইয়ের তথ্য নাও
-    S->>S: Password যাচাই
-    alt Credential বৈধ
+    alt Credential অনুপস্থিত বা অবৈধ
+        S-->>Staff: 401 + WWW-Authenticate challenge
+    else Credential বৈধ
         S->>S: পরিচয় যাচাই হয়েছে
         S->>S: আলাদা authorization check
         alt এই কাজের অনুমতি আছে
@@ -268,28 +269,10 @@ sequenceDiagram
         else অনুমতি নেই
             S-->>Staff: 403 Forbidden
         end
-    else Credential অনুপস্থিত বা অবৈধ
-        S-->>Staff: 401 + WWW-Authenticate challenge
     end
 ```
 
-প্রতিটা request-এর চেহারা তখন এরকম:
-
-```mermaid
-sequenceDiagram
-    actor Staff as কর্মী
-    participant S as KenaKata server
-
-    Staff->>S: GET /manage/orders, সঙ্গে password
-    S->>S: password যাচাই
-    S-->>Staff: অর্ডারের তালিকা
-    Staff->>S: POST /manage/products/17/price, সঙ্গে password
-    S->>S: আবার password যাচাই
-    S-->>Staff: দাম বদলেছে
-    Staff->>S: GET /manage/orders, সঙ্গে password
-    S->>S: আবার password যাচাই
-    S-->>Staff: অর্ডারের তালিকা
-```
+এই diagram-এ তিনটি আলাদা ফলাফল দেখা যাচ্ছে: credential না থাকলে বা ভুল হলে request প্রত্যাখ্যাত হয়; credential ঠিক হলেও নির্দিষ্ট কাজের অনুমতি নাও থাকতে পারে; আর দুটো শর্ত পূরণ হলেই request-এর কাজ এগোয়। বাস্তব server-এর সব response ঠিক এভাবেই হবে, এমন দাবি নয়, বরং ধারণাগত পার্থক্যটি বোঝানোর জন্য flow-টি সরল করা হয়েছে।
 
 কাজ হয়। কিন্তু দাম দিতে হয়:
 
