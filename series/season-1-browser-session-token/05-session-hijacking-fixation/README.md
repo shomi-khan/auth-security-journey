@@ -243,7 +243,7 @@ Session record-এ সাধারণত নিচের ধরনের তথ�
 
 এগুলো illustrative field, কোনো নির্দিষ্ট language বা storage schema নয়. User-Agent/IP mismatch পরিচয়ের প্রমাণ নয়; এটি কেবল অতিরিক্ত যাচাইয়ের সংকেত.
 
-আর middleware-এ:
+প্রতিটি request-এ context signal যাচাই করলে:
 
 প্রতিটি request-এ context বদলকে একমাত্র authentication decision না বানিয়ে risk signal হিসেবে ধরো:
 
@@ -468,7 +468,7 @@ WSTG আরেকটা পথ বলে: cookie-র **অখণ্ডতা** �
 | Rotate-এ কাজ হয়? | না, চুরি হয়েছে **নতুন** ID | হ্যাঁ, মূল সমাধান |
 | Idle/absolute timeout? | ক্ষতির জানালা ছোট করে | সরাসরি নয়। anonymous TTL ছোট রাখলে আক্রমণের সময় কমে |
 
-শেষ কলামে লুকানো একটা সংযোগ আছে: **Rotate hijacking ঠেকায় না, আর timeout fixation ঠেকায় না।** দুটো আলাদা রোগ, আলাদা ওষুধ। একটা করে অন্যটা হয়ে গেছে ভাবলে বিপদ।
+শেষ কলামে লুকানো একটা সংযোগ আছে: **Session ID rotation hijacking-এর প্রতিকার নয়, আর timeout fixation-এর প্রতিকার নয়।**
 
 এবার আরিফ পুরো lifecycle-টা একটা ছবিতে এঁকে রাখল। প্রশ্ন: **একটা session কোন কোন দরজা দিয়ে ঢোকে আর বেরোয়?**
 
@@ -526,7 +526,7 @@ stateDiagram-v2
 - **চতুর আক্রমণকারীকে idle timeout দিয়ে থামানো যায় না।** সে session জাগিয়ে রাখে। Absolute timeout তাকে থামায়, কিন্তু ৮ ঘণ্টা পর্যন্ত নয়।
 - **একই network বা একই UA-র আক্রমণকারীকে context signal দিয়ে ধরা যায় না।** আর আসল user-কে ভুল ধরে ফেলে।
 - **চলমান আক্রান্ত device।** Rotate, timeout, DBSC, কোনোটাই সেই আক্রমণকারীকে থামায় না, যে এখনো victim-এর মেশিনেই বসা।
-- **Fixation-এর সব রাস্তা বন্ধ নয়।** আমরা login আর password বদলে rotate করি। কিন্তু নতুন কোনো login-পথ যোগ করে rotate ভুলে গেলে সেটাই নতুন ফাঁক। Test আছে বলেই ধরা পড়ে, test না থাকলে নয়।
+- **Fixation-এর সব রাস্তা বন্ধ নয়।** নতুন কোনো login বা privilege-change path যোগ করলে সেখানে ID rotation ও পুরোনো ID invalidation আছে কি না আলাদাভাবে যাচাই করতে হবে.
 - **CSRF।** Session ID চুরি আর fixation, দুটোতেই আক্রমণকারী ID **জানে**। কিন্তু একটা তৃতীয় আক্রমণে সে ID জানে না, তবু victim-এর browser দিয়ে request করিয়ে নেয়। অধ্যায় ৬।
 - **XSS।** পাতায় চলা script session ID পড়তে না পারলেও (`HttpOnly`) request করাতে পারে। অধ্যায় ৭।
 - **Authorization।** শুভর session দিয়ে আক্রমণকারী যা করল, সেটা শুভর ক্ষমতার ভেতরেই। সেই ক্ষমতা কতটা, সেটা অধ্যায় ২ আর ১৫।
