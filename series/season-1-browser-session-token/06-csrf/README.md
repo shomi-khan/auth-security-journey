@@ -548,6 +548,6 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 ## লেখার অবস্থা
 
 - [x] Draft
-- [x] Technical Review (source-based conceptual review; implementation audit নয়)
-- [x] Security Review (threat model, control boundaries ও failure paths পর্যালোচিত; production certification নয়)
+- [ ] Technical Review
+- [ ] Security Review
 - [ ] Published
