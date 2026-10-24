@@ -69,3 +69,18 @@ Chapter 7-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-d
 - কোন অধ্যায়: ৫।
 - কেন পড়া useful: IP বা User-Agent বদলকে নিশ্চিত প্রমাণ ভাবা যাবে না; false positive ও false negative দুটোই আছে। সন্দেহ হলে account-bound authenticator দিয়ে reauthentication বেশি নির্ভরযোগ্য।
 - [Cookie Theft Mitigation Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cookie_Theft_Mitigation_Cheat_Sheet.html)
+
+
+## HTML5 Security Cheat Sheet
+
+- কী বিষয়: Browser storage APIs-এ sensitive data রাখার ঝুঁকি, বিশেষ করে localStorage ও sessionStorage।
+- কোন অধ্যায়: ১০।
+- কেন পড়া useful: Same-origin JavaScript storage-এর data পড়তে পারে; XSS থাকলে token disclosure-এর ঝুঁকি বোঝার জন্য।
+- [HTML5 Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)
+
+## Session Management Cheat Sheet — browser token storage
+
+- কী বিষয়: Browser storage ও session credential-এর নিরাপত্তা।
+- কোন অধ্যায়: ৪, ৫, এবং ১০।
+- কেন পড়া useful: Cookie, localStorage, sessionStorage এবং authentication credential-এর trade-off মিলিয়ে দেখো।
+- [Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)

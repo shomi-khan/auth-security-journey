@@ -93,3 +93,12 @@ Cookie কখন request-এর সঙ্গে যায়, আর `fetch` বা
 - [Chrome Developers: DBSC now available on Windows](https://developer.chrome.com/blog/dbsc-windows-announcement)
 
 DBSC-র specification ও browser support পরিবর্তনশীল। প্রকাশের আগে W3C status এবং browser vendor-এর বর্তমান documentation আবার যাচাই করো।
+
+
+## SPA token storage এবং BFF
+
+- কোন অধ্যায়: ১০।
+- কেন গুরুত্বপূর্ণ: Browser storage API-তে থাকা token-এ একই origin-এর JavaScript access পেতে পারে; cookie browser নিজে request-এ যোগ করতে পারে; BFF token server-side-এ রাখতে পারে, কিন্তু XSS/CSRF threat পুরোপুরি সরায় না।
+- [RFC 10017 — OAuth 2.0 for Browser-Based Applications](https://www.rfc-editor.org/rfc/rfc10017.html): browser-based OAuth architecture ও token-storage threat model। এটি Internet Best Current Practice, আগস্ট ২০২৬।
+- [MDN: Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): localStorage ও sessionStorage-এর lifetime ও scope।
+- [MDN: Secure cookie configuration](https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies): HttpOnly, Secure, SameSite ও cookie prefix।

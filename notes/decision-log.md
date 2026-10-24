@@ -188,3 +188,12 @@
 - Mermaid signing-input diagram সংশোধন করা হয়েছে। JWT-সম্পর্কিত ভুল ধারণাগুলো `notes/misconceptions.md`-এ যোগ করা হয়েছে।
 - Review record: `notes/technical-review-chapter-9.md`। Chapter 9-এর Technical Review ও Security Review source-based review হিসেবে checked; Published নয়।
 - Mermaid renderer, browser, mobile বা application implementation test চালানো হয়নি। এটি production security audit বা certification নয়।
+
+
+## 2026-10-25 — Chapter 10: SPA token storage
+
+- Chapter 10-এ localStorage, sessionStorage, in-memory storage, HttpOnly cookie এবং Backend for Frontend (BFF) তুলনা করা হয়েছে; কোনো storage-কে সব threat-এর সর্বজনীন সমাধান বলা হয়নি।
+- KenaKata-র product timeline অক্ষুণ্ণ: SPA browser client, mobile-এর access/refresh token আগে থেকেই আছে; এই অধ্যায়ে OAuth flow চালু করা হয়নি।
+- Cookie-ভিত্তিক authentication-এ Chapter 6-এর KenaKata-specific CSRF policy বহাল। BFF token browser থেকে আড়াল করলেও XSS-এর মাধ্যমে authenticated action-এর ঝুঁকি রয়ে যায়।
+- Source basis: RFC 10017 (August 2026 Internet Best Current Practice), OWASP HTML5 Security / Session Management / CSRF cheat sheets এবং MDN cookie/Web Storage documentation.
+- Chapter 10-এর Technical ও Security Review source-based conceptual review; browser test, Mermaid renderer test বা production audit নয়। Review record: notes/technical-review-chapter-10.md.

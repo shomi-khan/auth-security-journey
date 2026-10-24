@@ -117,3 +117,23 @@ Multi-factor authentication। একের বেশি উপায়ে পর�
 ## Absolute Timeout
 
 Session login হওয়ার পর সর্বোচ্চ কতক্ষণ বৈধ থাকবে, তার সীমা। Activity হলেও এই ঘড়ি নতুন করে শুরু হয়।
+
+## localStorage
+
+Browser-এর origin-ভিত্তিক persistent key-value storage, যা page reload ও browser restart-এর পরও সাধারণত থাকে। একই origin-এর JavaScript এটি পড়তে পারে। Authentication credential রাখার আগে XSS-এর ঝুঁকি বিবেচনা করতে হবে। বিস্তারিত অধ্যায় ১০।
+
+## sessionStorage
+
+Browser-এর origin ও tab-এর page session-ভিত্তিক key-value storage। localStorage-এর তুলনায় lifetime সীমিত, কিন্তু একই tab-এ চলা JavaScript এটি পড়তে পারে। বিস্তারিত অধ্যায় ১০।
+
+## In-memory Token Storage
+
+Token browser-এর চলমান JavaScript execution context-এর memory-তে রাখা। Persistent storage-এ token রেখে দেওয়ার exposure কমাতে পারে, কিন্তু active XSS থেকে token বা authenticated action সুরক্ষিত রাখার নিশ্চয়তা নয়। বিস্তারিত অধ্যায় ১০।
+
+## HttpOnly Cookie
+
+Set-Cookie header-এর attribute, যা cookie value-কে page-এর JavaScript API থেকে আড়াল রাখে। এটি নিজে থেকে CSRF বা XSS-এর সব প্রভাব আটকায় না। বিস্তারিত অধ্যায় ৭ ও ১০।
+
+## Backend for Frontend (BFF)
+
+একটি frontend বা SPA-র জন্য নির্দিষ্ট backend component, যা browser request সামলায় এবং sensitive token server-side-এ রাখতে পারে। Browser সাধারণত session cookie দিয়ে BFF-কে চেনে; BFF প্রয়োজনীয় API call-এ token যোগ করে। বিস্তারিত অধ্যায় ১০।

@@ -32,3 +32,10 @@
 - সাধারণ double-submit cookie যথেষ্ট
 - session-এর মেয়াদ কম রাখলে CSRF হবে না
 - login পাতায় CSRF লাগে না
+
+- sessionStorage-এ রাখলে token XSS থেকে নিরাপদ
+- In-memory token থাকলে malicious JavaScript কিছু করতে পারে না
+- HttpOnly cookie থাকলে XSS পুরোপুরি ঠেকে
+- BFF ব্যবহার করলে XSS বা CSRF নিয়ে আর ভাবতে হয় না
+- localStorage-এ token রাখলে শুধু browser বন্ধ করলেই token বাতিল হয়
+- CORS একাই authorization ও CSRF-এর সমাধান

@@ -63,3 +63,11 @@
 - [RFC 7009 — Token Revocation](https://www.rfc-editor.org/rfc/rfc7009)। অধ্যায় ১৪।
 - [RFC 7662 — Token Introspection](https://www.rfc-editor.org/rfc/rfc7662)। অধ্যায় ১৪ আর ২৩।
 - [RFC 9068 — JWT Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068)। অধ্যায় ৯ আর ১৬। প্রতিটা JWT-কে access token ধরে নিয়ো না। এই প্রোফাইলটা কখন লাগে, পড়ে দেখো।
+
+
+## RFC 10017 — OAuth 2.0 for Browser-Based Applications
+
+- কী বিষয়: Browser-based OAuth applications-এর threat model, architecture patterns এবং token storage।
+- কোন অধ্যায়: ১০-এ browser storage ও BFF pattern-এর reference হিসেবে; Season 2-এর OAuth অধ্যায়গুলোতেও প্রাসঙ্গিক।
+- কেন পড়া useful: আগস্ট ২০২৬-এ প্রকাশিত Internet Best Current Practice। Browser-based token storage, BFF, in-memory ও persistent storage-এর trade-off এবং malicious JavaScript-এর সীমা বুঝতে পড়ো। Chapter 10-এ KenaKata-র first-party SPA-কে OAuth client বলা হচ্ছে না।
+- [RFC 10017](https://www.rfc-editor.org/rfc/rfc10017.html)
