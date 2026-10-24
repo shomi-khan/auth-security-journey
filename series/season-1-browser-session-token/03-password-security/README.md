@@ -337,7 +337,7 @@ func NeedsRehash(encoded string) bool {
 }
 ```
 
-কোডটা আমি Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে চালিয়ে দেখেছি। একটা আসল ফল এরকম:
+এই code-এর আগের সংস্করণ Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে চালানো হয়েছিল। এই review-তে parser-এর canonical-field check ও NFC normalization বদলানোর পর সেই test আবার চালানো হয়নি, তাই নিচের sample output-কে এই সর্বশেষ সংস্করণের নতুন test result হিসেবে ধরো না। একটা আগের আসল ফল এরকম:
 
 ```
 $argon2id$v=19$m=19456,t=2,p=1$6ntZMPHCqYWOGNTS1t1w7Q$17RAHmtm7vQxx7rPGBzYLctpWOwUS4GG8oybUXxYO6Y
