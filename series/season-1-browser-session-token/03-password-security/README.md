@@ -55,8 +55,15 @@ flowchart TD
 
 ## ২. ফাঁস: dump খুললে আরিফ কী দেখল
 
-```sql
-SELECT id, email, password FROM users;
+```text
+Database থেকে পাওয়া তথ্যের ধারণাগত উদাহরণ:
+
+users table
+- id
+- email
+- password  ← এখানে plaintext password রাখা হয়েছিল
+
+আক্রমণকারী table-এর এই column-টিও পড়তে পারে, যদি dump-টি তার হাতে যায়।
 ```
 
 ```
