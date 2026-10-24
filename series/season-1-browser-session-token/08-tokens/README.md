@@ -47,11 +47,15 @@ sequenceDiagram
         K-->>M: Access token
         M->>K: Protected API request + access token
         K->>K: Token যাচাই
-        K->>K: Operation-এর permission যাচাই
-        alt Token ও permission গ্রহণযোগ্য
-            K-->>M: Requested resource
-        else Permission নেই
-            K-->>M: 403 Forbidden
+        alt Token অনুপস্থিত বা invalid
+            K-->>M: 401 Unauthorized
+        else Token গ্রহণযোগ্য
+            K->>K: Operation-এর permission যাচাই
+            alt Permission আছে
+                K-->>M: Requested resource
+            else Permission নেই
+                K-->>M: 403 Forbidden
+            end
         end
     else Login ব্যর্থ
         K-->>M: Login reject
@@ -83,7 +87,7 @@ Bearer token ব্যবহারের জন্য `Authorization` header এ
 
 না। Access token-কে “সব দরজা খোলার চাবি” ভাবলে ভুল হবে।
 
-ধরা যাক, রাফির token গ্রহণযোগ্য। তবু server-কে জানতে হবে সে কোন order দেখতে পারবে, কোন action করতে পারবে, এবং request করা resource তার অনুমোদনের মধ্যে পড়ে কি না। KenaKata-তে login করা মানেই সব কাজের অনুমতি নয়। পরের অধ্যায়ে organization ও role আসার আগে থেকেই authentication আর authorization-এর পার্থক্যটি গুরুত্বপূর্ণ।
+ধরা যাক, রাফির token গ্রহণযোগ্য। তবু server-কে যাচাই করতে হবে token-টি এই API-র জন্যই কি না, সে কোন order দেখতে পারবে, কোন action করতে পারবে, এবং request করা resource তার অনুমোদনের মধ্যে পড়ে কি না। KenaKata-তে login করা মানেই সব কাজের অনুমতি নয়। পরের অধ্যায়ে organization ও role আসার আগে থেকেই authentication আর authorization-এর পার্থক্যটি গুরুত্বপূর্ণ।
 
 ```mermaid
 flowchart TD
