@@ -216,7 +216,7 @@ flowchart TD
 
 দুটো জিনিস লক্ষ্য করার মতো।
 
-**প্রথমত,** এই flow-তে authentication সফল না হলে request handler পর্যন্ত পৌঁছায় না। নিরাপদ নকশার শুরু হলো: "ডিফল্টভাবে অস্বীকার করো, বৈধ প্রমাণ পেলে তবেই এগোও।" বাস্তবে কোন credential কীভাবে যাচাই হবে, সেটা পরের অধ্যায়গুলোতে আসবে।
+**প্রথমত,** এই flow-তে authentication সফল না হলে protected handler পর্যন্ত request পৌঁছায় না। তবে পরিচয় যাচাই মানেই কাজের অনুমতি নয়: handler চালানোর আগে প্রাসঙ্গিক authorization check-ও লাগতে পারে, যেমন এই কর্মী দাম বদলাতে পারবেন কি না। নিরাপদ নকশার শুরু হলো: "ডিফল্টভাবে অস্বীকার করো, বৈধ প্রমাণ পেলে তবেই এগোও।" বাস্তবে কোন credential কীভাবে যাচাই হবে, সেটা পরের অধ্যায়গুলোতে আসবে।
 
 **দ্বিতীয়ত,** authentication সফল হলে যাচাই-করা identity-কে request-এর সঙ্গে যুক্ত করে পরের ধাপে নেওয়া যায়। যে log আগে ছিল:
 
@@ -261,7 +261,13 @@ sequenceDiagram
     S->>S: Credential থেকে user/password যাচাইয়ের তথ্য নাও
     S->>S: Password যাচাই
     alt Credential বৈধ
-        S-->>Staff: Request চালাও
+        S->>S: পরিচয় যাচাই হয়েছে
+        S->>S: আলাদা authorization check
+        alt এই কাজের অনুমতি আছে
+            S-->>Staff: Request-এর ফল
+        else অনুমতি নেই
+            S-->>Staff: 403 Forbidden
+        end
     else Credential অনুপস্থিত বা অবৈধ
         S-->>Staff: 401 + WWW-Authenticate challenge
     end
@@ -287,10 +293,10 @@ sequenceDiagram
 
 কাজ হয়। কিন্তু দাম দিতে হয়:
 
-- **সবচেয়ে মূল্যবান secret সবচেয়ে বেশি ঘোরে।** Password এখন login-এর মুহূর্তে একবার নয়, প্রতিটা request-এ। Request যেখানে যেখানে পৌঁছায়, header-ও সেখানে: load balancer, reverse proxy, application, debug log, tracing tool। HTTPS network-এ আড়ি পাতা ঠেকায়, কিন্তু TLS শেষ হওয়ার পর server-এর ভেতরের প্রতিটা অংশে password-টা আছে। একটা ভুল debug log সব ফাঁস করে দিতে পারে।
+- **সবচেয়ে মূল্যবান secret বারবার পাঠানো হয়।** Password এখন login-এর মুহূর্তে একবার নয়, প্রতিটা request-এ। যে component request-টি পায় বা credential-সহ header log করে, তার কাছে password পৌঁছাতে পারে: যেমন TLS terminate করা reverse proxy, application, debug log বা tracing tool। HTTPS পথে আড়ি পাতা ঠেকায়, কিন্তু TLS terminate হওয়ার পর credential-এর সুরক্ষা নির্ভর করে কোন component সেটি পায় এবং কীভাবে সামলায় তার ওপর। ভুল logging হলে password ফাঁস হতে পারে।
 - **Client-কে password ধরে রাখতে হয়।** এক পেজ থেকে আরেক পেজে গেলেও পাঠাতে হবে, তাই client-এর কোথাও password থেকেই যাবে। কোন কোড সেটা পড়তে পারে, সেই প্রশ্ন আসবে অধ্যায় ৭-এ।
 - **Server-এর খরচ।** অধ্যায় ৩-এ দেখব, password যাচাই ইচ্ছা করেই ধীর বানানো হয়। তাহলে প্রতিটা request-এ সেই খরচ। আর ভুল password দিয়ে অসংখ্য request পাঠিয়ে server-এর CPU পোড়ানো আক্রমণকারীর জন্য সস্তা।
-- **সূক্ষ্মভাবে বাতিল করার উপায় নেই।** "শুধু এই ফোনের login বন্ধ করো" বলার জায়গা নেই, কারণ server-এর হাতে প্রমাণ একটাই: password। সব বাতিল করতে হলে password বদলাতে হয়।
+- **প্রতি-device session আলাদাভাবে বাতিল করার ব্যবস্থা নেই।** Basic Authentication নিজে থেকে login session তৈরি করে না, তাই "শুধু এই ফোনের login বন্ধ করো" ধরনের session-level revocation দেয় না। Credential বদলানো বা account/credential disable করা সম্ভব, কিন্তু সেটি আলাদা session-কে বেছে বাতিল করার সমতুল্য নয়।
 
 ### দুটো কাজকে আলাদা করা
 
