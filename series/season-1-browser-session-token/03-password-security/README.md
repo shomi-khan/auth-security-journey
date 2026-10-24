@@ -196,7 +196,7 @@ flowchart TD
 
 প্রতিটি password-এর জন্য আলাদা random salt ব্যবহার করতে হবে। বিশ্বস্ত password-hashing library সাধারণত salt তৈরি ও সংরক্ষণের কাজ নিজেই সামলায়। পাঠকের জন্য মূল ধারণা: salt unique হওয়া দরকার, গোপন হওয়া নয়।
 
-**Salt কী ঠিক করে না:** একটা নির্দিষ্ট password-এর অনুমান করার গতি। আক্রমণকারী যদি বিশেষ করে `user-1`-কে লক্ষ্য করে, তার জন্য শুধু ওই একটা salt নিয়েই অনুমান চালাতে পারে। Salt থাকলেও প্রতিটা অনুমান তত দ্রুতই থাকে। ফাটল ৩ খোলা।
+**Salt কী ঠিক করে না:** একটা নির্দিষ্ট password-এর অনুমান করার খরচ। আক্রমণকারী যদি বিশেষ করে `user-1`-কে লক্ষ্য করে, তার জন্য ওই account-এর salt নিয়েই অনুমান চালাতে পারে। Salt একা প্রতিটি অনুমানকে ধীর করে না; সেই কাজ password-hashing algorithm করে। ফাটল ৩ খোলা।
 
 ---
 
@@ -352,7 +352,7 @@ NIST-এর SP 800-63B-4, যা আগের SP 800-63B-কে প্রতি�
 
 ```mermaid
 flowchart TD
-    P["Password জমা"] --> N["Unicode password হলে<br/>একই normalization policy"]
+    P["Password জমা"] --> N["Unicode password হলে<br/>একই normalization policy (যেমন NFC)"]
     N --> L{"Password যথেষ্ট দীর্ঘ এবং<br/>service policy-তে গ্রহণযোগ্য?"}
     L -->|"না"| R["ব্যবহারকারীকে কারণ জানাও"]
     L -->|"হ্যাঁ"| B{"পুরো password কি পরিচিত,<br/>ফাঁস-হওয়া বা অনুমানযোগ্য?"}
@@ -367,7 +367,7 @@ flowchart TD
 
 NIST password-এ Unicode অক্ষর সমর্থন করার এবং একইভাবে উপস্থাপিত password-কে সামঞ্জস্যপূর্ণভাবে যাচাই করার গুরুত্ব তুলে ধরে। বাংলাসহ বিভিন্ন ভাষায় একই রকম দেখতে password অক্ষর ভিন্ন internal representation-এ আসতে পারে। ফলে password তৈরি করার সময় একরকমভাবে সামলানো হলেও login-এর সময় অন্যরকম হলে user নিজের সঠিক password দিয়েও ঢুকতে নাও পারে।
 
-এই সমস্যার মূল শিক্ষা: **password গ্রহণ, সংরক্ষণ এবং যাচাইয়ের সময় একই normalization policy ধারাবাহিকভাবে প্রয়োগ করতে হবে।** কোন library বা normalization form ব্যবহার হবে, সেটি implementation-এর সিদ্ধান্ত; এই অধ্যায়ে Unicode-এর অভ্যন্তরীণ গঠন মুখস্থ করানো লক্ষ্য নয়।
+NIST Unicode password-এর জন্য NFC normalization ব্যবহারের পরামর্শ দেয়। মূল শিক্ষা: **password গ্রহণ, সংরক্ষণ এবং যাচাইয়ের সময় একই normalization policy ধারাবাহিকভাবে প্রয়োগ করতে হবে।** NFC কীভাবে code point বদলায়, তার অভ্যন্তরীণ বিশদ এই অধ্যায়ের লক্ষ্য নয়।
 
 ### বৈধ user-এর খরচ
 
@@ -529,10 +529,10 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 - সাধারণ functional test পাস করা আর নিরাপদ হওয়া এক নয়। "ঠিক মানুষ ঢুকছে তো?" আর "জিনিসটা অন্যের হাতে গেলে কী হবে?" আলাদা প্রশ্ন।
 - Server-কে password **জানতে** হয় না, শুধু **চিনতে** হয়। যে system password ফিরিয়ে দিতে পারে, সে ভুল জিনিস রাখছে।
 - Dump হাতে এলে আক্রমণকারী আমাদের নিয়ন্ত্রণের বাইরে, **offline**। তখন গুরুত্বপূর্ণ প্রতিরক্ষা হলো password অনুমান করা কঠিন রাখা এবং প্রতিটি অনুমানের খরচ বাড়ানো।
-- Salt প্রতিটা password-কে আলাদা করে। Salt গোপন নয়। ধীর, memory-hard hash (Argon2id) প্রতিটা অনুমান দামি করে। দুটোই দরকার, আর একা কেউ যথেষ্ট নয়।
+- Salt প্রতিটা password-এর hash আলাদা করে এবং precomputed table-এর সুবিধা কমায়। Salt গোপন নয়, আর নিজে থেকে প্রতিটি অনুমান ধীর করে না। উপযুক্ত ধীর, memory-hard password-hashing algorithm প্রতিটি অনুমানের খরচ বাড়ায়।
 - Hash-এর শক্তি password-এর শক্তিকে ছাড়িয়ে যায় না। দৈর্ঘ্য আর blocklist composition rule-এর চেয়ে বেশি কাজের। বাংলা password-সহ Unicode password সামঞ্জস্যপূর্ণভাবে সামলানো গুরুত্বপূর্ণ।
 - Online আর offline দুটো আলাদা যুদ্ধক্ষেত্র। Rate limit offline guessing থামায় না; MFA hash cracking-এর খরচ বাড়ায় না, তবে password ফাঁস হলেও account takeover-এর ঝুঁকি কমাতে পারে।
-- সাধারণ বার্তা আর সমান সময় (dummy hash) enumeration আটকায়। Lockout নিজেই অস্ত্র হতে পারে।
+- সাধারণ error message ও কাছাকাছি processing time account enumeration-এর সংকেত কমায়, পুরোপুরি নির্মূলের নিশ্চয়তা দেয় না। Lockout নিজেই অস্ত্র হতে পারে।
 - Password আর তার hash আলাদা জিনিস: একটা credential, অন্যটা যাচাইয়ের উপাত্ত। আর পুরোনো হওয়ার জন্য hash-এর algorithm আর parameter সংরক্ষিত থাকে।
 - ফাঁসের পর ক্রম গুরুত্বপূর্ণ: আগে নতুন সংরক্ষণ চালু, তারপর reset। আর reset-এর পথ নিজেই একটা নতুন দরজা।
 
