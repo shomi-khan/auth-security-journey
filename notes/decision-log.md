@@ -172,3 +172,11 @@
 - Mermaid sequence diagram-এ missing/invalid token-এর 401 path এবং valid token-এর পরে authorization decision, permission না থাকলে 403 path আলাদা করা হয়েছে। Intended API/audience যাচাইয়ের কথাও স্পষ্ট করা হয়েছে।
 - RFC 6750-এর bearer-token semantics, Authorization header, invalid-token/insufficient-scope behavior এবং token disclosure/TLS/URL risks source হিসেবে দেখা হয়েছে। KenaKata-র first-party login-কে OAuth flow বলা হয়নি।
 - Review record: `notes/technical-review-chapter-8.md`। Chapter 8 Draft, source-based Technical Review ও Security Review হিসেবে চিহ্নিত; Published নয়। Mermaid renderer, browser বা mobile implementation test চালানো হয়নি.
+
+## 2026-10-25 — Chapter 9-এর scope ও প্রথম Draft
+
+- Chapter 9 JWT-কে token format হিসেবে শেখাবে, access token-এর সমার্থক হিসেবে নয়। Signed JWT/JWS-এর পরিচিত তিন অংশ, Base64URL encoding বনাম encryption, claims-এর সীমা, signature/integrity, এবং validation ও authorization-এর পার্থক্য ব্যাখ্যা করা হবে।
+- তিন-part structure-কে সব JWT-এর সার্বজনীন গঠন বলা হবে না; JWE Compact Serialization-এ পাঁচটি অংশ থাকতে পারে। JWS signature payload গোপন করে না।
+- Validation guidance-এ server-defined algorithm policy, trusted key, issuer, intended audience এবং প্রযোজ্য time claims থাকবে। এটি conceptual guidance, কোনো universal copy-paste validation recipe নয়।
+- OAuth access-token profile, SPA storage, expiry/replay timeline ও refresh-token lifecycle পরের অধ্যায়ের scope-এই থাকবে।
+- Source basis: RFC 7519 (JWT), RFC 7515 (JWS), RFC 8725 (JWT Best Current Practices)। Draft লেখার পর source-based Technical ও Security Review আলাদা করে করতে হবে; browser/app test বা production certification দাবি করা যাবে না।
