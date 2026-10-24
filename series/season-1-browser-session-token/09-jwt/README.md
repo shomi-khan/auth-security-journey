@@ -149,6 +149,8 @@ Token B-কে বিশ্বাস করা যাবে না। Payload de
 ## লেখার অবস্থা
 
 - [x] Draft
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (source-based conceptual review; no implementation/browser tests)
+- [x] Security Review (source-based threat-model review; not a production audit)
 - [ ] Published
+
+Review record: [Chapter 9 Technical ও Security Review](../../../notes/technical-review-chapter-9.md).
