@@ -39,36 +39,36 @@ status: draft
 
 ## ২. আরিফের প্রথম চেষ্টা: "যে ঢুকেছে, সে আমাদের লোক"
 
-আরিফ নতুন কিছু বানাল না। Refund-এর handler যোগ করল `/manage`-এর ভেতরে, অর্থাৎ অধ্যায় ১-এর পাহারাদারের পেছনে:
+আরিফ নতুন কিছু বানাল না। `/manage`-এর ভেতরে refund-এর নতুন route যোগ করল, অর্থাৎ অধ্যায় ১-এর authentication পাহারাদারের পেছনে। Flowchart-এ দেখা যাচ্ছে, এই পাহারা শুধু পরিচয় যাচাই করে; refund-এর অনুমতি যাচাই করে না:
 
-```go
-manage := http.NewServeMux()
-manage.HandleFunc("GET /orders", listAllOrders)
-manage.HandleFunc("POST /orders/{id}/refund", refundHandler) // নতুন
-
-// অধ্যায় ১-এর মতোই: /manage/-এর নিচে সবকিছু পাহারাদার পেরিয়ে যায়
-mux.Handle("/manage/", http.StripPrefix("/manage", requireAuthentication(manage)))
+```mermaid
+flowchart TD
+    R["Request আসে"] --> M{"কোন route?"}
+    M -->|"GET /manage/orders"| O["অর্ডার দেখার handler"]
+    M -->|"POST /manage/orders/1042/refund"| F["Refund handler"]
+    O --> G["/manage-এর authentication guard"]
+    F --> G
+    G --> A{"Credential বৈধ?"}
+    A -->|"না"| X["Request থামে"]
+    A -->|"হ্যাঁ"| H["Protected handler চলে"]
+    H --> N["Refund-এর আলাদা permission check নেই"]
+    N --> BAD["কর্মীও refund করতে পারে"]
 ```
 
-```go
-func refundHandler(w http.ResponseWriter, r *http.Request) {
-	// পাহারাদার পেরিয়ে এসেছে, মানে চেনা মানুষ। তাহলে refund হোক।
-	refund(r.PathValue("id")) // refund() এখানে কাল্পনিক
-	w.WriteHeader(http.StatusNoContent)
-}
+```mermaid
+flowchart TD
+    A["Refund request"] --> B{"Authentication সফল?"}
+    B -->|"না"| C["Request প্রত্যাখ্যান"]
+    B -->|"হ্যাঁ"| D["Refund handler"]
+    D --> E["কোনো authorization check নেই"]
+    E --> F["Refund কার্যকর"]
 ```
 
 পরদিন নীরা আরেকটা কথা তুলল: "কর্মীর screen-এ refund button থাকাটাই তো ঠিক না।"
 
-আরিফ template বদলে দিল:
+আরিফ পাতা বদলে এমন করল, যাতে Owner-এর জন্যই Refund button দেখা যায়:
 
-```html
-{{if .User.IsOwner}}
-  <form method="post" action="/manage/orders/{{.Order.ID}}/refund">
-    <button>Refund করো</button>
-  </form>
-{{end}}
-```
+UI-তে button দেখানোর সিদ্ধান্তটি এমন: Owner হলে Refund button দেখাও, কর্মী হলে লুকাও। কিন্তু এই শর্ত শুধু পাতা কী দেখাবে তা নিয়ন্ত্রণ করে, server-এ request পাঠানো আটকায় না।
 
 এখন দুটো সুরক্ষা। পাহারাদার অচেনা মানুষকে ঠেকায়, আর কর্মী button-ই দেখে না। আরিফের মনে হলো কাজটা শেষ। নীরাও খুশি, রাফিও।
 
@@ -167,78 +167,39 @@ flowchart TD
 
 ## ৫. প্রথম সমাধান: নিয়ম বসবে server-এ, প্রতিটা request-এ
 
-আরিফ এবার নিয়মটা কোডে লিখল। এই অধ্যায়ের জন্য একটা ইচ্ছাকৃত সরল ছক: দোকানে দুই ধরনের মানুষ, মালিক আর কর্মী।
+আরিফ এবার permission-এর নিয়মগুলো স্পষ্ট করল। এই অধ্যায়ের জন্য একটা ইচ্ছাকৃত সরল ছক: দোকানে দুই ধরনের মানুষ, মালিক আর কর্মী।
 
-```go
-type User struct {
-	ID      string
-	IsOwner bool // এই অধ্যায়ের সরল ছক। Organization আর role আসবে অধ্যায় ১৫-তে
-}
-
-type Action string
-
-const (
-	ViewOrders  Action = "orders:view"
-	RefundOrder Action = "orders:refund"
-)
-
-func can(u User, a Action) bool {
-	switch a {
-	case ViewOrders:
-		return true // পাহারাদার পেরিয়ে আসা যে কেউ
-	case RefundOrder:
-		return u.IsOwner
-	default:
-		return false // নিয়মে লেখা নেই মানে অনুমতি নেই
-	}
-}
+```mermaid
+flowchart TD
+    R["Protected request"] --> A{"Authentication থেকে যাচাই-করা পরিচয় পাওয়া গেছে?"}
+    A -->|"না"| E["401: credential প্রয়োজন বা অবৈধ"]
+    A -->|"হ্যাঁ"| U["User-এর বর্তমান role/permission আনো"]
+    U --> P{"এই action অনুমোদিত?"}
+    P -->|"না"| D["403: অনুমতি নেই<br/>প্রত্যাখ্যান log করো"]
+    P -->|"হ্যাঁ"| H["নির্দিষ্ট handler চালাও"]
+    H --> S["শুধু অনুমোদিত কাজটি সম্পন্ন করো"]
 ```
 
 আর handler-এর সামনে একটা ছোট সহায়ক। `identityKey` আর `Identity` অধ্যায় ১-এর, `loadUser` আর `refund` কাল্পনিক:
 
-```go
-// অধ্যায় ১-এর পাহারাদার Identity বসিয়ে গেছে। এখান থেকে পুরো User তুলে আনি।
-func userFrom(ctx context.Context) (User, bool) {
-	id, ok := ctx.Value(identityKey{}).(Identity)
-	if !ok {
-		return User{}, false
-	}
-	return loadUser(id.UserID) // খাতা থেকে: এই user কে, মালিক কি না
-}
-
-// authorized দুটো আলাদা প্রশ্ন করে, আর আলাদা উত্তর দেয়
-func authorized(w http.ResponseWriter, r *http.Request, a Action) bool {
-	u, ok := userFrom(r.Context())
-	if !ok {
-		http.Error(w, "authentication required", http.StatusUnauthorized) // 401
-		return false
-	}
-	if !can(u, a) {
-		log.Printf("denied: user=%s action=%s", u.ID, a) // প্রত্যাখ্যানও রেকর্ড হয়
-		http.Error(w, "forbidden", http.StatusForbidden) // 403
-		return false
-	}
-	return true
-}
-
-func refundHandler(w http.ResponseWriter, r *http.Request) {
-	if !authorized(w, r, RefundOrder) {
-		return
-	}
-	refund(r.PathValue("id"))
-	w.WriteHeader(http.StatusNoContent)
-}
+```mermaid
+flowchart TD
+    R["POST /manage/orders/1042/refund"] --> A{"Authentication সফল?"}
+    A -->|"না"| X["Request থামে"]
+    A -->|"হ্যাঁ"| P{"user-4 কি orders:refund করতে পারে?"}
+    P -->|"না"| D["403 + denial log"]
+    P -->|"হ্যাঁ"| F["Refund সম্পন্ন"]
 ```
 
-এখানে handler-টি method-aware route-এ বাঁধতে হবে, যেমন Go 1.22-এর `ServeMux`-এ `mux.HandleFunc("POST /manage/orders/{id}/refund", refundHandler)`। অন্য router হলে সমতুল্যভাবে non-`POST` request প্রত্যাখ্যান করতে হবে। শুধু `refundHandler`-এর ভেতরে authorization check থাকা মানে method নিজে থেকেই সীমাবদ্ধ হয়ে গেল, এমন নয়। `POST` ব্যবহার করলেও browser-ভিত্তিক request-এ CSRF প্রতিরক্ষা আলাদা করে দরকার, সেটা অধ্যায় ৬-এ আসবে।
+Refund route-টি শুধু `POST` method-এর জন্য নিবন্ধিত হতে হবে। অন্য method-এর request-কে router-এই প্রত্যাখ্যান করতে হবে। Handler-এর ভেতরে authorization check থাকলেই HTTP method নিজে থেকে সীমাবদ্ধ হয়ে যায় না। আর `POST` ব্যবহার করলেও browser-ভিত্তিক request-এ CSRF প্রতিরক্ষা আলাদা করে দরকার, সেটা অধ্যায় ৬-এ আসবে।
 
 এবার `user-4` সরাসরি `POST /manage/orders/1042/refund` পাঠালে পায় `403`। Button থাকুক বা না থাকুক, তাতে কিছু যায় আসে না। Button এখন শুধু সুবিধা: যে কাজের অনুমতি নেই, সেটা কেন দেখাব। আর log-এ থেকে যায় একটা প্রত্যাখ্যানের রেকর্ড। রাফি জানতে পারবে, কেউ চেষ্টা করেছিল।
 
-### এই কোডের পেছনের নীতিগুলো
+### এই permission model-এর পেছনের নীতিগুলো
 
 এগুলো আরিফের আবিষ্কার নয়। ১৯৭৫ সালে Jerome Saltzer আর Michael Schroeder "The Protection of Information in Computer Systems" নামের একটা লেখায় protection mechanism-এর কয়েকটা design principle দিয়েছিলেন। প্রায় অর্ধশতক পরেও সেগুলো আমাদের ছোট `can` ফাংশনে চেনা চেহারায় ফিরে আসে। সঙ্গে OWASP-এর Authorization Cheat Sheet আর Developer Guide একই কথা আজকের ভাষায় বলে।
 
-- **Deny by default** (Saltzer-Schroeder-এর *fail-safe defaults*)। `can`-এর `default` শাখা এই কাজ করছে। যুক্তিটা চমৎকার: যে system "অনুমতি আছে কি?" দেখে, তার ভুল সাধারণত "না" বলে ফেলে। সেটা তাড়াতাড়ি ধরা পড়ে, কারণ কেউ আটকে গিয়ে অভিযোগ করে। যে system "কী নিষিদ্ধ" তার তালিকা রাখে, তার ভুল "হ্যাঁ" বলে ফেলে। সেটা নিঃশব্দে থেকে যেতে পারে। বন্ধ দরজা চেঁচায়, খোলা দরজা চুপ থাকে।
+- **Deny by default** (Saltzer-Schroeder-এর *fail-safe defaults*)। Permission table-এ অজানা action-কে প্রত্যাখ্যান করার নিয়মটি এই কাজ করছে। যুক্তিটা চমৎকার: যে system "অনুমতি আছে কি?" দেখে, তার ভুল সাধারণত "না" বলে ফেলে। সেটা তাড়াতাড়ি ধরা পড়ে, কারণ কেউ আটকে গিয়ে অভিযোগ করে। যে system "কী নিষিদ্ধ" তার তালিকা রাখে, তার ভুল "হ্যাঁ" বলে ফেলে। সেটা নিঃশব্দে থেকে যেতে পারে। বন্ধ দরজা চেঁচায়, খোলা দরজা চুপ থাকে।
 - **প্রতিটা request-এ check** (*complete mediation*)। আগের request-এ অনুমতি ছিল বলে পরেরটায় ধরে নেওয়া যায় না। OWASP-ও বলে, বেশিরভাগ request-এ ঠিকমতো check করা যথেষ্ট নয়।
 - **Least privilege।** মানুষকে ততটুকুই ক্ষমতা, যতটুকু তার কাজের জন্য লাগে। এর একটা উপকার প্রথমে চোখে পড়ে না। কোনোদিন কর্মীর account অন্য কারও হাতে গেলে সে কর্মীর ক্ষমতাটুকুই পাবে, রাফির নয়। Authorization শুধু ভুল আটকায় না, account চুরি হলে ক্ষতির আকারও সীমিত রাখে।
 - **নিয়ম এক জায়গায়, আর রেকর্ড রাখা।** OWASP Developer Guide বলে, access-এর সিদ্ধান্ত একটা কেন্দ্রীয় component দিয়ে নিতে হবে, আর authorization-এর ঘটনাগুলো log করতে হবে। নিয়ম প্রতিটা handler-এ ছড়িয়ে থাকলে একটা handler-এ ভুলে গেলেই সেটা ফাঁক।
@@ -255,14 +216,11 @@ func refundHandler(w http.ResponseWriter, r *http.Request) {
 GET /manage/users/{id}/profile
 ```
 
-নাম, email, ফোন নম্বর। Action-টা যোগ হলো ছোট্ট একটা লাইনে: `ViewProfile`। আর নিয়ম? "যে কেউ নিজের profile দেখবে, সুতরাং login করা যে কেউ পারে।"
+নাম, email, ফোন নম্বর। নতুন action-এর নাম দিল `ViewProfile`। আর নিয়ম? "যে কেউ নিজের profile দেখবে, সুতরাং login করা যে কেউ পারে।"
 
-```go
-case ViewProfile:
-	return true // login করা যে কেউ
-```
+এই নিয়মটি ছিল অতিরিক্ত খোলা: যে কেউ login করেছে, সে যেকোনো profile দেখতে পারে। আসল নিয়ম হওয়া উচিত: মালিক সবার profile দেখতে পারেন; কর্মী শুধু নিজের profile দেখতে পারে।
 
-এখানে একটা ভুল আছে, যা কোডে লেখা প্রতিটা অক্ষর ঠিক থাকলেও থাকে। `can`-এর সংজ্ঞা অনুযায়ী "login করা যে কেউ" **profile দেখতে পারে**। কিন্তু আমরা বলতে চেয়েছিলাম, **নিজের** profile। দুটো এক কথা নয়।
+এখানে একটা ভুল আছে, implementation-এর syntax ঠিক থাকলেও যা থেকে যায়। এই নিয়ম অনুযায়ী "login করা যে কেউ" **যেকোনো profile দেখতে পারে**। কিন্তু আমরা বলতে চেয়েছিলাম, **নিজের** profile। দুটো এক কথা নয়।
 
 `user-7` একদিন নিজের profile পাতা খুলল: `/manage/users/user-7/profile`। URL-এ তার নিজের পরিচয়টা দেখে কৌতূহল হলো। সে শেষের অংশটা বদলে লিখল `user-1`।
 
@@ -336,82 +294,46 @@ Authentication সফল হয়েছে, তাই server request-টিক�
 
 ## ৭. দ্বিতীয় সমাধান: resource-টাকেও প্রশ্নে আনো
 
-আরিফ `can`-এ একটা তৃতীয় প্যারামিটার যোগ করল:
+আরিফ permission decision-এ তৃতীয় তথ্যটি যোগ করল: resource-টির মালিক কে।
 
-```go
-// resourceOwnerID: যার জিনিসটা। যে কাজে নির্দিষ্ট কোনো মালিক নেই, সেখানে ফাঁকা।
-func can(u User, a Action, resourceOwnerID string) bool {
-	switch a {
-	case ViewOrders:
-		return true
-	case RefundOrder:
-		return u.IsOwner
-	case ViewProfile:
-		return u.IsOwner || u.ID == resourceOwnerID // মালিক সবার, কর্মী শুধু নিজের
-	default:
-		return false
-	}
-}
+```mermaid
+flowchart TD
+    R["Profile request"] --> I["Authentication থেকে পরিচয়: user-7"]
+    I --> T["Request থেকে target profile: user-1"]
+    T --> C{"Target-এর ওপর অনুমতি আছে?"}
+    C -->|"না"| D["403, অথবা তথ্য গোপন রাখতে 404"]
+    C -->|"হ্যাঁ"| S["Profile দেখাও"]
 ```
 
 আর `authorized`-এ সেই প্যারামিটার পাঠানো, আর profile handler-এ target-টা path থেকে তোলা:
 
-```go
-func authorized(w http.ResponseWriter, r *http.Request, a Action, resourceOwnerID string) bool {
-	u, ok := userFrom(r.Context())
-	if !ok {
-		http.Error(w, "authentication required", http.StatusUnauthorized)
-		return false
-	}
-	if !can(u, a, resourceOwnerID) {
-		log.Printf("denied: user=%s action=%s target=%q", u.ID, a, resourceOwnerID)
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return false
-	}
-	return true
-}
-
-func profileHandler(w http.ResponseWriter, r *http.Request) {
-	target := r.PathValue("id") // client যা পাঠিয়েছে। বিশ্বাস নয়, মেলানোর জিনিস
-	if !authorized(w, r, ViewProfile, target) {
-		return
-	}
-	showProfile(w, target) // showProfile() কাল্পনিক
-}
+```mermaid
+flowchart TD
+    R["Request আসে"] --> I["Server-যাচাইকৃত identity নাও"]
+    I --> A{"Identity আছে?"}
+    A -->|"না"| E401["401"]
+    A -->|"হ্যাঁ"| T["Request থেকে target ID নাও"]
+    T --> P{"Action ও target-এর permission যাচাই"}
+    P -->|"না"| E403["403 / প্রয়োজনে 404<br/>denial log"]
+    P -->|"হ্যাঁ"| H["Resource দেখাও বা কাজ সম্পন্ন করো"]
 ```
 
 `refundHandler`-এ শুধু শেষে একটা ফাঁকা string যোগ হলো: `authorized(w, r, RefundOrder, "")`।
 
 এবার `user-7` যদি `user-1`-এর profile চায়, পায় `403`। রাফি চাইলে সবার profile দেখতে পারে।
 
-নিয়মগুলো যে সত্যি কাজ করছে, সেটা কোড নিজে বলে না। এটা পরীক্ষা করতে হয়, আর শুধু "অনুমতি আছে" দিক নয়, "অনুমতি নেই" দিকটাও। OWASP-এর Authorization Cheat Sheet-ও সেটাই বলে: design-এর সময় যে permission ঠিক করেছ, সেগুলো যে সত্যি প্রয়োগ হচ্ছে, তার জন্য test লেখো।
+নিয়মগুলো ঠিকভাবে প্রয়োগ হচ্ছে কি না, শুধু অনুমতি-আছে দিক দিয়ে বোঝা যায় না। অনুমতি-নেই দিকটাও পরিকল্পিতভাবে পরীক্ষা করতে হয়। OWASP-এর Authorization Cheat Sheet-ও সেটাই বলে: design-এর সময় যে permission ঠিক করেছ, সেগুলো যে সত্যি প্রয়োগ হচ্ছে, তার জন্য test লেখো।
 
-```go
-func TestCan(t *testing.T) {
-	owner := User{ID: "user-1", IsOwner: true}
-	staff := User{ID: "user-4"}
+| পরিচয় | Action | Target resource | প্রত্যাশিত সিদ্ধান্ত |
+|---|---|---|---|
+| কর্মী user-4 | অর্ডার দেখা | সব অর্ডার | অনুমতি |
+| কর্মী user-4 | Refund | অর্ডার 1042 | প্রত্যাখ্যান |
+| Owner user-1 | Refund | অর্ডার 1042 | অনুমতি |
+| কর্মী user-4 | Profile দেখা | নিজের profile | অনুমতি |
+| কর্মী user-4 | Profile দেখা | user-7-এর profile | প্রত্যাখ্যান |
+| Owner user-1 | নিয়মে নেই এমন orders:delete action | যেকোনো resource | ডিফল্টভাবে প্রত্যাখ্যান |
 
-	tests := []struct {
-		name   string
-		user   User
-		action Action
-		target string
-		want   bool
-	}{
-		{"কর্মী order দেখে", staff, ViewOrders, "", true},
-		{"কর্মী refund করতে পারে না", staff, RefundOrder, "", false},
-		{"মালিক refund করে", owner, RefundOrder, "", true},
-		{"কর্মী নিজের profile দেখে", staff, ViewProfile, "user-4", true},
-		{"কর্মী অন্যের profile দেখতে পারে না", staff, ViewProfile, "user-7", false},
-		{"নিয়মে নেই এমন action", owner, Action("orders:delete"), "", false},
-	}
-	for _, tc := range tests {
-		if got := can(tc.user, tc.action, tc.target); got != tc.want {
-			t.Errorf("%s: got %v, want %v", tc.name, got, tc.want)
-		}
-	}
-}
-```
+শেষ সারিটি লক্ষ্য করো। নিয়মের তালিকায় নেই এমন action Owner-এর জন্যও স্বয়ংক্রিয়ভাবে অনুমোদিত হওয়া উচিত নয়। এটিই deny by default-এর মূল কথা।
 
 শেষ test-টা লক্ষ্য করো। নিয়মের তালিকায় নেই এমন একটা action মালিকের জন্যও `false` পায়। Deny by default-এর পরীক্ষা এভাবেই হয়।
 
@@ -530,7 +452,7 @@ flowchart TD
 
 ## 🧪 পাঁচ মিনিটের পরীক্ষা
 
-নিজের কোনো project-এর staging-এ ক্ষমতায় সবচেয়ে নিচের একটা user দিয়ে সবচেয়ে সংবেদনশীল তিনটা endpoint-এ সরাসরি `curl` পাঠাও, UI একবারও না খুলে। কী আসে? `403`, নাকি সফল response?
+নিজের project-এর staging environment-এ সর্বনিম্ন অনুমতিসম্পন্ন test user দিয়ে তিনটি sensitive endpoint সরাসরি request করো, UI ব্যবহার না করে। কী আসে: `403`, নাকি সফল response?
 
 তারপর একই user দিয়ে একটা URL-এর ID বদলে অন্য কারও ID বসাও। তারপর log খুলে দেখো: প্রত্যাখ্যানগুলো কি সেখানে আছে, নাকি সব চুপ?
 
