@@ -230,6 +230,8 @@ func refundHandler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
+এখানে handler-টি method-aware route-এ বাঁধতে হবে, যেমন Go 1.22-এর `ServeMux`-এ `mux.HandleFunc("POST /manage/orders/{id}/refund", refundHandler)`। অন্য router হলে সমতুল্যভাবে non-`POST` request প্রত্যাখ্যান করতে হবে। শুধু `refundHandler`-এর ভেতরে authorization check থাকা মানে method নিজে থেকেই সীমাবদ্ধ হয়ে গেল, এমন নয়। `POST` ব্যবহার করলেও browser-ভিত্তিক request-এ CSRF প্রতিরক্ষা আলাদা করে দরকার, সেটা অধ্যায় ৬-এ আসবে।
+
 এবার `user-4` সরাসরি `POST /manage/orders/1042/refund` পাঠালে পায় `403`। Button থাকুক বা না থাকুক, তাতে কিছু যায় আসে না। Button এখন শুধু সুবিধা: যে কাজের অনুমতি নেই, সেটা কেন দেখাব। আর log-এ থেকে যায় একটা প্রত্যাখ্যানের রেকর্ড। রাফি জানতে পারবে, কেউ চেষ্টা করেছিল।
 
 ### এই কোডের পেছনের নীতিগুলো
