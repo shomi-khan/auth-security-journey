@@ -35,7 +35,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 
 1. **Chapter 1 ও 4-এর HTTP 401 উদাহরণ:** RFC 9110 অনুযায়ী 401 response-এ `WWW-Authenticate` challenge থাকা দরকার। Chapter 4 নিজেই স্বীকার করে যে cookie-session উদাহরণে challenge অনুপস্থিত। এটি একটি নথিভুক্ত standards caveat; এই review-তে কোনো ভুয়া বা বিভ্রান্তিকর challenge যোগ করা হয়নি। API contract স্থির করার সময় এটি আলাদা করে সমাধান করতে হবে।
 2. **Chapter 2:** Permission function-এর unit test ছাড়াও প্রতিটি protected route-এ authentication ও function/object-level authorization প্রয়োগ হচ্ছে কি না, তার integration test দরকার।
-3. **Chapter 3:** `norm.NFC` ও `checkPolicy`-র আচরণ, malformed PHC string-এর boundary case এবং parser-এর নতুন negative case বাস্তবে চালিয়ে যাচাই করা বাকি। RFC/OWASP parameter-এর উপযোগিতা production server-এ benchmark ছাড়া চূড়ান্ত বলা যাবে না।
+3. **Chapter 3:** পুরোনো implementation-code revision-এর `norm.NFC`, `checkPolicy`, malformed PHC string parser ও test-সংক্রান্ত findings বর্তমান diagram-first chapter-এর review criteria নয়। বর্তমান review-তে password hashing, salt, offline guessing, login enumeration, password policy, Unicode handling-এর মূল ধারণা ও সীমাবদ্ধতা এবং authoritative source-এ করা claims যাচাই করতে হবে। এই সিরিজের scope-এ parser implementation audit বা production parameter tuning নেই।
 4. **Chapter 4–5:** বাস্তব browser-এ cookie prefix, `SameSite`, HTTPS/HSTS, concurrent request ও session rotation আচরণ যাচাই করা বাকি। একাধিক application instance বা distributed session store-এ revocation consistency-ও এই review-তে পরীক্ষা করা হয়নি।
 5. **সব অধ্যায়:** উদাহরণে কাল্পনিক handler/function ও সরলীকরণ আছে। এগুলোকে production-ready application হিসেবে ব্যবহার করা যাবে না। Security review শেষ বলতে হলে source claim, executable example/test, route coverage এবং browser/deployment সীমা আলাদা করে যাচাই করতে হবে।
 
@@ -52,3 +52,12 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 The Chapter 3 bullets above that mention Go, `norm.NFC`, `checkPolicy`, parser tests, and prior compile/test history describe an earlier implementation-code revision. The current Chapter 3 teaching draft has been converted to Mermaid diagrams and language-neutral examples; those implementation-specific findings are historical and should not be read as claims about the current chapter content.
 
 The current draft has not been granted Technical Review or Security Review sign-off. Future review should focus on password-storage concepts, Argon2id parameter claims, PHC string validation invariants, Unicode normalization consistency, account-enumeration mitigations, online/offline threat boundaries, and the accuracy of diagrams and source references. No code tests were run for this diagram-first update.
+
+
+## 2026-10-25 — Review scope updated to theory-first
+
+Chapter 3 has been simplified to emphasize the security concepts: why passwords should not be stored in plaintext or reversible encryption, why fast general-purpose hashes are unsuitable, how unique salts help, why password hashing must be intentionally expensive, why password strength still matters, how online and offline attacks differ, and what login enumeration mitigations can and cannot do.
+
+The former implementation-specific notes about Argon2id parameter parsing, PHC string parsing, and code-level Unicode normalization were written for an earlier code-oriented draft. They are historical context, not mandatory implementation work for the current teaching draft. Review should verify conceptual accuracy, relevant threat boundaries, meaningful failure paths, and source-backed claims. It should not turn the chapter into an implementation manual or imply production security certification.
+
+Chapter 3's Technical Review and Security Review checkboxes remain unchecked until this conceptual review is actually completed. No code tests were run.
