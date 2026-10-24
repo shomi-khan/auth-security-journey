@@ -30,7 +30,7 @@ Source-based conceptual review of the Bengali theory-first chapter. The review c
 
 ## Limitations
 
-No application code was compiled or executed. No automated tests, real-browser behavior, browser compatibility matrix, proxy behavior, multi-instance deployment, or production configuration was tested. The chapter's Technical Review and Security Review checkboxes mean source-based conceptual review only, not implementation audit or production security certification.
+No application code was compiled or executed. No automated tests, real-browser behavior, browser compatibility matrix, proxy behavior, multi-instance deployment, or production configuration was tested. A source-based conceptual review has been conducted and documented here. However, the chapter's Technical Review and Security Review checkboxes intentionally remain unchecked because the Chapter 6 repo notes explicitly direct that only Draft be checked at this stage. These checkboxes must not be interpreted as a claim that no review work occurred, nor as implementation audit or production security certification.
 
 ## Follow-up outside this chapter review
 
