@@ -224,7 +224,7 @@ A শুধু browser-এর কপি সরাতে পারে; চুর�
 
 session ID-র গুণ নিয়ে OWASP-র Session Management Cheat Sheet পরিষ্কার। আমাদের কাজের কথাগুলো:
 
-- **অনুমান-অযোগ্য।** cryptographically secure random generator (CSPRNG) থেকে আসতে হবে, আর কমপক্ষে ৬৪ bit entropy থাকতে হবে। নিজে বানালে OWASP বলে কমপক্ষে ১২৮ bit-এর CSPRNG মান। আমরা নেব ৩২ byte, মানে ২৫৬ bit। `math/rand` চলবে না (অধ্যায় ৩-এর salt-এর মতোই), কারণ দুর্বল generator-এর মান statistical বিশ্লেষণে অনুমান করা যেতে পারে।
+- **অনুমান-অযোগ্য।** cryptographically secure random generator (CSPRNG) থেকে আসতে হবে, আর কমপক্ষে ৬৪ bit entropy থাকতে হবে। নিজে বানালে OWASP বলে কমপক্ষে ১২৮ bit-এর CSPRNG মান। সাধারণভাবে framework-এর session-management সুবিধা ব্যবহার করাই ভালো। নিজে session ID তৈরি করলে cryptographically secure random generator দরকার; শুধু লম্বা string হলেই সেটা অনুমান-অযোগ্য হয় না।
 - **অর্থহীন।** মানের ভেতরে user ID, role, ইমেল, কিছুই নয়। অর্থ থাকবে শুধু server-এর খাতায়।
 - **server-এর বানানো।** server যে ID কখনো বানায়নি, সেটা পেলে প্রত্যাখ্যান। OWASP একে strict mode বলে।
 - **generic নাম।** `PHPSESSID` বা `JSESSIONID`-এর মতো framework-এর ডিফল্ট নাম বলে দেয় কোন প্রযুক্তি চলছে। আমরা নাম রাখব `__Host-id`। `__Host-`-এর মানে §৭-এ।
@@ -250,7 +250,7 @@ browser নিজে পাঠায়, এই সুবিধাটাই আ�
 
 ## ৬. Request এলে server কীভাবে session চিনবে?
 
-এবার Go বা কোনো framework-এর implementation দেখব না। আগে mechanism-টা মাথায় বসাই।
+এখানে কোনো নির্দিষ্ট framework-এর implementation নয়, আগে mechanism-টা মাথায় বসাই।
 
 ### Login থেকে পরের request পর্যন্ত
 
@@ -320,7 +320,7 @@ RFC 9110 (§15.5.2) অনুযায়ী `401` পাঠালে সেই 
 
 তাই cookie-র জগতে সাধারণ চর্চা দুই ভাগে:
 
-- **browser-এর পাতা (GET):** `302` দিয়ে login পাতায় পাঠাই। উপরের কোড তাই করে।
+- **browser-এর পাতা (GET):** `302` দিয়ে login পাতায় পাঠাই। এই উদাহরণে তাই করা হয়।
 - **অন্য request (যেমন POST বা JavaScript-এর ডাক):** `401`। অনেক framework এটা `WWW-Authenticate` ছাড়াই পাঠায়, যা RFC 9110-এর কঠোর পাঠে অসম্পূর্ণ। আমাদের কোডও তাই করছে। অধ্যায় ৮-এ `Bearer` (RFC 6750) এলে এই API-র `401`-এর একটা প্রমিত challenge পাওয়া যাবে।
 
 এই ছাড় জেনেবুঝে রাখা হলো। নীরবে ধরে নেওয়া হয়নি।
@@ -329,7 +329,7 @@ RFC 9110 (§15.5.2) অনুযায়ী `401` পাঠালে সেই 
 
 ## 🛡️ ৭. Cookie-র অ্যাট্রিবিউট: browser-কে দেওয়া নির্দেশ
 
-`setSessionCookie`-এর প্রতিটা লাইন browser-এর জন্য একটা নির্দেশ। তার আগে একটা মূল সত্য, যেটা বুঝলে বাকিটা সহজ হয়ে যায়। browser যখন cookie ফেরত পাঠায়, তাতে থাকে শুধু `নাম=মান`। RFC 6265 স্পষ্ট বলে: `Cookie` header থেকে server জানতে পারে না cookie-র মেয়াদ কবে, কোন host আর path-এর জন্য, বা সেটা `Secure` বা `HttpOnly` ছিল কি না।
+Cookie-র প্রতিটি attribute browser-কে দেওয়া নির্দেশ। তার আগে একটা মূল সত্য, যেটা বুঝলে বাকিটা সহজ হয়ে যায়। browser যখন cookie ফেরত পাঠায়, তাতে থাকে শুধু `নাম=মান`। RFC 6265 স্পষ্ট বলে: `Cookie` header থেকে server জানতে পারে না cookie-র মেয়াদ কবে, কোন host আর path-এর জন্য, বা সেটা `Secure` বা `HttpOnly` ছিল কি না।
 
 ```http
 Cookie: __Host-id=jd3COo2PDshkWEsI2mswgz39yB6IXw9k1_zW4jdIN2o
@@ -422,9 +422,9 @@ cookie-র মেয়াদ আর session-এর মেয়াদ আলা
 - draft বলে, user agent cookie-র মেয়াদ সর্বোচ্চ ৪০০ দিনে কেটে দেবে (SHOULD NOT তার বেশি)। তুমি দশ বছর লিখলেও।
 - "browser বন্ধ করলে session cookie মুছে যায়" এর ওপরও ভরসা নেই। browser-এর session restore থাকলে session cookie ফিরে আসে (MDN আর OWASP দুজনেই এই সতর্কতা দেয়)।
 
-**session-এর মেয়াদ server-এর খাতার ব্যাপার, আর সেটাই আসল।** আমাদের `Lookup` প্রতিটা request-এ `ExpiresAt` দেখে। cookie যতই বলুক, খাতায় মেয়াদ শেষ মানে শেষ। OWASP-ও বলে, session-এর timeout server-এ প্রয়োগ করতে হবে, কারণ client-এর ওপর নির্ভর করলে আক্রমণকারী সময় বদলে দিতে পারে।
+**session-এর মেয়াদ server-এর খাতার ব্যাপার, আর সেটাই আসল।** Server প্রতিটি request-এ session record-এর মেয়াদ পরীক্ষা করে। cookie যতই বলুক, খাতায় মেয়াদ শেষ মানে শেষ। OWASP-ও বলে, session-এর timeout server-এ প্রয়োগ করতে হবে, কারণ client-এর ওপর নির্ভর করলে আক্রমণকারী সময় বদলে দিতে পারে।
 
-আরিফ তাই বেছে নিল: cookie-তে মেয়াদ নেই (session cookie), আর server-এ ৮ ঘণ্টা। কেন ৮? OWASP-র উদাহরণ: যে application একজন office কর্মী পুরো দিন ব্যবহার করে, তার absolute timeout ৪ থেকে ৮ ঘণ্টার মধ্যে হতে পারে। দোকানের একটা কর্মদিবসও মোটামুটি তাই। কেন persistent নয়? অধ্যায় ১-এ দোকানের shared কম্পিউটারের history আর autocomplete-এর কথা বলেছিলাম। কিছু কম্পিউটারে কেউ লগআউট না করেই উঠে যায়।
+এই গল্পে ধরা যাক, browser cookie-তে persistent expiry দেওয়া হয়নি, আর server-side session-এর সর্বোচ্চ মেয়াদ একটি কর্মদিবসের মধ্যে সীমাবদ্ধ। নির্দিষ্ট timeout application-এর ঝুঁকি, ব্যবহার এবং সংবেদনশীলতার ওপর নির্ভর করে; কোনো একক সময় সব system-এর জন্য সঠিক নয়। কেন persistent নয়? অধ্যায় ১-এ দোকানের shared কম্পিউটারের history আর autocomplete-এর কথা বলেছিলাম। কিছু কম্পিউটারে কেউ লগআউট না করেই উঠে যায়।
 
 এর দাম আছে, আর নীরা সেটা প্রথম দিনই টের পাবে। রাফিকে প্রতিদিন সকালে login করতে হবে। "আমাকে মনে রাখো" ধরনের দীর্ঘ session মানে চুরি-যাওয়া cookie-র আয়ু বাড়া। এটা একটা ব্যবসার সিদ্ধান্ত, শুধু প্রযুক্তির নয়। আর ৮ ঘণ্টাকে **idle** আর **absolute** এই দুই ঘড়িতে ভাগ করা অধ্যায় ৫-এর কাজ।
 
@@ -545,7 +545,7 @@ flowchart LR
 - **৮ ঘণ্টার মেয়াদ।** ছোট মেয়াদ নিরাপদ, কিন্তু রাফিকে রোজ সকালে login। দীর্ঘ মেয়াদ সুবিধাজনক, কিন্তু চুরির সুযোগ বড়।
 - **cookie শুধু browser-এর জিনিস।** browser নয় এমন client-এ cookie অস্বস্তিকর। সেই চাপ আসবে অধ্যায় ৮-এ।
 - **একসঙ্গে অনেক device।** প্রতিটা login-এর নিজস্ব session। সুবিধা: "আমার চালু device-এর তালিকা" দেখানো যায়। দাম: তালিকা সামলাতে হয়।
-- **ছোট জিনিস, যা কোডে রাখিনি।** `Clear-Site-Data` (logout-এ browser-এর cache আর cookie মুছতে বলা), HSTS, একজনের সর্বোচ্চ কয়টা session, ব্যর্থ ID-র অনুমান শনাক্ত করা, আর session ঘটনার log। OWASP-র পাতায় সব আছে।
+- **আরও কিছু operational control।** `Clear-Site-Data` (logout-এ browser-এর cache আর cookie মুছতে বলা), HSTS, একজনের সর্বোচ্চ কয়টা session, ব্যর্থ ID-র অনুমান শনাক্ত করা, আর session ঘটনার log। OWASP-র পাতায় সব আছে।
 
 ---
 
@@ -673,7 +673,7 @@ flowchart LR
 
 ## লেখার অবস্থা
 
-- [x] Draft
+- [x] Draft (theory-first revision)
 - [ ] Technical Review
 - [ ] Security Review
 - [ ] Published
