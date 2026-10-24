@@ -330,50 +330,20 @@ Hash ঠিক হলো। কিন্তু `/login` নিজেই আক�
 
 **সময়ে তথ্য ফাঁস।** বার্তা এক রাখলেও আরেকটা সংকেত থেকে যায়: সময়। Email না পাওয়া গেলে server যদি সঙ্গে সঙ্গে ফিরে যায় (৫ ms), আর পাওয়া গেলে ৪০ ms ধরে Argon2id চালায়, তাহলে বার্তা এক হলেও response-এর সময় আলাদা। আক্রমণকারী হাজার request পাঠিয়ে গড় মেপে বলে দিতে পারে কোন email আছে। OWASP-র সমাধান: email না পেলেও একই পরিমাণ কাজ করো, যেমন একটা নকল (dummy) hash-এর সঙ্গে মিলিয়ে দেখো।
 
-নিচের কোডে দুটো সূক্ষ্ম জায়গা আছে। প্রথমটা `!found || !ok` শর্ত: নকল hash-এর সঙ্গে মিলে গেলেও (যদি কেউ ঠিক সেই নকল password-টাই পাঠায়) user পাওয়া না গেলে অনুমতি দেওয়া যাবে না। দ্বিতীয়টা `NeedsRehash`: login-ই একমাত্র মুহূর্ত যখন আসল password আমাদের হাতে থাকে, তাই পুরোনো parameter-এর hash নতুনে বদলে নেওয়ার সুযোগ এখনই।
+এই flow-তে দুটো সূক্ষ্ম বিষয় আছে। প্রথমত, dummy hash-এর সঙ্গে password মিলে গেলেও account না পাওয়া গেলে login সফল হবে না। দ্বিতীয়ত, password যাচাই সফল হলে পুরোনো parameter-এ তৈরি hash-কে বর্তমান policy অনুযায়ী rehash করার সুযোগ থাকে।
 
-```go
-var dummyHash = func() string {
-	h, err := passwd.Hash("এই-password-কেউ-দেবে-না") // শুরুতে একবার বানানো
-	if err != nil {
-		panic("initialize dummy password hash: " + err.Error()) // startup-এ fail closed
-	}
-	return h
-}()
-
-func verifyPassword(email, pw string) (Identity, bool) {
-	u, found := findUserByEmail(email) // কাল্পনিক: (user, পাওয়া গেছে কি না)
-
-	stored := dummyHash // user না পেলেও একই পরিমাণ কাজ করি
-	if found {
-		stored = u.PasswordHash
-	}
-
-	ok, err := passwd.Verify(pw, stored)
-	if err != nil || !found || !ok {
-		return Identity{}, false
-	}
-
-	if passwd.NeedsRehash(stored) { // এখন plaintext আমাদের হাতে, আজকের parameter-এ আবার hash
-		if h, err := passwd.Hash(pw); err == nil {
-			updateHash(u.ID, h) // কাল্পনিক
-		}
-	}
-	return Identity{UserID: u.ID}, true
-}
-
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, 4<<10) // ৪ KiB-এর বেশি body নয়
-	email, pw := r.FormValue("email"), r.FormValue("password")
-
-	id, ok := verifyPassword(email, pw)
-	if !ok {
-		// email নেই, না password ভুল, বাইরে কখনো আলাদা করে বলি না
-		http.Error(w, "email বা password ঠিক নয়", http.StatusUnauthorized)
-		return
-	}
-	_ = id // একবার যাচাই হলো। পরের request-গুলোর কী হবে, সেটা অধ্যায় ৪।
-}
+```mermaid
+flowchart TD
+    R["Login: email + password"] --> Q["Email দিয়ে account খোঁজো"]
+    Q --> F{"Account পাওয়া গেছে?"}
+    F -->|"হ্যাঁ"| S["Stored password hash বেছে নাও"]
+    F -->|"না"| D["আগে থেকে তৈরি dummy hash বেছে নাও"]
+    S --> V["একই password-verification পদ্ধতি চালাও"]
+    D --> V
+    V --> O{"Account পাওয়া গেছে এবং<br/>password যাচাই সফল?"}
+    O -->|"না"| X["সাধারণ login failure"]
+    O -->|"হ্যাঁ"| Y["Login সফল"]
+    S -. "Hash-এর parameter পুরোনো?" .-> U["সফল login-এর পর নিরাপদে rehash"]
 ```
 
 (অধ্যায় ১-এর টীকা এখানেও খাটে: `401`-এর সঙ্গে `WWW-Authenticate` header আর browser-এর জন্য login পেজে redirect, এসব বাদ দিয়েছি। এই অধ্যায়ের প্রশ্ন অন্য।)
