@@ -3,6 +3,10 @@
 নিচে এমন কথা আছে, যেগুলো শুনতে সহজ, কিন্তু সিরিজে ভেঙে দেখতে হবে। ব্যাখ্যা এখনো নেই। অধ্যায় যখন কোনোটাকে ভাঙবে, তালিকায় ছোট করে যোগ হবে। আসল ব্যাখ্যা অধ্যায়েই থাকবে।
 
 - JWT মানেই encryption
+- JWT সবসময় তিন অংশের হয়
+- JWT payload decode করা গেলে সেটি বিশ্বাসযোগ্য
+- Signature valid হলেই token সব API-তে গ্রহণযোগ্য
+- JWT signature মানেই confidentiality
 - OAuth মানেই login
 - ID Token দিয়ে API call করা যায়
 - HttpOnly থাকলে XSS সমস্যা নেই
