@@ -63,3 +63,19 @@ Cookie কখন request-এর সঙ্গে যায়, আর `fetch` বা
 - কোন অধ্যায়: ৪, ৬, আর ১০।
 - কেন গুরুত্বপূর্ণ: “Cookie থাকলেই পরের request-এ যাবে” — এই কথাটা ডিফল্ট হিসেবে লিখে রেখো না। লেখার সময় MDN আর cookie ড্রাফট দেখে নাও।
 - [MDN: HTTP cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
+
+## Session Fixation testing
+
+- কোন অধ্যায়: ৫।
+- কেন পড়া useful: login-এর আগে জানা session ID-তে login করানো যায় কি না এবং login-এর সময় ID rotate হচ্ছে কি না, তা যাচাই করার test guidance।
+- [OWASP WSTG-SESS-03: Testing for Session Fixation](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management/03-Testing_for_Session_Fixation)
+
+## Device Bound Session Credentials (DBSC)
+
+- কোন অধ্যায়: ৫।
+- কেন পড়া useful: DBSC কীভাবে device-bound key দিয়ে session cookie refresh সুরক্ষিত করার চেষ্টা করে, আর ongoing compromised device-এর মতো কোন ঝুঁকি এটি সমাধান করে না, তা বোঝার জন্য।
+- [W3C WebAppSec DBSC explainer](https://github.com/w3c/webappsec-dbsc/blob/main/README.md)
+- [W3C DBSC Editor's Draft](https://w3c.github.io/webappsec-dbsc/)
+- [Chrome Developers: DBSC now available on Windows](https://developer.chrome.com/blog/dbsc-windows-announcement)
+
+DBSC-র specification ও browser support পরিবর্তনশীল। প্রকাশের আগে W3C status এবং browser vendor-এর বর্তমান documentation আবার যাচাই করো।
