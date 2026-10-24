@@ -23,13 +23,13 @@ status: draft
 
 ```
 09:58:41Z POST /login                        user=user-4  ip=192.0.2.10
-09:58:42Z session-start                      sid=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=192.0.2.10
-09:58:43Z GET  /manage/orders                sid=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=192.0.2.10
-10:41:12Z GET  /manage/orders                sid=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=192.0.2.10
+09:58:42Z session-start                      sid_hash=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=192.0.2.10
+09:58:43Z GET  /manage/orders                sid_hash=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=192.0.2.10
+10:41:12Z GET  /manage/orders                sid_hash=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=192.0.2.10
    ... ৬৬ মিনিট কোনো request নেই ...
-11:47:30Z GET  /manage/orders                sid=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=198.51.100.7
-11:47:58Z GET  /manage/orders                sid=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=198.51.100.7
-11:48:40Z POST /manage/orders/1042/refund    sid=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=198.51.100.7
+11:47:30Z GET  /manage/orders                sid_hash=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=198.51.100.7
+11:47:58Z GET  /manage/orders                sid_hash=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=198.51.100.7
+11:48:40Z POST /manage/orders/1042/refund    sid_hash=7c1e90a2d3f4b5c6d7e8f90123456789 user=user-4 ip=198.51.100.7
           denied: user=user-4 action=orders:refund
 ```
 
@@ -41,7 +41,7 @@ status: draft
 
 | কথা | প্রমাণিত? |
 |---|---|
-| একই session ID দুটো আলাদা IP থেকে এসেছে | হ্যাঁ, log-এ আছে |
+| একই session-correlation value দুটো আলাদা IP থেকে এসেছে | হ্যাঁ, log-এ আছে |
 | ID-টা কেউ কপি করেছে | সম্ভাব্য, প্রমাণিত নয়। ঘরের Wi-Fi থেকে মোবাইল ডেটায় গেলেও IP বদলায় |
 | শুভ কিছু অন্যায় করেছে | না। বরং ৬৬ মিনিট সে চুপ ছিল |
 | ক্রেতার ফোন-কলের সঙ্গে এর যোগ আছে | নিশ্চিত নয়। সময়ের মিল একটা সূত্র, সাক্ষ্য নয় |
@@ -405,7 +405,7 @@ sequenceDiagram
 
 সমাধানের মূল ধারণা একটাই: **authentication-এর ফল এমন একটা ID-তে বসবে, যা আক্রমণকারী কখনো দেখেনি।**
 
-Login সফল হলে পুরোনো ID নষ্ট করো, একটা নতুন ID বানাও, আর authenticated অবস্থা বসাও সেটাতে। OWASP, WSTG আর NIST তিনজনই এই কথা বলে। OWASP: privilege-এর স্তর বদলালে ID নতুন করতে হবে, আর পুরোনোটা নষ্ট করতে হবে। NIST-এর ভাষায়, session secret তৈরি হবে authentication event-এর সরাসরি প্রতিক্রিয়ায়। WSTG: authenticate করার আগে বিদ্যমান ID অকার্যকর করো, সফল হলে নতুন ID দাও।
+Login flow-তে anonymous ID-কে authenticated করার আগে অবশ্যই invalid করো। Credentials যাচাই সফল হলে নতুন, unpredictable ID-তে authenticated state বসাও; ব্যর্থ হলে পুরোনো ID কখনো authenticated session হবে না। OWASP ও WSTG পুরোনো ID invalid করে session ID renew করার পরামর্শ দেয়। NIST-এর ভাষায়, session secret তৈরি হবে authentication event-এর সরাসরি প্রতিক্রিয়ায়.
 
 নিরাপদ rotation-এর invariant:
 
@@ -427,7 +427,8 @@ sequenceDiagram
     Atk->>B: cookie jar-এ ID=X বসিয়ে যায়
     Shuvo->>B: login পাতা খুলে email আর passphrase দেয়
     B->>S: POST /login, Cookie ID=X
-    S->>S: password ঠিক, X মুছে দেয়, নতুন ID=Y বানায়
+    S->>S: X invalid করে; credentials যাচাই
+    S->>S: সফল হলে নতুন ID=Y-তে authenticated state
     S-->>B: 303, Set-Cookie ID=Y
     Atk->>S: GET /manage/orders, Cookie ID=X
     S-->>Atk: 302 /login, X কাউকে চেনে না
