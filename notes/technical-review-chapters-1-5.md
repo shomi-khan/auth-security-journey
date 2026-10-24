@@ -12,13 +12,14 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 
 - **[Medium] Argon2 encoded parameter-এর পুরো field যাচাই হচ্ছিল না।** `fmt.Sscanf` দিয়ে version ও parameter পড়ার পর এখন canonical string-এর সঙ্গে তুলনা করা হয়। এতে `v=19junk` বা parameter field-এ অতিরিক্ত অক্ষর থাকলে তা গ্রহণ করা হবে না।
 - **[Medium] Dummy hash তৈরি করার error উপেক্ষা করা হচ্ছিল।** এখন initialization ব্যর্থ হলে application শুরুতেই fail করবে, যাতে অজান্তে nil/খালি dummy hash নিয়ে চলতে না থাকে।
-- **Unicode normalization:** password policy, Argon2id `Hash` এবং `Verify` উদাহরণে একই `norm.NFC.String` normalization যোগ করা হয়েছে। Registration/reset/login-এর সব পথেই একই নিয়ম বজায় রাখতে হবে। এই integration আলাদা করে চালিয়ে পরীক্ষা করা বাকি.
+- **Unicode normalization:** password policy, Argon2id `Hash` এবং `Verify` উদাহরণে একই `norm.NFC.String` normalization যোগ করা হয়েছে। Registration/reset/login-এর সব পথেই একই নিয়ম বজায় রাখতে হবে। এই integration আলাদা করে চালিয়ে পরীক্ষা করা বাকি।
 - **Source verification:** RFC 9106-এর §3.1, §4 এবং §7.4 মূল উৎস থেকে মিলিয়ে reference note সংশোধন করা হয়েছে। RFC-এর 2 GiB / 64 MiB recommendation-কে OWASP-এর 19 MiB, `t=2`, `p=1` minimum configuration-এর সঙ্গে এক করে দেখা যাবে না। বাস্তব workload-এ benchmark জরুরি।
 
 ### Chapter 5: Session Hijacking এবং Session Fixation
 
 - **[Medium] `__Secure-` prefix-এর ক্ষমতা অতিরঞ্জিত ছিল।** এখন স্পষ্ট করা হয়েছে যে এটি `Secure` attribute বাধ্যতামূলক করে, কিন্তু `Domain` নিষিদ্ধ করে না। `__Host-` prefix-এর `Secure`, no-`Domain`, `Path=/` শর্ত আলাদা করে ব্যাখ্যা করা হয়েছে। Session ID rotate করাই fixation প্রতিরোধের মূল নিয়ম; cookie integrity অতিরিক্ত প্রতিরক্ষা।
 - **Password-change flow-তে session rotation error উপেক্ষা করা হচ্ছিল।** উদাহরণে cookie অনুপস্থিত থাকলে এখন `401`, আর rotation ব্যর্থ হলে `500` ফেরত দেওয়া হয়। Rotation সফল হওয়ার পর নতুন session-টি রেখে বাকি session বাতিল করা হয়। এটি documentation-level code correction; runnable test-এ এখনো পুনরায় যাচাই করা হয়নি।
+- **Expired anonymous session-এর state বহন হওয়ার ঝুঁকি ছিল।** `Rotate` এখন পুরোনো session-এর `Next` কেবল সেটি তখনও সক্রিয় এবং anonymous হলে বহন করে; expired row থাকলে সেটি মুছে ফেলে। নতুন code-এ regression test যোগ করা ও চালানো বাকি।
 
 ## Review-তে নিশ্চিত করা গুরুত্বপূর্ণ নীতি
 
