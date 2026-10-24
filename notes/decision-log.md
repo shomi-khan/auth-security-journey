@@ -136,3 +136,15 @@
 - OWASP WSTG-এর latest development guide এবং versioned stable v4.2 guide আলাদা করা হয়েছে। RFC ও OWASP-এর বর্তমান reference path মিলিয়ে নেওয়া হয়েছে।
 - Review conceptual/source-based। Application code, automated tests, browser matrix বা production configuration execute/verify করা হয়নি; তাই এই review production security certification নয়।
 
+## 2026-10-25 — Chapter 6: CSRF, theory-first revision
+
+- Chapter 6-এ Go implementation ও runnable shell command বাদ দিয়ে Mermaid diagram, illustrative HTTP request, route-policy table এবং manual review checklist রাখা হয়েছে। Review checkbox source-based conceptual review বোঝায়; implementation/browser test বা production certification নয়।
+- নীরার email-এর cancel link শুধু order page দেখাবে (GET); order cancel ও logout state-changing POST action। Safe method-এ state change করা যাবে না।
+- KenaKata-র Fetch Metadata policy: state-changing request-এ same-origin পরের validation স্তরে যাবে; cross-site, same-site, none এবং অচেনা value reject হবে। Sec-Fetch-Site অনুপস্থিত হলে server-configured target origin-এর সঙ্গে Origin হুবহু মেলাতে হবে; দুটোই অনুপস্থিত বা Origin: null হলে fail-safe reject। এটি KenaKata-র threat-model decision, universal browser requirement নয়। Non-browser client header জাল করতে পারে, তাই header authentication নয়।
+- Session-bound synchronizer CSRF token server-side session-এ থাকে, session ID থেকে স্বাধীন random value হয় এবং state-changing request-এ যাচাই হয়। Token URL বা log-এ থাকবে না। Login-এর আগে anonymous pre-session token login CSRF কমায়; successful login-এ পুরোনো anonymous session invalid করে নতুন session ID ও token তৈরি করতে হবে।
+- Framework-এর built-in CSRF protection-কে implementation-এর সম্ভাব্য starting point বলা হয়েছে, কিন্তু তার default behavior ও missing-header policy যাচাই না করে গ্রহণ করার পরামর্শ দেওয়া হয়নি।
+- notes/glossary.md-এ CSRF, Synchronizer Token ও Fetch Metadata যোগ করা হয়েছে। notes/misconceptions.md-এ Chapter 6-এর ১১টি misconception যোগ করা হয়েছে। references/owasp.md-এ CSRF Cheat Sheet-এর chapter scope ৬ ও ১০ করা হয়েছে। references/browser-security.md-এ W3C Fetch Metadata, WHATWG Fetch, RFC 9110, RFC 7617, Go CrossOriginProtection ও GO-2025-3955 reference যোগ করা হয়েছে।
+- Sources reviewed: OWASP CSRF Prevention Cheat Sheet; MDN CSRF and Fetch Metadata guidance; W3C Fetch Metadata Request Headers (21 September 2026 Working Draft, not a Recommendation); WHATWG Fetch forbidden request-header names; RFC 7617 §2.2; RFC 9110 §9.2.1; Go vulnerability report GO-2025-3955. Go advisory-টি নির্দিষ্টভাবে CrossOriginProtection.AddInsecureBypassPattern-এর Go 1.25.0 issue; Go 1.25.1-এ fixed, সব CrossOriginProtection use-এর generic vulnerability নয়।
+- Browser credential behavior, browser compatibility matrix, proxy behavior, application implementation, automated tests বা production configuration পরীক্ষা করা হয়নি। এগুলো manual follow-up হিসেবে রাখা হয়েছে, source-based review-কে runtime verification হিসেবে দেখানো হবে না।
+- Chapter 6-এর 06-repo-notes.md-এর প্রতিটি বিষয় chapter, shared glossary/misconception/reference docs অথবা এই decision/review record-এ resolve করার পর সরানো হবে; chapter Published চিহ্নিত হবে না।
+
