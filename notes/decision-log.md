@@ -79,3 +79,10 @@
 - Server-side authorization decision-এ subject, action ও resource-এর সম্পর্ক, deny-by-default, least privilege, প্রতিটি protected request-এ check এবং denial logging-এর ভূমিকা রাখা হয়েছে।
 - Route-টি শুধু POST method গ্রহণ করবে এবং POST থাকলেও CSRF আলাদা প্রতিরক্ষা, এই বিষয়টি language-specific example ছাড়াই রাখা হয়েছে।
 - এটি teaching-style update; chapter-এর Technical Review ও Security Review checkbox এখনো unchecked। Code test চালানো হয়নি এবং এই পরিবর্তনকে security certification ধরা যাবে না।
+
+
+## 2026-10-25 — Chapter 3-এ diagram-first পদ্ধতির প্রয়োগ
+
+- Chapter 3 থেকে Go implementation snippet, SQL snippet এবং runnable benchmark সরানো হয়েছে। Password storage, fast hash বনাম Argon2id, bcrypt-এর ৭২-byte সীমা, salt, PHC string, dummy-hash login flow এবং password policy Mermaid diagram বা language-neutral illustrative text দিয়ে বোঝানো হয়েছে।
+- বাস্তব implementation-এর ফল হিসেবে কোনো benchmark বা code test দাবি করা হচ্ছে না। Hardware-dependent Argon2id tuning-এর জন্য বাস্তব system-এ benchmark প্রয়োজন, কিন্তু এই learning series-এর উদাহরণগুলো runnable implementation নয়।
+- Chapter 3-এর Technical Review ও Security Review checkbox এখনো unchecked। Diagram-first update technical/security sign-off নয়।
