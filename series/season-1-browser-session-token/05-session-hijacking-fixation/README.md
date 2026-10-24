@@ -155,60 +155,32 @@ OWASP আরেকটা বিকল্পও বলে, **renewal timeout**: �
 
 KenaKata AAL ধরে চলে না, তবু সংখ্যাগুলো দিক দেখায়। আরিফ ভেবেছিল এভাবে: দোকানের কর্মী সারাদিন অ্যাপ ব্যবহার করে, তাই absolute ৮ ঘণ্টা থাকুক। কিন্তু অ্যাপে ক্রেতাদের নাম-ঠিকানা আছে, আর দোকানের কম্পিউটার shared। তাই idle নিচের দিকে, **৩০ মিনিট**। (এটা এই দৃশ্যের পছন্দ, চিরন্তন সংখ্যা নয়।) আরও কড়া করার বদলে সংবেদনশীল কাজে আলাদা ধাপ চাওয়া ভালো, সেটা অধ্যায় ২২।
 
-```go
-// Policy: তিনটা আলাদা ঘড়ি।
-type Policy struct {
-	Anonymous time.Duration // login-এর আগের session কতক্ষণ বাঁচবে
-	Idle      time.Duration // শেষ activity-র পর কতক্ষণ চুপ থাকলে শেষ
-	Absolute  time.Duration // login-এর পর সর্বোচ্চ কতক্ষণ, activity যা-ই হোক
-}
+Diagram-এ KenaKata-র তিনটি server-side ঘড়ি আলাদা রাখা হয়েছে:
 
-var DefaultPolicy = Policy{Anonymous: 30 * time.Minute, Idle: 30 * time.Minute, Absolute: 8 * time.Hour}
-
-func (s *Store) alive(r record, now time.Time) bool {
-	if !r.Authenticated() {
-		return now.Sub(r.StartedAt) < s.p.Anonymous
-	}
-	return now.Sub(r.LastSeen) < s.p.Idle && now.Sub(r.StartedAt) < s.p.Absolute
-}
-
-// Lookup (অধ্যায় ৪-এর নামে, এখন পুরো record ফেরত দেয়): মেয়াদ দেখে, ঠিক থাকলে LastSeen নতুন করে।
-func (s *Store) Lookup(token string) (record, bool) {
-	key := digest(token)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	r, found := s.rows[key]
-	if !found {
-		return record{}, false // server যা বানায়নি, তা চেনে না
-	}
-	now := s.now()
-	if !s.alive(r, now) {
-		delete(s.rows, key)
-		return record{}, false
-	}
-	r.LastSeen = now
-	s.rows[key] = r
-	return r, true
-}
+```mermaid
+flowchart TD
+    A["Request-এ session ID"] --> B{"Session record আছে?"}
+    B -->|না| X["প্রত্যাখ্যান"]
+    B -->|হ্যাঁ| C{"Authenticated?"}
+    C -->|না| D{"Anonymous session-এর বয়স < ৩০ মিনিট?"}
+    D -->|না| X
+    D -->|হ্যাঁ| OKA["শুধু login flow-তে ব্যবহারযোগ্য"]
+    C -->|হ্যাঁ| E{"শেষ activity থেকে < ৩০ মিনিট?"}
+    E -->|না| X
+    E -->|হ্যাঁ| F{"Login থেকে < ৮ ঘণ্টা?"}
+    F -->|না| X
+    F -->|হ্যাঁ| OK["Session গ্রহণ; LastSeen হালনাগাদ"]
 ```
+
+Anonymous session-এর ঘড়ি session তৈরির সময় থেকে চলে। Authenticated session-এ idle আর absolute, দুটো শর্তই পাস করতে হবে। Expired record আর বৈধ নয়, এবং পরের request-এ গ্রহণ করা যাবে না.
 
 আসল শিক্ষাটা এখন আসে। আরিফ একটা test লিখল, আক্রমণকারীর দৃষ্টিকোণ থেকে: **যদি আক্রমণকারী ২০ মিনিট পরপর একটা করে request পাঠিয়ে session জাগিয়ে রাখে?**
 
-```go
-stolen := &browser{token: token, ip: "192.0.2.10", ua: "Browser/1.0"}
-for elapsed := 20 * time.Minute; elapsed < 8*time.Hour; elapsed += 20 * time.Minute {
-	c.advance(20 * time.Minute)
-	if r := stolen.do(h, "GET", "/manage/orders", nil); r.Code != 200 {
-		t.Fatalf("keep-alive %v-এ মরে গেল: %d", elapsed, r.Code)
-	}
-}
-c.advance(20 * time.Minute) // এখন ঠিক ৮ ঘণ্টা
-// এবার absolute ঘড়ি কাটে
-```
+ধরো, আক্রমণকারী চুরি করা cookie দিয়ে প্রতি ২০ মিনিটে একটা request পাঠায়। প্রতিবার server `LastSeen` নতুন করলে idle ঘড়ি আবার শুরু হবে। সে যতক্ষণ absolute সীমার মধ্যে আছে, session সচল থাকতে পারে। Absolute timeout-এ পৌঁছালে activity থাকলেও session শেষ হবে.
 
-Test পাস করল, আর তার মানে একটা অপ্রিয় সত্য: **idle timeout চতুর আক্রমণকারীকে থামায় না।** OWASP-ও এটাই বলে: হাইজ্যাক করা session-এ আক্রমণকারী নিজেই activity তৈরি করে ঘড়ি নতুন করে দিতে পারে। Idle timeout কাজের সেই আক্রমণকারীর জন্য, যে দেরিতে আসে। আজকের ঘটনার আক্রমণকারী ৬৬ মিনিট দেরিতে এসেছিল, নতুন নিয়মে সে `/login`-এ ফেরত যেত। কিন্তু সে ১০টা ৪২-এ এলে? তখন idle কিছুই করত না।
+এই পরিস্থিতি একটি অপ্রিয় সত্য দেখায়: **idle timeout চতুর আক্রমণকারীকে থামায় না।** OWASP-ও এটাই বলে: হাইজ্যাক করা session-এ আক্রমণকারী নিজেই activity তৈরি করে ঘড়ি নতুন করে দিতে পারে। Idle timeout কাজের সেই আক্রমণকারীর জন্য, যে দেরিতে আসে। আজকের ঘটনার আক্রমণকারী ৬৬ মিনিট দেরিতে এসেছিল, নতুন নিয়মে সে `/login`-এ ফেরত যেত। কিন্তু সে ১০টা ৪২-এ এলে? তখন idle কিছুই করত না।
 
-আসল বাধা absolute timeout, কারণ সেটা activity দেখে না। আর একটা ছোট সূক্ষ্মতা: absolute ঘড়ি শুরু হয় **login থেকে**, session তৈরির সময় থেকে নয়। কেন, সেটা fixation-এর অংশে (§১০) বুঝবে। এটাও test-এ আছে।
+আসল বাধা absolute timeout, কারণ সেটা activity দেখে না। আর একটা ছোট সূক্ষ্মতা: absolute ঘড়ি শুরু হয় **login থেকে**, session তৈরির সময় থেকে নয়। কেন, সেটা fixation-এর অংশে (§১০) বুঝবে। এটিও policy-তে স্পষ্ট থাকা দরকার।
 
 ### এই মেয়াদের দাম
 
@@ -233,43 +205,20 @@ Session-এর সবচেয়ে বড় সুবিধা অধ্য�
 
 Password বদলের সারিটা নতুন, আর ঠিক আজকের ঘটনার জন্য। ধরো শুভর password আক্রমণকারীও জানে। শুভ password বদলাল, কিন্তু আক্রমণকারীর হাতে আগের session ID। যদি সেটা না কাটি, তাহলে নতুন password-ও আক্রমণকারীকে বের করল না। OWASP-র নির্দেশও: password বদলকে privilege পরিবর্তনের মতো ধরো, session ID নতুন করো।
 
-```go
-// DeleteOthers: একজন user-এর বাকি সব session মোছে, keep ছাড়া।
-func (s *Store) DeleteOthers(userID, keep string) int {
-	keepKey := digest(keep)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	n := 0
-	for k, r := range s.rows {
-		if r.UserID == userID && k != keepKey {
-			delete(s.rows, k)
-			n++
-		}
-	}
-	return n
-}
+Password বদলানোর পর session lifecycle-এর সিদ্ধান্তটি এই flow-তে:
 
-func (a *App) changePassword(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie(cookieName)
-	if err != nil {
-		http.Error(w, "authentication required", http.StatusUnauthorized)
-		return
-	}
-	uid := r.Header.Get("X-Test-User") // শুধু এই demo/test-এর সরলীকরণ
-	// ... এখানে বর্তমান password যাচাই ও নতুন password-এর hash সংরক্ষণ হয় (অধ্যায় ৩) ...
-
-	// আগে বর্তমান session rotate করি। ব্যর্থ হলে অন্য session-গুলো অকারণে কাটব না।
-	token, err := a.sessions.Rotate(c.Value, uid, r.UserAgent(), clientIP(r))
-	if err != nil {
-		http.Error(w, "session update failed", http.StatusInternalServerError)
-		return
-	}
-	a.sessions.DeleteOthers(uid, token) // নতুন session ছাড়া user-এর বাকি সব session মরে
-	setSessionCookie(w, token)
-	w.Header().Set("Cache-Control", "no-store")
-	w.WriteHeader(http.StatusNoContent)
-}
+```mermaid
+flowchart TD
+    A["বর্তমান session-এ password-change request"] --> B{"বর্তমান পরিচয় ও password যাচাই সফল?"}
+    B -->|না| X["পরিবর্তন প্রত্যাখ্যান; session policy অপরিবর্তিত"]
+    B -->|হ্যাঁ| C["নতুন password hash সংরক্ষণ"]
+    C --> D{"বর্তমান session ID rotate সফল?"}
+    D -->|না| E["নিরাপদ failure; অন্য session কাটার আগে incident handle"]
+    D -->|হ্যাঁ| F["নতুন ID-সহ cookie পাঠাও"]
+    F --> G["এই user-এর অন্য সব session বাতিল"]
 ```
+
+এই উদাহরণে password পরিবর্তন সফল হলে বর্তমান session-এর ID নতুন হয় এবং ওই user-এর অন্য session-গুলো বাতিল হয়। আসল implementation-এ password update ও session changes-এর atomicity, failure handling এবং concurrent request-এর আচরণ আলাদাভাবে নির্ধারণ করতে হবে.
 
 (`X-Test-User` শুধু test-এ দেখার জন্য, অধ্যায় ৪-এর middleware-এর সরলীকরণ। আসল অ্যাপে এটা request context থেকে আসে।)
 
@@ -283,35 +232,34 @@ func (a *App) changePassword(w http.ResponseWriter, r *http.Request) {
 
 ধারণা সহজ: session তৈরির সময় কিছু প্রসঙ্গ জমাও (কোন network, কোন browser)। প্রতিটা request-এ মিলিয়ে দেখো। বড় বদল হলে সন্দেহ। OWASP-র দুটো পাতাই এটা বলে, সঙ্গে একটা সতর্কতা, আর এখানেই সূক্ষ্মতা।
 
-```go
-type record struct {
-	UserID    string
-	Next      string // §৯-এ আসবে
-	StartedAt time.Time
-	LastSeen  time.Time
-	UA        string       // login-এর সময়ের User-Agent
-	Net       netip.Prefix // login-এর সময়ের network (IPv4 হলে /24, IPv6 হলে /64)
-}
+Session record-এ সাধারণত নিচের ধরনের তথ্য লাগে:
 
-// Suspicious: একটা সংকেত, প্রমাণ নয়।
-func (r record) Suspicious(ua string, ip netip.Addr) bool {
-	return r.UA != ua || !r.Net.Contains(ip.Unmap())
-}
-```
+| তথ্য | উদ্দেশ্য |
+|---|---|
+| User ID ও authentication state | session কোন পরিচয়ের, এবং login সম্পন্ন কি না |
+| শুরু ও শেষ activity-র সময় | absolute ও idle timeout |
+| Login-এর সময়ের User-Agent ও network prefix | পরিবর্তনকে risk signal হিসেবে দেখা |
+| Anonymous session-এর `Next` destination | login-এর পরে কোথায় ফেরত পাঠাতে হবে |
+
+এগুলো illustrative field, কোনো নির্দিষ্ট language বা storage schema নয়. User-Agent/IP mismatch পরিচয়ের প্রমাণ নয়; এটি কেবল অতিরিক্ত যাচাইয়ের সংকেত.
 
 আর middleware-এ:
 
-```go
-if rec.Suspicious(r.UserAgent(), clientIP(r)) {
-	log.Printf("session context changed: user=%s", rec.UserID) // raw ID নয়
-	a.sessions.Delete(c.Value)
-	clearSessionCookie(w)
-	deny()
-	return
-}
+প্রতিটি request-এ context বদলকে একমাত্র authentication decision না বানিয়ে risk signal হিসেবে ধরো:
+
+```mermaid
+flowchart TD
+    A["Session lookup ও timeout check পাস"] --> B["বর্তমান User-Agent/network-এর সঙ্গে তুলনা"]
+    B --> C{"অপ্রত্যাশিত পরিবর্তন?"}
+    C -->|না| D["স্বাভাবিক authorization check চালাও"]
+    C -->|হ্যাঁ| E["Raw session ID ছাড়া event log করো"]
+    E --> F["Risk policy: re-authenticate, step-up বা revoke"]
+    F --> G["User-কে নিরাপদ recovery পথ দাও"]
 ```
 
-আরিফ চারটা পরীক্ষা চালাল। ফলগুলো নিজে চালিয়ে দেখা:
+Network বা User-Agent বদলেছে বলে session স্বয়ংক্রিয়ভাবে বাতিল করাই সবসময় সঠিক নয়. VPN, mobile network ও shared Wi-Fi false positive দিতে পারে; একই network-এর ভেতরে আক্রমণকারী আবার ধরা নাও পড়তে পারে.
+
+কয়েকটি সম্ভাব্য ফল নিয়ে চিন্তা করো:
 
 | পরিস্থিতি | ফল | কেন |
 |---|---|---|
@@ -383,24 +331,22 @@ A-তে false positive-এর কারণে বৈধ user বারবার
 
 "Login সফল হলে নতুন session বানানোর দরকার কী? একটা তো আগে থেকেই আছে। শুধু ওই row-তে user বসিয়ে দিই।"
 
-```go
-// আরিফের সংস্করণ। কাজ করে, কিন্তু ভুল। (এটা test-ফাইলে আছে, কারণ production কোডে এই ভুল থাকা উচিত নয়।)
-func upgradeInPlace(s *Store) func(old, uid string, r *http.Request) (string, error) {
-	return func(old, uid string, r *http.Request) (string, error) {
-		s.mu.Lock()
-		defer s.mu.Unlock()
-		if rec, ok := s.rows[digest(old)]; ok {
-			rec.UserID = uid // চালু anonymous row-তেই user বসাল
-			rec.StartedAt, rec.LastSeen = s.now(), s.now()
-			s.rows[digest(old)] = rec
-			return old, nil // সেই একই ID
-		}
-		// ...
-	}
-}
+আরিফের ভুল সিদ্ধান্তটা ভাষায় লিখলে এমন: login সফল হলে anonymous session-এর আগের ID-টাই রেখে শুধু তার সঙ্গে user জুড়ে দেওয়া। এতে ID-টি login-এর আগেই আক্রমণকারীর জানা থাকতে পারে, কিন্তু login-এর পরে সেটিই authenticated credential হয়ে যায়.
+
+```mermaid
+sequenceDiagram
+    actor Atk as আক্রমণকারী
+    participant S as KenaKata server
+    participant B as শুভর browser
+    Atk->>S: Login পাতা চেয়ে anonymous ID=X পায়
+    Atk->>B: X browser-এ বসানোর চেষ্টা
+    B->>S: POST /login, Cookie ID=X
+    S->>S: ভুল নকশা: X-তেই user জুড়ে দেয়
+    Atk->>S: GET /manage/orders, Cookie ID=X
+    S-->>Atk: 200, শুভর পরিচয়ে
 ```
 
-সে test করল: লিংক ধরে login, ঠিক জায়গায় ফেরা। সব ঠিক। এবং, অধ্যায় ৩-এর পাঠ আবার: **functional test পাস করা আর নিরাপদ হওয়া এক নয়।**
+সাধারণ functional check-এ লিংক ধরে login করে ঠিক জায়গায় ফেরা সফল হতে পারে। কিন্তু, অধ্যায় ৩-এর পাঠ আবার: **functional test পাস করা আর নিরাপদ হওয়া এক নয়।**
 
 ### আক্রমণকারীর চেয়ার
 
@@ -446,19 +392,9 @@ sequenceDiagram
 
 ছবিতে খেয়াল করো, কোথাও কিছু ভাঙেনি। Password ঠিক ছিল, TLS ঠিক ছিল, Argon2id ঠিকঠাক চলেছে। আক্রমণকারী password জানেই না। যে মুহূর্তে server `X`-কে "user-4-এর" বলে লিখল, সেই মুহূর্তে ID `X` একটা authenticated credential হয়ে গেল, আর `X` আক্রমণকারী আগে থেকেই জানত।
 
-আরিফ এটা নিজের test-এও চালাল, আক্রমণকারীর ভূমিকায়:
+আক্রমণকারীর ভূমিকায় ঘটনাটির ধাপগুলো সাজালে:
 
-```go
-attacker.do(h, "GET", "/login", nil)          // server নিজে একটা বৈধ anonymous ID দিল
-fixedID := attacker.token
-
-victim := &browser{token: fixedID, ip: "203.0.113.58", ua: "Browser/1.0"} // X এখন victim-এর jar-এ
-victim.do(h, "POST", "/login", shuvoLogin)    // victim login করে
-
-attacker.token = fixedID                      // attacker কোনো নতুন কিছু পায়নি, শুধু X
-resp := attacker.do(h, "GET", "/manage/orders", nil)
-// resp.Code == 200, আর body-তে user-4
-```
+এখানে আক্রমণকারীর জন্য নতুন কোনো secret দরকার হয় না. সে server-প্রদত্ত anonymous ID-টি আগেই জানে; victim login করার পর একই ID-কে authenticated হিসেবে গ্রহণ করাটাই fixation-এর ফাটল.
 
 ### Strict mode কেন যথেষ্ট নয়
 
@@ -474,30 +410,13 @@ resp := attacker.do(h, "GET", "/manage/orders", nil)
 
 Login সফল হলে পুরোনো ID নষ্ট করো, একটা নতুন ID বানাও, আর authenticated অবস্থা বসাও সেটাতে। OWASP, WSTG আর NIST তিনজনই এই কথা বলে। OWASP: privilege-এর স্তর বদলালে ID নতুন করতে হবে, আর পুরোনোটা নষ্ট করতে হবে। NIST-এর ভাষায়, session secret তৈরি হবে authentication event-এর সরাসরি প্রতিক্রিয়ায়। WSTG: authenticate করার আগে বিদ্যমান ID অকার্যকর করো, সফল হলে নতুন ID দাও।
 
-```go
-// Rotate: login সফল হলে পুরোনো ID মেরে নতুন ID বানায়।
-// পুরোনো session থেকে শুধু Next নেয়। StartedAt আবার শুরু: absolute ঘড়ি login থেকে।
-func (s *Store) Rotate(old, userID, ua string, ip netip.Addr) (string, error) {
-	now := s.now()
-	var next string
-	oldKey := digest(old)
-	s.mu.Lock()
-	if r, ok := s.rows[oldKey]; ok {
-		// Expired anonymous session-এর Next নতুন authenticated session-এ টানা যাবে না।
-		if s.alive(r, now) && !r.Authenticated() {
-			next = r.Next
-		}
-		delete(s.rows, oldKey) // পুরোনো ID মরে গেল, expired হলেও
-	}
-	s.mu.Unlock()
+নিরাপদ rotation-এর invariant:
 
-	return s.put(record{
-		UserID: userID, Next: next,
-		StartedAt: now, LastSeen: now,
-		UA: ua, Net: prefixOf(ip),
-	})
-}
-```
+- Authentication সফল হওয়ার আগে authenticated session তৈরি হবে না.
+- Login-এর সময় পুরোনো anonymous ID অকার্যকর হবে, নতুন cryptographically unpredictable ID তৈরি হবে.
+- পুরোনো ID-র সঙ্গে user-কে জুড়ে দেওয়া হবে না; authenticated session-এর absolute timeout login-এর সময় থেকে শুরু হবে.
+- Anonymous session-এর `Next` destination কেবল বৈধ, same-site/local destination হলে নতুন session-এ নেওয়া হবে.
+- Rotation ব্যর্থ হলে পুরোনো ID-কে authenticated হিসেবে চালু রাখা যাবে না; failure path-এ session state নিরাপদ থাকতে হবে.
 
 আর handler-এ `upgradeInPlace`-এর জায়গায় এটা। বাকি handler একই। নতুন cookie `Set-Cookie`-তে যায়, আর `Cache-Control: no-store` থাকে (অধ্যায় ৪)।
 
@@ -678,7 +597,7 @@ Login-এর আগে browser-এ session ID `X` ছিল। Login সফল �
 <details>
 <summary>উত্তর ও ব্যাখ্যা দেখো</summary>
 
-**Session fixation প্রতিরোধ।** Login-এর সময় ID rotate হয়েছে, আর পুরোনো ID authenticated session হিসেবে আর গ্রহণ করা হচ্ছে না। শুধু নতুন cookie পাঠানো যথেষ্ট নয়, পুরোনো ID-টিকেও অকার্যকর করতে হবে। এই test fixation-এর একটি গুরুত্বপূর্ণ পথ পরীক্ষা করে; এটি একা পুরো application-এর সব session security প্রমাণ করে না।
+**Session fixation প্রতিরোধ।** Login-এর সময় ID rotate হয়েছে, আর পুরোনো ID authenticated session হিসেবে আর গ্রহণ করা হচ্ছে না। শুধু নতুন cookie পাঠানো যথেষ্ট নয়, পুরোনো ID-টিকেও অকার্যকর করতে হবে। এই conceptual check fixation-এর একটি গুরুত্বপূর্ণ পথ পরীক্ষা করে; এটি একা পুরো application-এর সব session security প্রমাণ করে না।
 
 </details>
 
@@ -690,16 +609,15 @@ Login-এর আগে browser-এ session ID `X` ছিল। Login সফল �
 
 **এক: fixation।** দুটো `curl` jar দিয়ে:
 
-```bash
-# ১. login পাতা থেকে একটা anonymous cookie নাও (attacker হিসেবে)
-curl -si https://staging.example/login -c attacker.jar | head -20
+### Conceptual verification: fixation
 
-# ২. সেই cookie সহ login করো (victim হিসেবে), আর নতুন cookie আলাদা jar-এ রাখো
-curl -si -b attacker.jar -c victim.jar -d 'email=...&password=...' https://staging.example/login
+1. আক্রমণকারী login পাতা থেকে anonymous ID `X` পায়.
+2. Victim-এর browser-এ `X` বসানো সম্ভব হয় কি না, তা threat model অনুযায়ী বিবেচনা করো.
+3. Victim `X` নিয়ে login করে.
+4. Victim-এর login response-এ নতুন ID `Y` আসে এবং server-side `X` অকার্যকর করে.
+5. আক্রমণকারী `X` দিয়ে protected resource চাইলে request প্রত্যাখ্যাত হয়; `Y`-ই একমাত্র authenticated session.
 
-# ৩. attacker-এর পুরোনো jar দিয়ে protected পাতা চাও
-curl -si -b attacker.jar https://staging.example/protected
-```
+এটি ধারণাগত পরীক্ষা, executable test নয়. বাস্তব application-এ test করার সময় অনুমোদিত staging environment ব্যবহার করতে হবে.
 
 তৃতীয় ধাপে `200` এলে fixation আছে। দ্বিতীয় ধাপের response-এ `Set-Cookie` নেই মানেও সন্দেহজনক। (এই কৌশল WSTG-SESS-03-এর "forced cookies" পরীক্ষার ছোট রূপ।)
 
@@ -738,7 +656,7 @@ Browser তো cookie নিজে জুড়ে দেয়। আক্র�
 - [NIST SP 800-63B-4: Session Management](https://pages.nist.gov/800-63-4/sp800-63b/session/) আর [AAL পাতা](https://pages.nist.gov/800-63-4/sp800-63b/aal/): **দুটো পাতাই পুরো পড়া।** session secret তৈরি হয় authentication event-এর প্রতিক্রিয়ায়, cookie-র নিয়ম, timeout শেষ হলে session শেষ, session monitoring আর তার privacy, DBSC-র উল্লেখ, AAL1–3-এর timeout-সংখ্যা।
 - [W3C DBSC explainer](https://github.com/w3c/webappsec-dbsc/blob/main/README.md): **পড়া।** লক্ষ্য, non-goal, refresh প্রক্রিয়া। Spec উন্নয়নাধীন।
 - [Chrome Developers: DBSC now available on Windows](https://developer.chrome.com/blog/dbsc-windows-announcement) এবং [Chrome Developers overview](https://developer.chrome.com/blog/io26-web-identity), সঙ্গে [W3C DBSC Editor's Draft](https://w3c.github.io/webappsec-dbsc/): **প্রাথমিক browser/specification উৎস পড়া।** Chrome-এর Windows availability-র ঘোষণা ও experimental status আলাদা করে উল্লেখ করা হয়েছে; অন্য browser/platform-এর support নিশ্চিত বলে দাবি করা হয়নি। DBSC-র অবস্থা দ্রুত বদলায়, প্রকাশের আগে আবার যাচাই করো।
-- Go: আগের সংস্করণ Go 1.22.2 দিয়ে compile করে `go vet` আর `go test` (race detector সহ) চালানো হয়েছিল। Test পরীক্ষা করেছিল: দুর্বল (`upgradeInPlace`) সংস্করণে fixation সফল, rotate-সংস্করণে ব্যর্থ আর পুরোনো ID মৃত, অচেনা ID প্রত্যাখ্যান, anonymous session দিয়ে protected পাতা বন্ধ, `next` আর বাইরের URL প্রত্যাখ্যান, idle আর absolute timeout (সক্রিয় keep-alive সহ), absolute ঘড়ি login থেকে, anonymous TTL, password বদলে বাকি session মৃত আর নিজেরটার ID নতুন, logout-এর পর কপি-করা cookie মৃত, context signal (অন্য network ধরা পড়ে, একই /24 পড়ে না, network বদলালে false positive), একসঙ্গে ৫০টা login, `Set-Cookie`-র আকার। `Rotate`-এর `delete` সরিয়ে mutation চালানো হয়েছিল, test ফেল করেছিল। **এই review-তে `Rotate` বদলানোর পর compile/test আবার চালানো হয়নি**; নতুন test-এ expired anonymous session-এর `Next` নতুন session-এ না যাওয়া এবং password-change rotation failure path-ও যাচাই করতে হবে. চালানো হয়নি: বাস্তব browser-এ আচরণ, আসল TLS, একাধিক server, `X-Forwarded-For`। Test-এর IP নমুনা (`203.0.113.x`), লেখার IP আলাদা নমুনা (`192.0.2.x`, `198.51.100.x`), আচরণ একই।
+- আগের সংস্করণে Go implementation ও automated test ছিল; সেগুলো এই diagram-first সংস্করণের অংশ নয়। এখানে কোনো application code compile বা test করা হয়নি. বাস্তব implementation audit আলাদা কাজ۔
 
 ## লেখার অবস্থা
 
