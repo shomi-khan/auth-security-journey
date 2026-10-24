@@ -593,38 +593,22 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 
 ## 🧪 পাঁচ মিনিটের পরীক্ষা
 
-**এক।** নিজের machine-এ একই কাজ মাপো. `golang.org/x/crypto/argon2` প্যাকেজ লাগবে:
+**এক।** আগের চারটি প্রশ্নের উত্তর flowchart দেখে নিজে যাচাই করো।
 
-```go
-package main
+```text
+পাঁচ মিনিটের চিন্তার অনুশীলন
 
-import (
-	"crypto/sha256"
-	"fmt"
-	"time"
+১. SHA-256 আর Argon2id-এর মধ্যে কোনটি password guess করা ব্যয়বহুল করে, এবং কেন?
+২. একই password-এর জন্য দুটি account-এর hash যেন এক না হয়, তার জন্য কোন উপাদানটি দরকার?
+৩. Registration-এ NFC normalization করা হলেও login-এ না করলে কী সমস্যা হতে পারে?
+৪. Database dump ফাঁস হলে rate limit কেন offline guessing থামাতে পারে না?
 
-	"golang.org/x/crypto/argon2"
-)
-
-func main() {
-	pw := []byte("correct horse battery staple")
-	salt := []byte("0123456789abcdef") // শুধু পরীক্ষার জন্য ধ্রুব salt
-
-	start := time.Now()
-	for i := 0; i < 1_000_000; i++ {
-		sha256.Sum256(pw)
-	}
-	fmt.Println("১০ লক্ষ × SHA-256:", time.Since(start))
-
-	start = time.Now()
-	argon2.IDKey(pw, salt, 2, 19*1024, 1, 32)
-	fmt.Println("১ × Argon2id     :", time.Since(start))
-}
+নিজের উত্তরের পাশে সংশ্লিষ্ট flowchart-এর security invariant লিখে দেখো। বাস্তব benchmark বা code চালানো এই অধ্যায়ের শেখার শর্ত নয়।
 ```
 
-দুটো সময়ের অনুপাত দেখো। তারপর `t` আর `m` বদলে দেখো, কোন parameter-এ তোমার machine-এ এক সেকেন্ডের কাছাকাছি যায়।
+বাস্তব system-এ Argon2id parameter বাছাই করতে hardware ও concurrent login load অনুযায়ী benchmark দরকার। এই সিরিজে আমরা implementation code না লিখে এই trade-off-এর কারণ শিখছি।
 
-**দুই।** নিজের কোনো project-এর **staging** database-এ (production-এ নয়) `users` table খোলো। Password column-টা পড়া যায়? যায় যদি, সেটা কী: plaintext, দ্রুত hash, নাকি `$argon2id$...`-এর মতো কিছু? তারপর application log-এ `grep` করে দেখো কোথাও password বা তার ধরনের কিছু লেখা আছে কি না।
+**দুই।** কাল্পনিক একটি database dump-এ `password` column দেখলে কী প্রশ্ন করবে? সেখানে plaintext, দ্রুত hash, নাকি `$argon2id$...`-এর মতো PHC string আছে? এরপর log-এ password বা credential-সংক্রান্ত তথ্য থাকার ঝুঁকি ব্যাখ্যা করো।
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
@@ -650,7 +634,7 @@ func main() {
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ বার্তা, response-এর সময়ে তথ্য ফাঁস, dummy hash। (এই খসড়া লেখার সময় শুধু প্রাসঙ্গিক অংশ দেখা হয়েছে। Technical Review-এ পূর্ণ পাঠ মেলাতে হবে।)
 - [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): §৩.১-এ parameter-এর সংজ্ঞা এবং §৪ ও §৭.৪-এ Argon2id parameter বাছাইয়ের recommendation সরাসরি পড়ে মেলানো হয়েছে। RFC-র 2 GiB ও 64 MiB recommendation-কে OWASP-এর 19 MiB, `t=2`, `p=1` baseline-এর সঙ্গে এক করে দেখা যাবে না; hardware অনুযায়ী benchmark জরুরি।
 - [PHC string format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md): `$argon2id$v=19$m=...,t=...,p=...$salt$hash` গঠন। (OWASP-র পাতা যে লিঙ্ক দেয়, সেটা। সরাসরি পড়া হয়নি।)
-- `golang.org/x/crypto/argon2` আর `golang.org/x/crypto/bcrypt`: আগের সংস্করণের উদাহরণ Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে compile করে চালানো হয়েছিল (hash বানানো, যাচাই, ভুল password, না-থাকা user, `NeedsRehash`, bcrypt-এর ৭২ byte error)। এই review-তে Argon2id parser ও NFC normalization বদলানোর পর **বর্তমান সংস্করণ compile বা test করে পুনরায় যাচাই করা হয়নি**। তাই আগের test result নতুন সংস্করণের পক্ষে প্রমাণ নয়। `norm.NFC` integration, malformed PHC input-এর negative case এবং `checkPolicy`-র মতো ছোট টুকরো আলাদা করে পরীক্ষা করা বাকি।
+- Password hashing implementation-এর সঠিকতা শুধু diagram বা PHC string দেখে প্রমাণ করা যায় না। Production system-এ ব্যবহারের আগে নির্বাচিত, রক্ষণাবেক্ষণাধীন password-hashing library-এর official documentation অনুসরণ করতে হবে এবং parameter parsing, malformed PHC string, ভুল password, account না পাওয়া, Unicode normalization ও rehash flow আলাদাভাবে যাচাই করতে হবে। এই সিরিজের উদাহরণগুলো implementation নয়, শেখার মডেল।
 - Robert Morris, Ken Thompson, *Password Security: A Case History*, Communications of the ACM, ১৯৭৯: Unix-এর password file-এ salt-এর ঐতিহাসিক উদাহরণ। (ঐতিহাসিক সূত্র, স্পেসিফিকেশন নয়। সরাসরি মেলানো হয়নি।)
 - Unicode Standard Annex #15, *Unicode Normalization Forms* (NFC): NIST-এর নির্দেশনার সূত্রে। (সরাসরি পড়া হয়নি।)
 
