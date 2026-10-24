@@ -654,7 +654,7 @@ flowchart LR
 ## তথ্যসূত্র
 
 - [RFC 6265: HTTP State Management Mechanism](https://www.rfc-editor.org/rfc/rfc6265): প্রকাশিত cookie RFC। পুরো পাঠ পড়ে মেলানো হয়েছে: §১ (Secure-এর অখণ্ডতার সীমা, port-এর আলাদা না হওয়া), §৩.১, §৪.১.২ (Expires, Max-Age, Domain, Path, Secure, HttpOnly), §৪.২.২ (Cookie header-এ অ্যাট্রিবিউট নেই), §৫.৩, §৬.১ (user agent যে কোনো cookie মুছতে পারে), §৮.১–৮.৬ (ambient authority, clear text, session identifier, session fixation, weak confidentiality, weak integrity)।
-- [draft-ietf-httpbis-rfc6265bis-22](https://datatracker.ietf.org/doc/draft-ietf-httpbis-rfc6265bis/): এই লেখার সময় datatracker-এ Active Internet-Draft, IESG state "RFC Ed Queue", RFC Editor status "In Final Review"। এখনো RFC নয়, তাই draft হিসেবেই উদ্ধৃত। Internet-Draft নিজেই বলে, একে work in progress ছাড়া অন্যভাবে উদ্ধৃত করা অনুচিত। কেন্দ্রীয় অংশ পড়ে মেলানো হয়েছে: §৪.১.২.৭, §৪.১.৩ (`__Secure-`, `__Host-`), §৫.৫ (৪০০ দিনের সীমা), §৫.৬.৭ (SameSite: Strict, Lax, Lax-allowing-unsafe), §৫.৭ (storage model), §৫.৮.৩ (retrieval algorithm)। §৮-এর SameSite-সংক্রান্ত অংশ (§৮.৮) পুরো পড়া হয়নি, তাই সেখানকার কোনো দাবি এখানে নেই। যেহেতু draft বদলাতে পারে, লেখার আগে আবার দেখে নিয়ো। RFC হয়ে গেলে লিংক বদলাবে।
+- [draft-ietf-httpbis-rfc6265bis-22](https://datatracker.ietf.org/doc/draft-ietf-httpbis-rfc6265bis/): ২০২৬-১০-২৫ তারিখে datatracker-এ draft-টির IESG state "RFC Ed Queue" এবং RFC Editor status "Blocked: Final Approval Pending"। এটি এখনো RFC নয়, তাই draft হিসেবেই উদ্ধৃত। Internet-Draft নিজেই বলে, একে work in progress ছাড়া অন্যভাবে উদ্ধৃত করা অনুচিত। কেন্দ্রীয় অংশ পড়ে মেলানো হয়েছে: §৪.১.২.৭, §৪.১.৩ (`__Secure-`, `__Host-`), §৫.৫ (৪০০ দিনের সীমা), §৫.৬.৭ (SameSite: Strict, Lax, Lax-allowing-unsafe), §৫.৭ (storage model), §৫.৮.৩ (retrieval algorithm)। §৮-এর SameSite-সংক্রান্ত অংশ (§৮.৮) পুরো পড়া হয়নি, তাই সেখানকার কোনো দাবি এখানে নেই। যেহেতু draft বদলাতে পারে, লেখার আগে আবার দেখে নিয়ো। RFC হয়ে গেলে লিংক বদলাবে।
 - [MDN: Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie): পাতাটা ২০২৬-এর ১ সেপ্টেম্বর সর্বশেষ বদলানো। পুরোটা পড়া হয়েছে: SameSite-এর ডিফল্ট আর দুই মিনিটের ছাড়, HttpOnly cookie JavaScript-এর request-এ যাওয়া, Path "security measure নয়", localhost-এ Secure, prefix, session restore আর Expires-এর ঘড়ির ফারাক।
 - [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html): এই লেখার সময় পুরো পড়া হয়েছে। session ID-র entropy (কমপক্ষে ৬৪ bit, নিজে বানালে CSPRNG-এর ১২৮ bit), generic নাম, server-side storage আর hash-এর বিকল্প, সরল hash যথেষ্ট, strict mode, URL-এর বদলে cookie, `__Host-`, SameSite স্পষ্ট লেখা, মেয়াদ server-এ প্রয়োগ, cookie মুছলে session বাতিল হয় না, `Cache-Control: no-store`, log-এ আসল ID নয়, IP বা User-Agent-এর সঙ্গে binding-এর সীমা।
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110): §১১.৬.১ (`WWW-Authenticate`) ও §১৫.৫.২ (`401 Unauthorized`) মূল RFC Editor-এর পাঠ থেকে পড়ে মেলানো হয়েছে। 401 response-এ challenge থাকা দরকার; cookie-session উদাহরণে এই বিষয়টি এখনো একটি নথিভুক্ত standards caveat, কারণ প্রচলিত cookie login-এর জন্য উপযুক্ত challenge scheme নির্বাচন করা হয়নি।
@@ -665,6 +665,6 @@ flowchart LR
 ## লেখার অবস্থা
 
 - [x] Draft (theory-first revision)
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (conceptual claims ও authoritative references যাচাই করা হয়েছে; implementation audit নয়)
+- [x] Security Review (threat model, control boundaries ও failure paths পর্যালোচিত; production certification নয়)
 - [ ] Published
