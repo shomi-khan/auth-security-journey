@@ -68,3 +68,15 @@ Chapter 3's Technical Review and Security Review checkboxes are now checked for 
 Chapter 4's Go snippets, executable shell command, and code-specific test history were removed from the teaching chapter. The replacement focuses on the browser/server/session mental model, cookie attributes, server-side expiry and revocation, session-store exposure, and the limits of each control. Mermaid diagrams and language-neutral HTTP examples are now the primary explanatory tools.
 
 Chapter 4 Technical Review and Security Review remain unchecked pending a focused source-based review of the revised chapter's conceptual claims, cookie behavior, session lifecycle, and threat boundaries. No implementation tests or browser tests were run for this revision.
+
+
+## 2026-10-25 — Chapter 4 conceptual review completed
+
+- [x] Session ID as a bearer credential, server-side session lookup, expiry and revocation checked against OWASP Session Management guidance and RFC 6265.
+- [x] Cookie attributes reviewed: `Secure`, `HttpOnly`, `SameSite`, `Path`, `Domain`, and `__Host-`; the chapter states both what each helps with and what it does not solve.
+- [x] Session ID entropy, meaningless identifiers, strict acceptance of server-issued IDs, and the distinction between random session ID verifiers and password hashing checked against OWASP guidance.
+- [x] Browser-cookie expiry versus server-side session expiry, logout/replay behavior, and session-store read-only disclosure threat boundary reviewed.
+- [x] Removed code-specific claims and clarified that a stolen session can be as serious as password theft within the application, while typically not reusable across unrelated sites.
+- [x] Refreshed the citation note for draft-ietf-httpbis-rfc6265bis-22: as of 2026-10-25, its RFC Editor state is blocked pending final approval, so it must still be described as a draft, not a published RFC.
+
+The Chapter 4 Technical Review and Security Review checkboxes are checked for conceptual, source-based review only. No code tests, live browser compatibility tests, production deployment tests, or exhaustive implementation audit were performed. Chapter 5 and the other remaining review items are still separate work.
