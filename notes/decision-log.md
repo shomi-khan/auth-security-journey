@@ -29,3 +29,15 @@
 - MFA কোন উপায়ে হবে, সেটা ধরা নেই।
 - দাম আর প্ল্যানের নাম ধরা নেই।
 - লাইসেন্স MIT। Copyright-এর জায়গায় `[COPYRIGHT HOLDER]`, কারণ মালিকের নাম দেওয়া হয়নি।
+
+
+## 2026-10-24 — অধ্যায় ৫-এর session design
+
+এই সিদ্ধান্তগুলো Chapter 5-এর KenaKata-দৃশ্য ও উদাহরণে গৃহীত আচরণ। এগুলো সর্বজনীন security policy নয়।
+
+- Login-এর আগে anonymous session থাকবে, যাতে login-এর পর user-কে তার চাওয়া পাতায় ফেরানো যায়।
+- Session-এর তিনটি server-side timeout: anonymous session ৩০ মিনিট, authenticated session-এর idle timeout ৩০ মিনিট, absolute timeout login থেকে ৮ ঘণ্টা।
+- Login সফল হলে session ID rotate হবে; password বদলালে বর্তমান session-এর ID-ও rotate হবে এবং ওই user-এর অন্য session বাতিল হবে।
+- Session record-এ login-এর সময়ের User-Agent ও network prefix রাখা হবে। বদলকে risk signal হিসেবে ধরা হবে, পরিচয়ের প্রমাণ হিসেবে নয়; KenaKata-র ছোট দোকানের দৃশ্যের বাইরে এই policy পুনর্বিবেচনা করতে হবে।
+- Session store-এর `Lookup` পুরো record ফেরত দেবে, যাতে authentication state, timeout ও context signal যাচাই করা যায়।
+- শুভর session কীভাবে চুরি হয়েছে তা গল্পে নির্দিষ্ট করা হবে না; কারণ চুরির পথ জানা না থাকলেও incident response ও ক্ষতি সীমিত করার ব্যবস্থা দরকার।
