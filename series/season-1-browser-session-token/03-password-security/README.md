@@ -394,21 +394,15 @@ NIST-এর SP 800-63B-4, যা আগের SP 800-63B-কে প্রতি�
 
 কেন composition rule নয়? কারণ ওগুলো মানুষকে একই পূর্বানুমেয় পথে ঠেলে দেয়। বরং দৈর্ঘ্য আর blocklist আসল কাজ করে। NIST-এর মূল যুক্তি পাওয়া যাবে তাদের Appendix A-তে।
 
-```go
-func checkPolicy(email, pw string) error {
-	pw = norm.NFC.String(pw) // policy ও hash একই normalized password দেখবে
-	n := utf8.RuneCountInString(pw) // অক্ষর গোনা code point ধরে, byte ধরে নয়
-	switch {
-	case n < 15:
-		return errors.New("password কমপক্ষে ১৫ অক্ষরের হতে হবে")
-	case n > 128:
-		return errors.New("password ১২৮ অক্ষরের বেশি হতে পারে না")
-	}
-	if isBlocked(pw, email) { // কাল্পনিক: ফাঁস-হওয়া/পরিচিত তালিকা, "kenakata", email-এর অংশ
-		return errors.New("এই password খুব পরিচিত বা অনুমানযোগ্য, অন্যটা বেছে নিন")
-	}
-	return nil // "বড় হাতের অক্ষর + সংখ্যা + চিহ্ন" ধরনের কোনো শর্ত নেই
-}
+```mermaid
+flowchart TD
+    P["Password জমা"] --> N["NFC normalization<br/>policy ও hashing-এ একই নিয়ম"]
+    N --> L{"দৈর্ঘ্য ১৫–১২৮ code point-এর মধ্যে?"}
+    L -->|"না"| R["ব্যবহারকারীকে কারণ জানাও"]
+    L -->|"হ্যাঁ"| B{"পরিচিত/ফাঁস-হওয়া password<br/>বা email-এর অংশ?"}
+    B -->|"হ্যাঁ"| R
+    B -->|"না"| A["Password গ্রহণ"]
+    A -.-> X["বড় হাতের অক্ষর + সংখ্যা + চিহ্ন বাধ্যতামূলক নয়"]
 ```
 
 ফাঁস-হওয়া password-এর তালিকার জন্য OWASP একটা সহজ রাস্তা দেখায়: Pwned Passwords-এর মতো সেবা, যেটা নিজের server-এ চালানোও যায়। আর NIST সতর্ক করে, তালিকা অতি বিশাল হওয়ার সুবিধা কম, কারণ এটা online আক্রমণের জন্য, আর সেখানে আলাদা করে throttling আছে।
@@ -417,7 +411,7 @@ func checkPolicy(email, pw string) error {
 
 NIST বলে Unicode অক্ষর গ্রহণ করা উচিত, আর প্রতিটা code point একটা অক্ষর হিসেবে গোনা হবে (তাই উপরে `utf8.RuneCountInString`)। একই সঙ্গে সতর্ক করে: hash করার আগে NFC নামের normalization চালানো উচিত।
 
-বাংলায় এটা সত্যিকারের সমস্যা। একই দেখতে লাগা অক্ষর দুভাবে সংরক্ষিত হতে পারে। যেমন "ো" একটা একক code point (U+09CB) হতে পারে, আবার "ে" আর "া" দুটো আলাদা code point (U+09C7 ও U+09BE) পরপর বসেও একই রূপ দিতে পারে। সব keyboard, ফোন আর browser একই রূপে সংরক্ষণ করবে, এমন নিশ্চয়তা নেই। NIST নিজেও সতর্ক করে, কিছু endpoint কিছু অক্ষর আলাদাভাবে উপস্থাপন করতে পারে। Normalization না করলে user এক device-এ password বানিয়ে অন্য device-এ ঢুকতে পারবে না, আর বুঝতেও পারবে না কেন। Go-তে `golang.org/x/text/unicode/norm` প্যাকেজের `norm.NFC.String(pw)` দিয়ে এটা করা যায়। নিচের `checkPolicy`, `Hash` ও `Verify`-তে একই normalization দেখানো হয়েছে। Registration, password change/reset এবং login-এর প্রতিটি পথেই একই নিয়ম প্রয়োগ করতে হবে; শুধু policy-তে normalize করে hash বা verify-তে বাদ দিলে হবে না।
+বাংলায় এটা সত্যিকারের সমস্যা। একই দেখতে লাগা অক্ষর দুভাবে সংরক্ষিত হতে পারে। যেমন "ো" একটা একক code point (U+09CB) হতে পারে, আবার "ে" আর "া" দুটো আলাদা code point (U+09C7 ও U+09BE) পরপর বসেও একই রূপ দিতে পারে। সব keyboard, ফোন আর browser একই রূপে সংরক্ষণ করবে, এমন নিশ্চয়তা নেই। NIST নিজেও সতর্ক করে, কিছু endpoint কিছু অক্ষর আলাদাভাবে উপস্থাপন করতে পারে। Normalization না করলে user এক device-এ password বানিয়ে অন্য device-এ ঢুকতে পারবে না, আর বুঝতেও পারবে না কেন। Unicode NFC normalization-এর নিয়মটি implementation-এর উপযুক্ত library দিয়ে প্রয়োগ করতে হবে। Password policy, hash তৈরি ও যাচাই, তিন ক্ষেত্রেই একই normalization বজায় রাখতে হবে। Registration, password change/reset এবং login-এর প্রতিটি পথেই একই নিয়ম প্রয়োগ করতে হবে; শুধু policy-তে normalize করে hash বা verify-তে বাদ দিলে হবে না।
 
 ### বৈধ user-এর খরচ
 
