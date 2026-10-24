@@ -52,6 +52,10 @@ Trade-off
 
 > লক্ষ্য শুধু JWT, OAuth বা Session-এর definition মুখস্থ করানো নয়। লক্ষ্য হলো এমন একটি mental model তৈরি করা, যাতে একজন junior engineer নতুন application-এর authentication এবং authorization architecture নিয়ে নিজে reasoning করতে পারে।
 
+## শেখানোর গভীরতা
+
+এই সিরিজ মূল security theory, mental model, threat model, control-এর সীমা ও trade-off শেখায়। এটি কোনো নির্দিষ্ট programming language, framework বা security library-র implementation manual নয়। Tool-এর detail তখনই থাকবে, যখন মূল ধারণা বোঝাতে বা ভুল security assumption ঠেকাতে দরকার। Chapter-গুলো যেন tool-specific parameter বা implementation detail-এর rabbit hole-এ না ঢুকে যায়।
+
 ## Season 1
 
 ### Browser, Session এবং Token
