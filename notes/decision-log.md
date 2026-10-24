@@ -53,3 +53,11 @@
 - Protocol ও security claim authoritative source দিয়ে যাচাই করতে হবে।
 - পুরোনো অধ্যায়ের code একবারে সব বদলানো হবে না; chapter-by-chapter আপডেট করা হবে।
 - বিস্তারিত নিয়ম: [উদাহরণ ও Diagram লেখার নীতি](../docs/code-example-policy.md)।
+
+
+## 2026-10-25 — Chapter 1-এ diagram-first পদ্ধতির pilot
+
+- Chapter 1 থেকে Go implementation snippet সরিয়ে Mermaid flowchart ও sequence diagram দিয়ে route exposure, server-side authentication guard, protected route grouping এবং প্রতি request-এ Basic credential যাচাইয়ের flow বোঝানো হয়েছে।
+- Browser-এর বাইরে থেকেও request পাঠানো যায়, সেটি বোঝাতে runnable command-এর বদলে illustrative HTTP request রাখা হয়েছে।
+- Log sample, HTTP request ও protocol header-এর মতো ছোট illustrative example রাখা যাবে; এগুলো implementation code নয়।
+- এটি প্রথম pilot। Chapter 1-এর technical ও security review এখনও আলাদা করে সম্পন্ন করতে হবে; code test না চালানোকে correctness-এর প্রমাণ ধরা যাবে না।
