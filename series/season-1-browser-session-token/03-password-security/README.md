@@ -136,12 +136,15 @@ flowchart LR
 
 তাহলে আমরা password রাখব না। রাখব তার hash। Login-এর সময় user যা দিল, তার hash বের করে stored hash-এর সঙ্গে মেলাব। Server কখনো আসল password রাখেনি, শুধু তার ছাপ।
 
-আরিফ SHA-256 বেছে নিল। এটা পরিচিত, শক্তিশালী হিসেবে সুনাম আছে, আর Go-র standard library-তেই আছে:
+আরিফ SHA-256 বেছে নিল। এটা পরিচিত cryptographic hash, কিন্তু password সংরক্ষণের জন্য খুব দ্রুত। Flowchart-এ দেখা যাক, এই দ্রুততার কারণে কী সমস্যা হয়:
 
-```go
-sum := sha256.Sum256([]byte(pw))
-stored := hex.EncodeToString(sum[:])
-// "password" → 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
+```mermaid
+flowchart TD
+    P["User-এর password"] --> H["দ্রুত SHA-256 hash"]
+    H --> S["একই password হলে একই hash"]
+    S --> D["Database dump"]
+    D --> A["আক্রমণকারী অনেক সম্ভাব্য password নিজে hash করে মিলিয়ে দেখে"]
+    A --> W["দুর্বল password দ্রুত পাওয়া যেতে পারে"]
 ```
 
 আগের চেয়ে ভালো। এখন dump খুলে `rafi1985` পড়া যায় না। কিন্তু এই নকশারও তিনটা ফাটল আছে, আর তিনটাই আক্রমণকারীর অনুমান করার ধরন থেকে আসে।
