@@ -227,14 +227,18 @@ OWASP-র বর্তমান Password Storage Cheat Sheet যেভাবে 
 
 ### bcrypt-এর ৭২ byte আর বাংলা password
 
-bcrypt শুধু প্রথম ৭২ byte পড়ে। OWASP বলে, বেশিরভাগ implementation-এ এই সীমা আছে, তাই ৭২ byte-এর বেশি password আটকাতে হবে। আমার পরীক্ষা করা Go library (`golang.org/x/crypto` v0.31.0) এমন password-এ error দেয়:
+bcrypt-এর প্রচলিত implementation-গুলো password-এর প্রথম ৭২ byte-ই ব্যবহার করে। OWASP তাই এই সীমা সম্পর্কে সতর্ক করে। কোনো library অতিরিক্ত দীর্ঘ password প্রত্যাখ্যান করতে পারে, আবার কোনোটি নীরবে truncate করতে পারে।
 
-```go
-_, err := bcrypt.GenerateFromPassword([]byte(strings.Repeat("a", 73)), 12)
-fmt.Println(err) // bcrypt: password length exceeds 72 bytes
+```mermaid
+flowchart TD
+    P["Password"] --> B["bcrypt"]
+    B --> L{"UTF-8 encoded password<br/>৭২ byte-এর বেশি?"}
+    L -->|"হ্যাঁ"| E["কিছু implementation reject করে;<br/>কিছু truncate করতে পারে"]
+    L -->|"না"| V["bcrypt যাচাই"]
+    E --> R["সীমা ও library behavior বুঝে নাও"]
 ```
 
-সব implementation এমন ভদ্র নয়। কিছু চুপচাপ ছেঁটে ফেলে, আর তখন user ভাবে তার ৩০ অক্ষরের password কাজ করছে, অথচ যাচাই হচ্ছে শুধু প্রথম অংশ। NIST-এর নির্দেশনা স্পষ্ট: verifier-কে পুরো password যাচাই করতে হবে, ছাঁটা চলবে না।
+সব implementation একইভাবে আচরণ করে না। কোনোটি চুপচাপ ছেঁটে ফেললে user ভাবে তার পুরো password যাচাই হচ্ছে, অথচ শুধু প্রথম অংশ ব্যবহৃত হচ্ছে। NIST-এর নির্দেশনা স্পষ্ট: verifier-কে পুরো password যাচাই করতে হবে, ছাঁটা চলবে না।
 
 এখানে একটা স্থানীয় বিষয় আছে। UTF-8-এ বাংলা অক্ষর সাধারণত ৩ byte নেয়। অর্থাৎ ২৪টা বাংলা অক্ষরেই ৭২ byte পূর্ণ। বাংলায় একটা লম্বা passphrase বেছে নিলে bcrypt-এর সীমা সবার আগে তাকেই ধাক্কা দেয়। Argon2id-তে এমন ছোট সীমা নেই।
 
