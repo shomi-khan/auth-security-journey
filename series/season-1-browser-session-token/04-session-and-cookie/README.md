@@ -256,176 +256,70 @@ browser নিজে পাঠায়, এই সুবিধাটাই আ�
 
 ---
 
-## ৬. কোড: খাতা, cookie, আর অধ্যায় ১-এর ফাঁকা `authenticate`
 
-এই কোড আমি Go 1.22.2-তে compile করে, test চালিয়ে দেখেছি (§তথ্যসূত্রে বিস্তারিত)। প্রথমে খাতা। `Store` একটা `map`, production-এ এটা database বা Redis-এর মতো কিছু হবে। ধারণাটা এক।
+## ৬. Request এলে server কীভাবে session চিনবে?
 
-```go
-package main
+এবার Go বা কোনো framework-এর implementation দেখব না। আগে mechanism-টা মাথায় বসাই।
 
-import (
-	"crypto/rand"
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/hex"
-	"sync"
-	"time"
-)
+### Login থেকে পরের request পর্যন্ত
 
-const (
-	tokenBytes  = 32            // ২৫৬ bit
-	sessionLife = 8 * time.Hour // এই অধ্যায়ের সরল ছক: একটাই মেয়াদ। idle আর absolute আলাদা হবে অধ্যায় ৫-এ
-)
+```mermaid
+sequenceDiagram
+    actor R as রাফি
+    participant B as Browser
+    participant S as KenaKata server
+    participant DB as Session store
 
-type record struct {
-	UserID    string
-	CreatedAt time.Time
-	ExpiresAt time.Time
-}
+    R->>B: Email ও password দিয়ে login
+    B->>S: Login request
+    S->>S: Password যাচাই
+    alt Password ভুল
+        S-->>B: Login ব্যর্থ
+    else Password সঠিক
+        S->>DB: নতুন random session ID-র verifier/record সংরক্ষণ
+        S-->>B: Set-Cookie: session ID + cookie attributes
+        B->>B: Cookie সংরক্ষণ
+    end
 
-// Store: key হলো session ID-র hash, session ID নিজে নয়।
-type Store struct {
-	mu   sync.Mutex
-	rows map[string]record
-	now  func() time.Time
-}
-
-func NewStore() *Store {
-	return &Store{rows: map[string]record{}, now: time.Now}
-}
-
-func digest(token string) string {
-	sum := sha256.Sum256([]byte(token))
-	return hex.EncodeToString(sum[:])
-}
-
-// Create নতুন random session ID বানায়। store-এ যায় শুধু তার hash।
-// ID ফেরত যায় একবারই, cookie-তে বসানোর জন্য।
-func (s *Store) Create(userID string) (string, error) {
-	b := make([]byte, tokenBytes)
-	if _, err := rand.Read(b); err != nil { // crypto/rand, math/rand নয়
-		return "", err
-	}
-	token := base64.RawURLEncoding.EncodeToString(b)
-
-	now := s.now()
-	s.mu.Lock()
-	s.rows[digest(token)] = record{UserID: userID, CreatedAt: now, ExpiresAt: now.Add(sessionLife)}
-	s.mu.Unlock()
-	return token, nil
-}
-
-// Lookup: cookie থেকে আসা ID কোন user-এর? না পেলে বা মেয়াদ গেলে ok=false।
-func (s *Store) Lookup(token string) (string, bool) {
-	key := digest(token)
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	r, found := s.rows[key]
-	if !found {
-		return "", false
-	}
-	if !s.now().Before(r.ExpiresAt) {
-		delete(s.rows, key)
-		return "", false
-	}
-	return r.UserID, true
-}
+    B->>S: পরের request + Cookie
+    S->>S: Session ID থেকে record খোঁজা
+    S->>DB: Record আছে, মেয়াদ বৈধ?
+    alt বৈধ session
+        DB-->>S: User identity ও session state
+        S->>S: Identity দিয়ে authorization পরীক্ষা
+        S-->>B: অনুমোদিত response
+    else Cookie নেই, অজানা বা মেয়াদোত্তীর্ণ session
+        DB-->>S: বৈধ session নেই
+        S-->>B: Login করতে বলো / authentication error
+    end
 ```
 
-কোডে নাম `token`, কারণ এটা random, অনুমান-অযোগ্য মান। মনে রেখো, এটাই session ID। তারপর cookie বসানো:
+খেয়াল করো, **session authentication-এর বিকল্প প্রমাণ নয়; এটি সফল authentication-এর পরের অবস্থা ধরে রাখে।** Session থেকে user-কে চেনার পরও প্রতিটি protected action-এ তার অনুমতি আছে কি না আলাদা করে যাচাই করতে হয়।
 
-```go
-const cookieName = "__Host-id"
+### Server-এর খাতায় কী থাকবে?
 
-func setSessionCookie(w http.ResponseWriter, token string) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
-		Value:    token,
-		Path:     "/",                  // __Host- prefix-এর শর্ত
-		Secure:   true,                 // শুধু HTTPS-এ যাবে
-		HttpOnly: true,                 // document.cookie-তে দেখা যাবে না
-		SameSite: http.SameSiteLaxMode, // ডিফল্টের ওপর ভরসা নয়, স্পষ্ট করে লেখা
-		// Domain নেই: __Host- prefix-এ Domain থাকা চলে না। cookie শুধু এই host-এ
-		// MaxAge/Expires নেই: browser বন্ধ হলে cookie যাওয়ার কথা। আসল মেয়াদ server-এর খাতায়
-	})
-}
+Session store-এ সাধারণত session-এর সঙ্গে যুক্ত user, কখন তৈরি হয়েছে, কখন মেয়াদ শেষ হবে এবং প্রয়োজনীয় session state থাকে। Browser-এর cookie-তে থাকবে server-এর তৈরি একটি random, অনুমান-অযোগ্য session identifier। ID-র ভেতরে email, role বা অন্য ব্যক্তিগত তথ্য encode করার দরকার নেই।
+
+কিছু গুরুত্বপূর্ণ সিদ্ধান্ত:
+
+- **Session ID-র randomness:** ID অনুমান করা কঠিন হতে হবে। Randomness guessing-এর ঝুঁকি কমায়, কিন্তু ID চুরি হয়ে গেলে replay ঠেকায় না।
+- **Server-side state:** server record মুছে বা invalidate করে session বন্ধ করতে পারে। এর বদলে server-side state রাখতে হয় এবং একাধিক server থাকলে session store-এ সমন্বয় দরকার।
+- **Store-এ raw ID নাকি verifier:** raw ID store-এ রাখলে read-only database leak-এ সেই ID-গুলো replay করা যেতে পারে। Threat model-এ store leak থাকলে ID-র one-way verifier রাখা ঝুঁকি কমাতে পারে। এটা একটি design choice, সব system-এর একমাত্র বাধ্যতামূলক architecture নয়।
+- **কেন password-এর মতো ধীর hash নয়?** Session ID server-ই cryptographically secure random উৎস থেকে তৈরি করে; password-এর মতো মানুষের অনুমানযোগ্য পছন্দ নয়। তাই verifier-এর জন্য সাধারণত দ্রুত cryptographic hash যথেষ্ট। এতে request-এর খরচ কম থাকে।
+- **কখন session তৈরি হবে?** Password যাচাই সফল হওয়ার পরে নতুন session তৈরি করো। Login-এর আগে attacker-এর বেছে দেওয়া session ID-কে authenticated session হিসেবে চালিয়ে দিও না। Login-এর সময় session ID বদলানো session fixation প্রতিরোধের গুরুত্বপূর্ণ অংশ, যা পরের অধ্যায়ে দেখব।
+
+### Cookie-র মান আর server-এর record এক জিনিস নয়
+
+```mermaid
+flowchart TD
+    A["Browser cookie jar<br/>random session ID"] -->|প্রতিটি request-এ পাঠায়| B["Server session lookup"]
+    B --> C{"Record আছে এবং মেয়াদ বৈধ?"}
+    C -->|হ্যাঁ| D["সংশ্লিষ্ট user identity"]
+    C -->|না| E["Unauthenticated"]
+    D --> F["Authorization আলাদা করে যাচাই"]
 ```
 
-এই একটা ফাংশন যে সিদ্ধান্তগুলো বয়ে আনছে, সেগুলো পরের অংশে একে একে খুলব। আগে অধ্যায় ১-এর ফাঁকা `authenticate` আর পাহারাদার:
-
-```go
-func authenticate(r *http.Request) (Identity, bool) {
-	c, err := r.Cookie(cookieName)
-	if err != nil {
-		return Identity{}, false
-	}
-	userID, ok := sessions.Lookup(c.Value)
-	if !ok {
-		return Identity{}, false
-	}
-	return Identity{UserID: userID}, true
-}
-
-func requireAuthentication(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, ok := authenticate(r)
-		if !ok {
-			if r.Method == http.MethodGet { // browser-এর পাতা: login পাতায় পাঠাই
-				http.Redirect(w, r, "/login", http.StatusFound)
-				return
-			}
-			http.Error(w, "authentication required", http.StatusUnauthorized)
-			return
-		}
-		ctx := context.WithValue(r.Context(), identityKey{}, id)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-```
-
-আর `loginHandler`-এর সেই `_ = id` লাইন এখন এরকম:
-
-```go
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, 4<<10)
-	id, ok := verifyPassword(r.FormValue("email"), r.FormValue("password"))
-	if !ok {
-		http.Error(w, "email বা password ঠিক নয়", http.StatusUnauthorized)
-		return
-	}
-	token, err := sessions.Create(id.UserID)
-	if err != nil {
-		http.Error(w, "server error", http.StatusInternalServerError)
-		return
-	}
-	setSessionCookie(w, token)
-	w.Header().Set("Cache-Control", "no-store") // session ID সহ response কোনো cache-এ জমবে না
-	http.Redirect(w, r, "/manage/orders", http.StatusSeeOther)
-}
-```
-
-আমার test-এ একটা আসল login-এর response header এমন এসেছিল (ID-টা এক-ব্যবহারের নমুনা):
-
-```
-Set-Cookie: __Host-id=jd3COo2PDshkWEsI2mswgz39yB6IXw9k1_zW4jdIN2o; Path=/; HttpOnly; Secure; SameSite=Lax
-```
-
-ID ৪৩ অক্ষরের। store-এ যে key বসেছিল, সেটা এর SHA-256, ৬৪ hex অক্ষরের `c9ae14…edebe`। ID নিজে store-এ নেই।
-
-### কোডের পেছনের সিদ্ধান্তগুলো
-
-**store-এ hash কেন?** অধ্যায় ৩-এ ডাটাবেসের ফাঁস আমাদের ঘুম কেড়েছিল। ধরো আবার কোনোদিন একটা backup বেরিয়ে গেল। store-এ যদি আসল session ID থাকে, আক্রমণকারী সেগুলো cookie হিসেবে বসিয়ে সব চালু session-এ ঢুকে পড়বে, password ছাড়াই। OWASP-র কথা: শক্ত random ID অনুমান আটকায়, কিন্তু ফাঁস-হওয়া ID আটকায় না। তাই read-only ফাঁস যদি threat model-এ থাকে (আমাদের আছে), store-এ one-way hash রাখো।
-
-আমার test-এও এটা দেখেছি: store-এর key, মানে hash-টাকেই cookie হিসেবে পাঠালে server ফিরিয়ে দেয়, কারণ সে hash-এর hash খোঁজে।
-
-**Argon2id নয় কেন, SHA-256 কেন?** অধ্যায় ৩-এর তালিকায় লিখেছিলাম, যন্ত্রের বানানো লম্বা random মানের জন্য ধীর hash দরকার হয় না, আর এই অধ্যায়ে এসে বলব কেন। password ধীর hash চায়, কারণ আক্রমণকারী **অনুমান** করে আর ছোট একটা সম্ভাবনার জায়গায়: `rafi1985`, `shuvo@123`। ধীর hash প্রতিটা অনুমান দামি করে। আমাদের session ID-র সম্ভাবনার জায়গা 2²⁵⁶, কেউ অনুমান করবে না। সেখানে hash-এর কাজ শুধু "dump পড়ে ID ফিরে পাওয়া যাবে না"। OWASP-ও বলে, এই random মানের জন্য দ্রুত hash যথেষ্ট, password hashing algorithm অপ্রয়োজনীয়। আর দ্রুত বলেই প্রতিটা request-এ খরচ নগণ্য। ঠিক এটাই আমাদের আজকের সমস্যা ছিল।
-
-**একটা সৎ টীকা।** OWASP এও বলে, শক্তভাবে নিয়ন্ত্রিত store-এ আসল token রাখা গ্রহণযোগ্য হতে পারে। hash রাখা দরকার হয় যখন store-এর read-only ফাঁস threat model-এ আছে। OWASP আরেকটা নকশাও দেখায়: cookie-তে দুটো অংশ (একটা খোঁজার identifier, একটা গোপন verifier), store-এ identifier আর verifier-এর hash, আর যাচাইয়ে constant-time তুলনা। আমরা সরল পথে গেছি। এর দাম আছে: খোঁজার সময় যাচাইয়ের অংশ আলাদা নয়। এখানে সেটা শুধু ভাবনা, কোনো প্রমাণিত আক্রমণ নয়। বড় system-এ OWASP-র নকশাটা দেখে নিয়ো।
-
-**login-এর আগে কোনো session নেই।** আমাদের কোডে session তৈরি হয় শুধু password যাচাইয়ের **পরে**। আর `Lookup` শুধু সেই ID চেনে, যা server নিজে বানিয়েছে। এতে অধ্যায় ৫-এর একটা পথ আপাতত বন্ধ। কিন্তু "বন্ধ" বলছি না, "সমস্যা শেষ" বলছি না। fixation পুরোপুরি অধ্যায় ৫-এর বিষয়।
-
-**মেয়াদ server-এর খাতায়।** cookie-তে `MaxAge` নেই। এর কারণ §৮-এ।
+Cookie-তে session ID থাকা মানে cookie নিজে server-side record নয়। Browser শুধু credential-টি বহন করে; server-ই ঠিক করে সেই credential এখনো বৈধ কি না।
 
 ### `401`-এর ঋণ শোধ
 
@@ -549,54 +443,44 @@ cookie-র মেয়াদ আর session-এর মেয়াদ আলা
 
 ## 🔍 ৯. বাতিল: খাতা থেকে লাইন কাটা
 
-বুধবার। রাফি জানাল, কর্মী `user-7`-কে আজ থেকে ছাড়িয়ে দিয়েছে। কিন্তু ফোনের browser-এ তার login এখনো খোলা। অধ্যায় ২ থেকে এই প্রশ্নটা ঝুলছিল।
+বুধবার। রাফি জানাল, কর্মী `user-7`-কে আজ থেকে ছাড়িয়ে দিয়েছে। তার browser-এ login এখনো খোলা। শুধু browser-এর cookie মুছে দিলে কর্মীর কাছে আগে থেকে কপি করা session ID-টি কিন্তু বেঁচে থাকবে।
 
-আরিফ দুটো ফাংশন যোগ করল:
+### Logout এবং session বাতিল
 
-```go
-// Delete: একটা session বাতিল (logout)।
-func (s *Store) Delete(token string) {
-	s.mu.Lock()
-	delete(s.rows, digest(token))
-	s.mu.Unlock()
-}
+```mermaid
+sequenceDiagram
+    actor R as রাফি
+    participant B as Browser
+    participant S as KenaKata server
+    participant DB as Session store
 
-// DeleteAllFor: একজন user-এর সব session বাতিল।
-func (s *Store) DeleteAllFor(userID string) int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	n := 0
-	for k, r := range s.rows {
-		if r.UserID == userID {
-			delete(s.rows, k)
-			n++
-		}
-	}
-	return n
-}
+    R->>B: Logout চাপল
+    B->>S: Logout request + session cookie
+    S->>DB: এই session record invalidate করো
+    DB-->>S: Record আর বৈধ নয়
+    S-->>B: Cookie মুছতে Set-Cookie নির্দেশ
+    B->>B: নিজের cookie কপি মুছে ফেলে
 ```
 
-`sessions.DeleteAllFor("user-7")` চালানো মাত্র `user-7`-এর পরের প্রতিটা request-এ `Lookup` ব্যর্থ হয়, আর সে login পাতায় ফেরে। সই-করা cookie দিয়ে এটা হতো না, §৩-এর দ্বিতীয় প্রশ্ন।
+**গুরুত্বপূর্ণ ক্রম:** server-side session আগে invalidate করতে হবে। Browser-এর cookie মুছে ফেলা পরিষ্কার-পরিচ্ছন্নতার অংশ, আসল security action হলো server-কে সেই session ID প্রত্যাখ্যান করানো।
 
-আর logout:
+### এক session, নাকি সব session?
 
-```go
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	if c, err := r.Cookie(cookieName); err == nil {
-		sessions.Delete(c.Value) // আগে server-এর খাতা: এটাই আসল বাতিল
-	}
-	clearSessionCookie(w) // তারপর browser-এর cookie: শুধু পরিচ্ছন্নতা
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
-}
+- **একটি session বাতিল:** নির্দিষ্ট browser/device থেকে logout।
+- **এক user-এর সব session বাতিল:** account compromise, কর্মী চলে যাওয়া, password reset-এর পর সব device থেকে logout করানোর মতো ক্ষেত্রে উপকারী হতে পারে।
+- **মেয়াদ শেষ:** server নিজেই record-কে invalid ধরে। Browser cookie এখনো পাঠালেও server সেটি গ্রহণ করবে না।
+
+```mermaid
+flowchart TD
+    A["Protected request + session ID"] --> B["Server-side session lookup"]
+    B --> C{"Session valid?"}
+    C -->|হ্যাঁ| D["Request-এর authentication এগোয়"]
+    C -->|না| E["Access দেওয়া হয় না"]
+    F["Logout / revoke / expiry"] --> G["Session record invalid"]
+    G --> C
 ```
 
-`clearSessionCookie` পাঠায় `__Host-id=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` (Go-তে `MaxAge: -1` এই header হয়, আমি দেখেছি)। RFC 6265 বলে, cookie মুছতে চাইলে `Path` আর `Domain` অবশ্যই cookie বানানোর সময়ের সঙ্গে মিলতে হবে। আমাদের `Path=/`, `Domain` নেই, তাই মেলে।
-
-আমার test-এ একটা জিনিস পরীক্ষা করেছি: login করে cookie-র মান আলাদা করে রাখলাম, logout করলাম, তারপর সেই রাখা মান `curl`-এর মতো করে আবার পাঠালাম। server ফিরিয়ে দিল। অর্থাৎ "আগে server, পরে browser" এই ক্রমটা সত্যিই কাজ করছে। উল্টো করলে (শুধু cookie মুছলে) চুরি-যাওয়া কপি বেঁচে থাকত।
-
-logout একটা `POST`, `GET` নয়। কেন, সেটা অধ্যায় ৬-এ আসবে। আর "logout" বলতে আসলে কী বোঝাচ্ছি (একটা device, সব device, নাকি চুরি-যাওয়া credential), সেই পুরো প্রশ্ন অধ্যায় ১৪-এর। এখানে শুধু প্রথম টুকরো: session-এ বাতিলের হাতলটা আছে।
-
----
+Browser-এ cookie মুছে ফেলা আর server-side session বাতিল করা এক ব্যাপার নয়। OWASP এই পার্থক্যটি স্পষ্ট করে: চুরি-যাওয়া কপি কাজ করতে পারে যতক্ষণ server সেটিকে বৈধ ধরে। Logout request-কে state-changing action হিসেবে ধরতে হবে; GET request দিয়ে logout করানো উচিত নয়। CSRF নিয়ে বিস্তারিত অধ্যায় ৬-এ।
 
 ## ১০. Threat model: session ID-র পাশে আক্রমণকারী
 
@@ -759,23 +643,17 @@ flowchart LR
 
 </details>
 
-## 🧪 পাঁচ মিনিটের পরীক্ষা
+## 🧠 পাঁচ মিনিটের চিন্তার পরীক্ষা
 
-নিজের কোনো project-এর **staging**-এ (production-এ নয়):
+কোনো command চালানোর দরকার নেই। প্রতিটি পরিস্থিতিতে server কী সিদ্ধান্ত নেবে, সেটা ব্যাখ্যা করো।
 
-**এক।** browser-এর developer tools-এ cookie-টা খোলো। `Secure`, `HttpOnly`, `SameSite`, `Path`, `Domain`, মেয়াদ, সব ঠিকঠাক আছে? session ID-র নাম কি framework-এর ডিফল্ট (`PHPSESSID`, `JSESSIONID`)?
+**এক. Browser-এর cookie মুছে গেছে, কিন্তু server record এখনো valid।** আগে কপি করে রাখা session ID দিয়ে request এলে কী হবে?
 
-**দুই।** logout-এর আগে cookie-র মান কপি করে রাখো। browser-এ logout করো। তারপর:
+**দুই. Server session record revoke করেছে, কিন্তু browser পুরোনো cookie পাঠাচ্ছে।** Request কি authenticated হবে?
 
-```bash
-curl -i -H 'Cookie: <cookie-র নাম>=<কপি-করা মান>' https://staging.example/protected
-```
+**তিন. Session store-এর read-only backup ফাঁস হয়েছে।** Store-এ raw session ID থাকলে আর শুধু one-way verifier থাকলে আক্রমণকারীর সুযোগ কীভাবে আলাদা হবে?
 
-`200` এলে তোমার logout শুধু cookie মুছেছে, session নয়।
-
-**তিন।** session store-এর টেবিল খোলো (শুধু staging-এ)। cookie-র মানটা সেখানে হুবহু পাওয়া যায়? পেলে store-এর ফাঁস মানে সব চালু session-এর ফাঁস।
-
-**চার।** application log-এ `grep` করো, আসল session ID কোথাও লেখা হচ্ছে কি না।
+**চার. Cookie-তে `HttpOnly`, `Secure` ও `SameSite` আছে।** এগুলো কি session ID চুরি বা replay অসম্ভব করে? প্রতিটি attribute কোন ঝুঁকি কমায়, আর কোন ঝুঁকি অমীমাংসিত থাকে, তা বলো।
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
