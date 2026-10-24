@@ -97,6 +97,8 @@ func updatePrice(w http.ResponseWriter, r *http.Request) {
 
 লক্ষ্য করো, তিনটা সম্ভাবনার একটাকেও আরিফ অন্যগুলো থেকে আলাদা করতে পারছে না। এটা শুধু "বাইরের শত্রু ঠেকানোর" সমস্যা নয়। এটা আরও গভীর: **system জানে না কে কী করছে।**
 
+> **Log ≠ পরিচয়ের প্রমাণ।** Audit log তদন্তে কাজে লাগে, কিন্তু IP address ও timestamp একা প্রমাণ করে না কোন মানুষটি কাজটি করেছে। Authentication চালু করার পর log-এ authenticated user ID, কী action হয়েছে, কোন resource বদলেছে এবং কখন হয়েছে, সেগুলো রাখা অনেক বেশি কার্যকর। তবুও log-কে চূড়ান্ত সত্য ধরে নেওয়া যাবে না: application বা account compromise হলে log-ও অসম্পূর্ণ বা বিভ্রান্তিকর হতে পারে।
+
 ---
 
 ## ৩. প্রথম ভুল চাল: URL লুকিয়ে ফেলি
@@ -468,6 +470,27 @@ sequenceDiagram
 - Credential হলো প্রমাণ। Authentication state হলো যাচাইয়ের ফল। যা দিয়ে সেই ফল বহন করা হয়, সেটা চরিত্রে credential-এরই মতো: যার হাতে, সে-ই ব্যবহার করতে পারে।
 - Authentication নতুন দায়ও আনে: secret সংরক্ষণ, state, recovery, ঘর্ষণ, আর login নিজেই লক্ষ্য হয়ে ওঠা।
 
+## এক মিনিটের সিদ্ধান্ত-খেলা
+
+**আগে উত্তরটা নিজে বেছে নাও, তারপর ব্যাখ্যা খোলো।**
+
+KenaKata-র `/manage/orders` URL তুমি জানো। কোনো login না করেই request পাঠালে server অর্ডার দেখিয়ে দিচ্ছে। প্রথমে কোন পরিবর্তনটি দরকার?
+
+- A. URL-টা আরও কঠিন করে নাম দেওয়া
+- B. Browser-এর JavaScript দিয়ে menu লুকিয়ে রাখা
+- C. Server-এ request-এর পরিচয় যাচাই করা
+- D. Log-এ request-এর IP address লেখা
+
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
+
+**সঠিক উত্তর: C. Server-এ request-এর পরিচয় যাচাই করা।**
+
+A কেবল URL গোপন রাখার ওপর নির্ভর করে। B-কে পাশ কাটিয়ে সরাসরি HTTP request পাঠানো যায়। D তদন্তে কিছু context দেয়, কিন্তু কে request পাঠিয়েছে তা নিশ্চিত করে না। Server-side authentication হলো প্রথম দরজা; এরপরও কোন user কোন order দেখতে পারবে, সেটা আলাদা করে authorization দিয়ে ঠিক করতে হবে.
+
+</details>
+
+---
 ## পাঁচ মিনিটের পরীক্ষা
 
 নিজের কোনো project-এর staging-এ একটা সুরক্ষিত endpoint-এ কোনো credential ছাড়া `curl -i` চালাও। কী আসে? `401`, `403`, নাকি সফল response? তারপর log খুলে দেখো, সেখানে কি "কে" প্রশ্নের উত্তর থাকে, নাকি শুধু IP আর সময়?
