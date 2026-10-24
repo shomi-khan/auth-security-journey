@@ -70,3 +70,12 @@
 - Authentication সফল হলেও authorization check আলাদা, সেটি Basic Authentication flow-তে দৃশ্যমান করা হয়েছে।
 - পুনরাবৃত্ত Basic Authentication sequence diagram সরিয়ে একটি diagram-এ credential failure, authorization denial ও success-এর পার্থক্য রাখা হয়েছে।
 - Chapter 1-এর Technical Review ও Security Review checkbox এখনো unchecked। এই পরিবর্তনগুলো final polish, formal sign-off নয়।
+
+
+## 2026-10-25 — Chapter 2-এ diagram-first পদ্ধতির প্রয়োগ
+
+- Chapter 2 থেকে Go implementation snippet ও template code সরিয়ে Mermaid flowchart, sequence diagram, permission matrix এবং illustrative HTTP/log examples ব্যবহার করা হয়েছে।
+- Function-level authorization (BFLA) ও object-level authorization (BOLA) আলাদা করে দেখানো হয়েছে; client-provided target ID-কে server-verified identity ধরে নেওয়া যাবে না।
+- Server-side authorization decision-এ subject, action ও resource-এর সম্পর্ক, deny-by-default, least privilege, প্রতিটি protected request-এ check এবং denial logging-এর ভূমিকা রাখা হয়েছে।
+- Route-টি শুধু POST method গ্রহণ করবে এবং POST থাকলেও CSRF আলাদা প্রতিরক্ষা, এই বিষয়টি language-specific example ছাড়াই রাখা হয়েছে।
+- এটি teaching-style update; chapter-এর Technical Review ও Security Review checkbox এখনো unchecked। Code test চালানো হয়নি এবং এই পরিবর্তনকে security certification ধরা যাবে না।
