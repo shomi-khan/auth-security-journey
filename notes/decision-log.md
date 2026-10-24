@@ -96,3 +96,11 @@
 - Technical Review-এর লক্ষ্য chapter-এর মূল claims, protocol/concept accuracy, source quality ও mental model যাচাই করা। Security Review-এর লক্ষ্য threat model, important risks, control boundaries এবং misleading security assurance যাচাই করা। Production implementation certification বা exhaustive library audit এই blog series-এর review scope নয়।
 - Mermaid diagram, story, language-neutral example এবং decision game প্রধান teaching tools। Pseudocode default নয়; language-specific implementation code থাকবে না।
 - Chapter 3-এ Argon2id parameter table, exact encoded hash example, bcrypt input-length deep dive ও Unicode code-point detail সংক্ষিপ্ত করে মূল theory-তে ফোকাস করা হয়েছে।
+
+
+## 2026-10-25 — Chapter 4: Session and Cookie theory-first revision
+
+- Chapter 4-এ Go implementation snippets ও executable shell commands বাদ দিয়ে Mermaid flowchart/sequence diagram এবং language-neutral HTTP examples ব্যবহার করা হবে।
+- মূল teaching objective: authentication সফল হওয়ার পর session কীভাবে continuity ধরে রাখে; cookie কীভাবে browser-এ credential বহন করে; server-side session state কীভাবে lookup, expiry ও revocation সমর্থন করে; cookie attributes কী ঝুঁকি কমায় এবং কোন ঝুঁকি থেকে যায়।
+- Framework-specific code, exact library API, compile/test history ও implementation-only cleanup detail chapter-এর teaching content নয়। এগুলো দরকার হলে আলাদা implementation guide-এ রাখা যাবে।
+- Security claims-এর review-তে cookie attributes, session ID entropy, replay, fixation, expiry, logout, session store leakage এবং browser-vs-server responsibility যাচাই করতে হবে। Chapter 4-এর Technical Review ও Security Review এখনো unchecked থাকবে যতক্ষণ source-based review সম্পন্ন না হয়।
