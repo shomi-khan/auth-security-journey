@@ -250,12 +250,23 @@ func (s *Store) DeleteOthers(userID, keep string) int {
 }
 
 func (a *App) changePassword(w http.ResponseWriter, r *http.Request) {
-	c, _ := r.Cookie(cookieName)
-	uid := r.Header.Get("X-Test-User")
-	// ... এখানে নতুন password-এর hash বসে (অধ্যায় ৩) ...
-	a.sessions.DeleteOthers(uid, c.Value)                                  // বাকি সব মরে
-	token, _ := a.sessions.Rotate(c.Value, uid, r.UserAgent(), clientIP(r)) // এইটার ID নতুন
+	c, err := r.Cookie(cookieName)
+	if err != nil {
+		http.Error(w, "authentication required", http.StatusUnauthorized)
+		return
+	}
+	uid := r.Header.Get("X-Test-User") // শুধু এই demo/test-এর সরলীকরণ
+	// ... এখানে বর্তমান password যাচাই ও নতুন password-এর hash সংরক্ষণ হয় (অধ্যায় ৩) ...
+
+	// আগে বর্তমান session rotate করি। ব্যর্থ হলে অন্য session-গুলো অকারণে কাটব না।
+	token, err := a.sessions.Rotate(c.Value, uid, r.UserAgent(), clientIP(r))
+	if err != nil {
+		http.Error(w, "session update failed", http.StatusInternalServerError)
+		return
+	}
+	a.sessions.DeleteOthers(uid, token) // নতুন session ছাড়া user-এর বাকি সব session মরে
 	setSessionCookie(w, token)
+	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusNoContent)
 }
 ```
