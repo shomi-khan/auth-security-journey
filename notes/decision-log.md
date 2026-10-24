@@ -86,3 +86,13 @@
 - Chapter 3 থেকে Go implementation snippet, SQL snippet এবং runnable benchmark সরানো হয়েছে। Password storage, fast hash বনাম Argon2id, bcrypt-এর ৭২-byte সীমা, salt, PHC string, dummy-hash login flow এবং password policy Mermaid diagram বা language-neutral illustrative text দিয়ে বোঝানো হয়েছে।
 - বাস্তব implementation-এর ফল হিসেবে কোনো benchmark বা code test দাবি করা হচ্ছে না। Hardware-dependent Argon2id tuning-এর জন্য বাস্তব system-এ benchmark প্রয়োজন, কিন্তু এই learning series-এর উদাহরণগুলো runnable implementation নয়।
 - Chapter 3-এর Technical Review ও Security Review checkbox এখনো unchecked। Diagram-first update technical/security sign-off নয়।
+
+
+## 2026-10-25 — Theory-first security teaching
+
+- সিরিজের প্রধান লক্ষ্য junior engineer-দের security theory, mental model, threat model, security control-এর সীমা এবং trade-off বোঝানো। কোনো নির্দিষ্ট tool, library বা implementation গভীরভাবে শেখানো নয়।
+- Chapter-এর প্রতিটি section-এ core learning objective থাকতে হবে: সমস্যা কী, mechanism কেন কাজ করে, কী সমাধান করে না, এবং কী trade-off থাকে।
+- Algorithm, library ও standard-এর নাম প্রয়োজনে থাকবে, কিন্তু parameter list, parser detail, API usage বা implementation edge case তখনই থাকবে যখন তা core concept বোঝাতে অপরিহার্য বা ভুল security assumption ঠেকাতে দরকার।
+- Technical Review-এর লক্ষ্য chapter-এর মূল claims, protocol/concept accuracy, source quality ও mental model যাচাই করা। Security Review-এর লক্ষ্য threat model, important risks, control boundaries এবং misleading security assurance যাচাই করা। Production implementation certification বা exhaustive library audit এই blog series-এর review scope নয়।
+- Mermaid diagram, story, language-neutral example এবং decision game প্রধান teaching tools। Pseudocode default নয়; language-specific implementation code থাকবে না।
+- Chapter 3-এ Argon2id parameter table, exact encoded hash example, bcrypt input-length deep dive ও Unicode code-point detail সংক্ষিপ্ত করে মূল theory-তে ফোকাস করা হয়েছে।
