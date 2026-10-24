@@ -100,9 +100,11 @@ users table
 flowchart LR
     subgraph Online["Online: আমাদের server-এর মধ্য দিয়ে"]
         A1["আক্রমণকারী"] -->|"email + অনুমান"| L["POST /login"]
-        L --> C{"rate limit, throttling, log, MFA"}
-        C -->|"সীমার মধ্যে"| V["Argon2id যাচাই"]
-        C -->|"সীমা পার"| B["আটকে দিই"]
+        L --> C{"Rate limit / throttling / monitoring"}
+        C -->|"অনুমোদিত"| V["Password hash যাচাই"]
+        C -->|"সীমা পার"| B["অনুরোধ ধীর বা আটকে দিই"]
+        V --> M["প্রয়োজনে অতিরিক্ত factor (MFA)"]
+        M --> G["প্রবেশের সিদ্ধান্ত"]
     end
     subgraph Offline["Offline: dump আক্রমণকারীর নিজের machine-এ"]
         A2["আক্রমণকারী"] --> G["অনুমান → hash → মিলিয়ে দেখা"]
@@ -185,14 +187,14 @@ flowchart TD
 ফল:
 
 - দুজনের password এক হলেও salt আলাদা, তাই hash আলাদা। Dump দেখে কে কার সঙ্গে password ভাগ করছে, বোঝা যায় না।
-- আগেভাগে বানানো তালিকা অকেজো। প্রতিটা salt মানে একটা নতুন তালিকা, আর কোন salt আসবে সেটা আগে জানা যায় না।
+- আগে থেকে তৈরি hash table বা rainbow table পুনর্ব্যবহার করা অনেক কম কার্যকর হয়ে যায়। প্রতিটি salt-এর জন্য আলাদা হিসাব করতে হয়।
 - আক্রমণকারীকে প্রতিটা hash আলাদা আলাদা করে ভাঙতে হয়। OWASP-র ভাষায়, hash যত বেশি, সময় তার সমানুপাতে বাড়ে।
 
 এখানে একটা বিষয় অনেকে ভুল বোঝে। **Salt গোপন নয়।** NIST-এর নির্দেশনা বলছে salt আর hash দুটোই একসঙ্গে সংরক্ষণ করতে হবে। আক্রমণকারী dump থেকে salt পায়, এবং সেটাই প্রত্যাশিত। Salt-এর কাজ গোপনীয়তা নয়। কাজ হলো আক্রমণকারীর পরিশ্রম প্রতিটা account-এর জন্য আলাদা করে দেওয়া। অধ্যায় ১-এর Kerckhoffs-এর নীতি এখানেও খাটে: পদ্ধতি জানা থাকলেও system টিকে থাকবে, যদি আসল সুরক্ষা অন্য জায়গায় থাকে।
 
 ধারণাটা নতুনও নয়। Unix-এর password file-এ ১৯৭০-এর দশকেই salt ছিল (Robert Morris আর Ken Thompson-এর ১৯৭৯-এর লেখা এ নিয়ে একটা ঐতিহাসিক দলিল)। আমরা একটা পুরোনো শিক্ষা আবার শিখছি, নতুন কিছু আবিষ্কার করছি না।
 
-Salt তৈরির সময় প্রতিটি password-এর জন্য আলাদা, unpredictable random মান ব্যবহার করতে হবে। বিশ্বস্ত password-hashing library সাধারণত salt তৈরি ও সংরক্ষণের কাজ নিজেই সামলায়। পাঠকের জন্য মূল ধারণা: salt unique হওয়া দরকার, গোপন হওয়া নয়।
+প্রতিটি password-এর জন্য আলাদা random salt ব্যবহার করতে হবে। বিশ্বস্ত password-hashing library সাধারণত salt তৈরি ও সংরক্ষণের কাজ নিজেই সামলায়। পাঠকের জন্য মূল ধারণা: salt unique হওয়া দরকার, গোপন হওয়া নয়।
 
 **Salt কী ঠিক করে না:** একটা নির্দিষ্ট password-এর অনুমান করার গতি। আক্রমণকারী যদি বিশেষ করে `user-1`-কে লক্ষ্য করে, তার জন্য শুধু ওই একটা salt নিয়েই অনুমান চালাতে পারে। Salt থাকলেও প্রতিটা অনুমান তত দ্রুতই থাকে। ফাটল ৩ খোলা।
 
@@ -200,9 +202,9 @@ Salt তৈরির সময় প্রতিটি password-এর জন�
 
 ## ৫. ধীর হওয়াটাই নকশা
 
-ফাটল ৩ বন্ধ করতে হলে password hash-কে **ইচ্ছা করে ব্যয়বহুল** করতে হবে। সাধারণ hash দ্রুত হওয়াটাই তার কাজ; password storage-এর জন্য আমাদের এমন পদ্ধতি দরকার, যাতে প্রতিটি অনুমান করতে সময় ও memory দুটোই খরচ হয়।
+ফাটল ৩ বন্ধ করতে হলে password hashing-কে **ইচ্ছা করে ব্যয়বহুল** করতে হবে। সাধারণ hash দ্রুত হওয়াটাই তার কাজ; password storage-এর জন্য আমাদের এমন পদ্ধতি দরকার, যাতে প্রতিটি অনুমান করতে সময় ও memory দুটোই খরচ হয়।
 
-যুক্তিটা একটা অসামঞ্জস্যের ওপর। বৈধ user login করলে hash চলে **একবার**। সেটা ৫০ মিলিসেকেন্ড লাগলেও কেউ টের পায় না। আক্রমণকারী কোটি কোটি অনুমান চালায়। প্রতিটার দাম ৫০ মিলিসেকেন্ড হলে সেটা আর বাস্তবসম্মত থাকে না। আমরা এমন একটা কাজ বেছে নিচ্ছি যার খরচ আমাদের কাছে নগণ্য, আক্রমণকারীর কাছে পাহাড়সমান।
+যুক্তিটা হলো বৈধ user সাধারণত login-এ password যাচাই করায় অল্প কয়েকবার, কিন্তু database dump পাওয়া আক্রমণকারী বিপুল সংখ্যক অনুমান চালাতে পারে। প্রতিটি অনুমানে সময় ও memory খরচ করালে মোট খরচ বাড়ে। আক্রমণকারী parallel hardware ব্যবহার করতে পারে, তাই শুধু ধীর হওয়া নয়, memory ব্যবহারসহ সঠিক password-hashing নকশা গুরুত্বপূর্ণ।
 
 ধারণাটা বোঝাতে নিচে একটি illustrative তুলনা দেওয়া হলো। এগুলো সর্বজনীন benchmark নয়:
 
@@ -268,7 +270,7 @@ flowchart TD
     P --> R1["পড়লেই account দখল"]
     E --> R2["চাবি পেলে সব একসঙ্গে"]
     F --> R3["দুর্বল password দ্রুত ভাঙে<br/>একই password-এর hash এক"]
-    S --> R4["আগেভাগে বানানো তালিকা অকেজো<br/>কিন্তু প্রতি অনুমান এখনো সস্তা"]
+    S --> R4["আগে থেকে তৈরি table পুনর্ব্যবহার কঠিন<br/>কিন্তু প্রতি অনুমান এখনো সস্তা"]
     A --> R5["প্রতি অনুমান দামি<br/>শক্ত password guess করা কঠিন"]
 ```
 
@@ -321,7 +323,7 @@ sequenceDiagram
     U->>S: email + password (HTTPS)
     S->>DB: email দিয়ে stored hash আনা (না পেলে dummy hash)
     S->>S: stored string থেকে salt আর parameter পড়ে আবার hash
-    S->>S: constant-time তুলনা
+    S->>S: password যাচাইয়ের ফল নিরাপদভাবে যাচাই
     S-->>U: সফল হলে Identity, নইলে সবসময় একই বার্তা
 ```
 
@@ -350,10 +352,10 @@ NIST-এর SP 800-63B-4, যা আগের SP 800-63B-কে প্রতি�
 
 ```mermaid
 flowchart TD
-    P["Password জমা"] --> N["NFC normalization<br/>policy ও hashing-এ একই নিয়ম"]
+    P["Password জমা"] --> N["Unicode password হলে<br/>একই normalization policy"]
     N --> L{"Password যথেষ্ট দীর্ঘ এবং<br/>service policy-তে গ্রহণযোগ্য?"}
     L -->|"না"| R["ব্যবহারকারীকে কারণ জানাও"]
-    L -->|"হ্যাঁ"| B{"পরিচিত/ফাঁস-হওয়া password<br/>বা email-এর অংশ?"}
+    L -->|"হ্যাঁ"| B{"পুরো password কি পরিচিত,<br/>ফাঁস-হওয়া বা অনুমানযোগ্য?"}
     B -->|"হ্যাঁ"| R
     B -->|"না"| A["Password গ্রহণ"]
     A -.-> X["বড় হাতের অক্ষর + সংখ্যা + চিহ্ন বাধ্যতামূলক নয়"]
@@ -526,10 +528,10 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 - সাধারণ functional test পাস করা আর নিরাপদ হওয়া এক নয়। "ঠিক মানুষ ঢুকছে তো?" আর "জিনিসটা অন্যের হাতে গেলে কী হবে?" আলাদা প্রশ্ন।
 - Server-কে password **জানতে** হয় না, শুধু **চিনতে** হয়। যে system password ফিরিয়ে দিতে পারে, সে ভুল জিনিস রাখছে।
-- Dump হাতে এলে আক্রমণকারী আমাদের নিয়ন্ত্রণের বাইরে, **offline**। তখন একমাত্র বাধা প্রতি অনুমানের খরচ।
+- Dump হাতে এলে আক্রমণকারী আমাদের নিয়ন্ত্রণের বাইরে, **offline**। তখন গুরুত্বপূর্ণ প্রতিরক্ষা হলো password অনুমান করা কঠিন রাখা এবং প্রতিটি অনুমানের খরচ বাড়ানো।
 - Salt প্রতিটা password-কে আলাদা করে। Salt গোপন নয়। ধীর, memory-hard hash (Argon2id) প্রতিটা অনুমান দামি করে। দুটোই দরকার, আর একা কেউ যথেষ্ট নয়।
 - Hash-এর শক্তি password-এর শক্তিকে ছাড়িয়ে যায় না। দৈর্ঘ্য আর blocklist composition rule-এর চেয়ে বেশি কাজের। বাংলা password-সহ Unicode password সামঞ্জস্যপূর্ণভাবে সামলানো গুরুত্বপূর্ণ।
-- Online আর offline দুটো আলাদা যুদ্ধক্ষেত্র। Rate limit আর MFA শুধু online-এ কাজ করে।
+- Online আর offline দুটো আলাদা যুদ্ধক্ষেত্র। Rate limit offline guessing থামায় না; MFA hash cracking-এর খরচ বাড়ায় না, তবে password ফাঁস হলেও account takeover-এর ঝুঁকি কমাতে পারে।
 - সাধারণ বার্তা আর সমান সময় (dummy hash) enumeration আটকায়। Lockout নিজেই অস্ত্র হতে পারে।
 - Password আর তার hash আলাদা জিনিস: একটা credential, অন্যটা যাচাইয়ের উপাত্ত। আর পুরোনো হওয়ার জন্য hash-এর algorithm আর parameter সংরক্ষিত থাকে।
 - ফাঁসের পর ক্রম গুরুত্বপূর্ণ: আগে নতুন সংরক্ষণ চালু, তারপর reset। আর reset-এর পথ নিজেই একটা নতুন দরজা।
@@ -585,7 +587,7 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 - [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html): Argon2id-র ন্যূনতম configuration, scrypt, bcrypt (legacy, নির্দিষ্ট input-length limitation), PBKDF2, salt, pepper, work factor, hash হালনাগাদের কৌশল, encoded hash record format-এর সুপারিশ। এই লেখার সময় পাতাটা পুরো পড়ে মেলানো হয়েছে।
 - [NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management](https://pages.nist.gov/800-63-4/sp800-63b.html): §3.1.1 Passwords (দৈর্ঘ্য, composition rule নিষেধ, নিয়মিত বদল নিষেধ, blocklist, password manager আর paste, Unicode আর NFC, salt ও hash সংরক্ষণ, keyed hashing), §3.2.2 Rate Limiting, §3.2.7 Replay Resistance (password replay-resistant নয়)। লেখার সময় পড়ে মেলানো হয়েছে।
 - [OWASP Credential Stuffing Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Credential_Stuffing_Prevention_Cheat_Sheet.html): brute force, credential stuffing আর password spraying-এর পার্থক্য, MFA, proxy দিয়ে ছড়ানো আক্রমণ, ফাঁস-হওয়া password শনাক্তকরণ, অস্বাভাবিক ঘটনায় user-কে জানানো, unpredictable username। পড়ে মেলানো হয়েছে।
-- [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ বার্তা, response-এর সময়ে তথ্য ফাঁস, dummy hash। (এই খসড়া লেখার সময় শুধু প্রাসঙ্গিক অংশ দেখা হয়েছে। Technical Review-এ পূর্ণ পাঠ মেলাতে হবে।)
+- [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ error response, response-time discrepancy এবং automated attack প্রতিরোধ।
 - [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): Argon2-র নকশা ও password hashing-এ memory-hard পদ্ধতির ভূমিকার প্রাথমিক specification। এই অধ্যায়ে RFC-র configuration-গুলো মুখস্থ করানো বা নির্দিষ্ট deployment-এর parameter বেছে দেওয়া লক্ষ্য নয়।
 - Password hashing implementation-এর সঠিকতা শুধু diagram দেখে প্রমাণ করা যায় না। বাস্তব system-এ রক্ষণাবেক্ষণাধীন library-এর official documentation অনুসরণ করতে হবে। এই সিরিজের উদাহরণগুলো implementation নয়, শেখার মডেল; এখানে লক্ষ্য algorithm, salt, offline guessing এবং trade-off-এর মূল ধারণা বোঝা।
 
