@@ -244,7 +244,7 @@ OWASP-র ন্যূনতম configuration-গুলো সমমানের
 | 9 MiB | 4 | 1 |
 | 7 MiB | 5 | 1 |
 
-RFC 9106 নিজে parameter বাছাইয়ের আলাদা নির্দেশনা দেয়। যেসব library আর issue thread RFC-র পাঠ উদ্ধৃত করেছে, সেখানে আমি দুটো সুপারিশ দেখেছি: বেশি memory থাকলে 2 GiB, `t=1`, `p=4`। কম memory থাকলে 64 MiB, `t=3`, `p=4`। (RFC-র মূল পাঠ আমি সরাসরি খুলে মেলাইনি, দেখো §তথ্যসূত্রের টীকা।) সংখ্যা যা-ই হোক, নীতি এক: নিজের server-এ মেপে ঠিক করো। OWASP-র সাধারণ নিয়ম, একটা hash বানাতে এক সেকেন্ডের কম লাগা উচিত।
+RFC 9106-এর §৪ ও §৭.৪ সরাসরি পড়ে দুটো recommendation মেলে: বেশি memory থাকলে 2 GiB, `t=1`, `p=4`; memory সীমিত হলে 64 MiB, `t=3`, `p=4`। এগুলো RFC-র প্রস্তাবিত configuration, OWASP-এর নিচের দিকের baseline-এর বিকল্প দাবি নয়। বাস্তব server-এ কতটা memory ও latency সম্ভব, সেটা মেপে parameter বেছে নিতে হবে। OWASP-র সাধারণ নিয়ম, একটা hash বানাতে এক সেকেন্ডের কম লাগা উচিত।
 
 KenaKata-র মতো ছোট একটা server-এর জন্য আরিফ বেছে নিল OWASP-র মাঝের সারি: **19 MiB, `t=2`, `p=1`**।
 
@@ -296,8 +296,15 @@ func Verify(pw, encoded string) (bool, error) {
 	if _, err := fmt.Sscanf(parts[2], "v=%d", &version); err != nil || version != argon2.Version {
 		return false, errors.New("unsupported argon2 version")
 	}
+	// Sscanf সফল হলেও field-এর শেষে অতিরিক্ত অক্ষর থাকতে পারে। পুরো field canonical কি না যাচাই করি।
+	if parts[2] != fmt.Sprintf("v=%d", version) {
+		return false, errors.New("malformed argon2 version")
+	}
 	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &m, &t, &p); err != nil {
 		return false, errors.New("bad parameters")
+	}
+	if parts[3] != fmt.Sprintf("m=%d,t=%d,p=%d", m, t, p) {
+		return false, errors.New("malformed argon2 parameters")
 	}
 	// Database-এর encoded hash-ও অবিশ্বাস্য input হিসেবে ধরো।
 	// Parameter-এর সীমা না থাকলে tampered row অস্বাভাবিক memory/CPU খরচ করাতে পারে।
@@ -386,7 +393,13 @@ Hash ঠিক হলো। কিন্তু `/login` নিজেই আক�
 নিচের কোডে দুটো সূক্ষ্ম জায়গা আছে। প্রথমটা `!found || !ok` শর্ত: নকল hash-এর সঙ্গে মিলে গেলেও (যদি কেউ ঠিক সেই নকল password-টাই পাঠায়) user পাওয়া না গেলে অনুমতি দেওয়া যাবে না। দ্বিতীয়টা `NeedsRehash`: login-ই একমাত্র মুহূর্ত যখন আসল password আমাদের হাতে থাকে, তাই পুরোনো parameter-এর hash নতুনে বদলে নেওয়ার সুযোগ এখনই।
 
 ```go
-var dummyHash, _ = passwd.Hash("এই-password-কেউ-দেবে-না") // শুরুতে একবার বানানো
+var dummyHash = func() string {
+	h, err := passwd.Hash("এই-password-কেউ-দেবে-না") // শুরুতে একবার বানানো
+	if err != nil {
+		panic("initialize dummy password hash: " + err.Error()) // startup-এ fail closed
+	}
+	return h
+}()
 
 func verifyPassword(email, pw string) (Identity, bool) {
 	u, found := findUserByEmail(email) // কাল্পনিক: (user, পাওয়া গেছে কি না)
@@ -730,7 +743,7 @@ func main() {
 - [NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management](https://pages.nist.gov/800-63-4/sp800-63b.html): §3.1.1 Passwords (দৈর্ঘ্য, composition rule নিষেধ, নিয়মিত বদল নিষেধ, blocklist, password manager আর paste, Unicode আর NFC, salt ও hash সংরক্ষণ, keyed hashing), §3.2.2 Rate Limiting, §3.2.7 Replay Resistance (password replay-resistant নয়)। লেখার সময় পড়ে মেলানো হয়েছে।
 - [OWASP Credential Stuffing Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Credential_Stuffing_Prevention_Cheat_Sheet.html): brute force, credential stuffing আর password spraying-এর পার্থক্য, MFA, proxy দিয়ে ছড়ানো আক্রমণ, ফাঁস-হওয়া password শনাক্তকরণ, অস্বাভাবিক ঘটনায় user-কে জানানো, unpredictable username। পড়ে মেলানো হয়েছে।
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ বার্তা, response-এর সময়ে তথ্য ফাঁস, dummy hash। (এই খসড়া লেখার সময় শুধু প্রাসঙ্গিক অংশ দেখা হয়েছে। Technical Review-এ পূর্ণ পাঠ মেলাতে হবে।)
-- [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): parameter-এর সংজ্ঞা আর বাছাইয়ের নির্দেশনা। (মূল RFC-র পাঠ সরাসরি মেলানো হয়নি। দুটো সুপারিশের সংখ্যা এসেছে RFC উদ্ধৃত করা অন্য সোর্স থেকে। Technical Review-এ মেলাতে হবে।)
+- [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): §৩.১-এ parameter-এর সংজ্ঞা এবং §৪ ও §৭.৪-এ Argon2id parameter বাছাইয়ের recommendation সরাসরি পড়ে মেলানো হয়েছে। RFC-র 2 GiB ও 64 MiB recommendation-কে OWASP-এর 19 MiB, `t=2`, `p=1` baseline-এর সঙ্গে এক করে দেখা যাবে না; hardware অনুযায়ী benchmark জরুরি।
 - [PHC string format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md): `$argon2id$v=19$m=...,t=...,p=...$salt$hash` গঠন। (OWASP-র পাতা যে লিঙ্ক দেয়, সেটা। সরাসরি পড়া হয়নি।)
 - `golang.org/x/crypto/argon2` আর `golang.org/x/crypto/bcrypt`: এই অধ্যায়ের কোড Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে compile করে চালিয়ে দেখা হয়েছে (hash বানানো, যাচাই, ভুল password, না-থাকা user, `NeedsRehash`, bcrypt-এর ৭২ byte error)। `norm.NFC` আর `checkPolicy`-র মতো ছোট টুকরো আলাদা করে চালানো হয়নি।
 - Robert Morris, Ken Thompson, *Password Security: A Case History*, Communications of the ACM, ১৯৭৯: Unix-এর password file-এ salt-এর ঐতিহাসিক উদাহরণ। (ঐতিহাসিক সূত্র, স্পেসিফিকেশন নয়। সরাসরি মেলানো হয়নি।)
