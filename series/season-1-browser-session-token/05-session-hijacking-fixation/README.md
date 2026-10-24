@@ -13,7 +13,7 @@ status: draft
 
 আরিফের পেটের ভেতর কিছু একটা নড়ে উঠল। ক্রেতার নাম, ফোন আর ঠিকানা আছে শুধু একটা জায়গায়: `/manage/orders`।
 
-গত সপ্তাহে অধ্যায় ৪ শেষ করে সে session-এর ঘটনা log করার ব্যবস্থা রেখেছিল। Log-এ raw session ID নয়, keyed HMAC থেকে তৈরি একটি পর্যাপ্ত দীর্ঘ correlation value রাখা হয়, যাতে একই session-এর event মেলানো যায় কিন্তু log ফাঁস হলে value-টি সরাসরি login credential হিসেবে ব্যবহার করা না যায়। আজ সেই log-ই তার একমাত্র সাক্ষী।
+গতকাল অধ্যায় ৪ শেষ করে সে session-এর ঘটনা log করার ব্যবস্থা রেখেছিল। Log-এ raw session ID নয়, keyed HMAC থেকে তৈরি একটি পর্যাপ্ত দীর্ঘ correlation value রাখা হয়, যাতে একই session-এর event মেলানো যায় কিন্তু log ফাঁস হলে value-টি সরাসরি login credential হিসেবে ব্যবহার করা না যায়। আজ সেই log-ই তার একমাত্র সাক্ষী।
 
 ---
 
