@@ -10,11 +10,10 @@ Browser ছোট ডেটা জমিয়ে রাখে, আর পরের
 - কেন গুরুত্বপূর্ণ: Session cookie না বুঝলে পরের আক্রমণগুলোর ছবি আলাদা হয় না।
 - [MDN: HTTP cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
 - [MDN: Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
-- [RFC 6265 — HTTP State Management Mechanism](https://www.rfc-editor.org/rfc/rfc6265)
+- [RFC 10025 — Cookies: HTTP State Management Mechanism](https://www.rfc-editor.org/info/rfc10025)
+- [RFC 6265 — historical cookie standard](https://www.rfc-editor.org/info/rfc6265)
 
-RFC 6265 প্রকাশিত cookie RFC। যে সংশোধন এখনো ড্রাফট, সেটাকে ড্রাফট বলেই উদ্ধৃত করবে:
-
-- [draft-ietf-httpbis-rfc6265bis — Cookies: HTTP State Management Mechanism](https://httpwg.org/http-extensions/draft-ietf-httpbis-rfc6265bis.html)
+RFC 10025 জুলাই ২০২৬-এ প্রকাশিত হয়ে RFC 6265-কে supersede করেছে। Cookie-সংক্রান্ত বর্তমান normative claim-এ RFC 10025 ব্যবহার করো; RFC 6265-কে ঐতিহাসিক ব্যাখ্যার জন্য উদ্ধৃত করতে পারো। প্রকাশের আগে RFC Editor-এর বর্তমান status আবার যাচাই করো।
 
 ## Secure
 
