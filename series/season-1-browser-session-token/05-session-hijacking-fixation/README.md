@@ -400,7 +400,7 @@ sequenceDiagram
 
 অধ্যায় ৪-এ আমরা `Lookup`-এ লিখেছিলাম, server যে ID বানায়নি তা চেনে না। OWASP একে *strict mode* বলে (উল্টোটা permissive, যেখানে server ক্লায়েন্টের পাঠানো যেকোনো ID নিয়েই session বানিয়ে ফেলে)। আরিফ ভেবেছিল, এটাই fixation আটকায়।
 
-আটকায়, কিন্তু শুধু একটা রূপ। আক্রমণকারী যদি নিজের বানানো `attacker-chosen-123` পাঠায়, server চেনে না, নতুন ID দেয়। আমাদের test এটা দেখিয়েছে, দুর্বল সংস্করণেও। কিন্তু আজকের আক্রমণে `X` **server-ই** বানিয়েছে, তাই strict mode-এর চোখে সেটা পুরোপুরি বৈধ। এই পার্থক্যটা পরের লোকেরা প্রায়ই মিস করে: **strict mode ID-র উৎস দেখে, ID-র ব্যবহার দেখে না।**
+Strict mode-এ server-তৈরি anonymous ID বৈধ হতে পারে, তাই source validation একা fixation-এর সমাধান করে না. কিন্তু আজকের আক্রমণে `X` **server-ই** বানিয়েছে, তাই strict mode-এর চোখে সেটা পুরোপুরি বৈধ। এই পার্থক্যটা পরের লোকেরা প্রায়ই মিস করে: **strict mode ID-র উৎস দেখে, ID-র ব্যবহার দেখে না।
 
 ---
 
@@ -440,11 +440,11 @@ sequenceDiagram
 
 ### এই সমাধানের চারটা সূক্ষ্মতা
 
-**এক: পুরোনো ID নষ্ট করা জরুরি।** আমাদের নকশায় পুরোনো row যেহেতু anonymous, সেটা বাঁচলেও সরাসরি ক্ষতি হতো না। তবু OWASP আর WSTG দুজনেই স্পষ্ট বলে, মুছে ফেলতে। Test-এও এটা পরীক্ষা করা আছে, আর আমি `delete` লাইনটা সরিয়ে mutation চালিয়ে দেখেছি, test ফেল করে।
+**এক: পুরোনো ID নষ্ট করা জরুরি।** আমাদের নকশায় পুরোনো row যেহেতু anonymous, সেটা বাঁচলেও সরাসরি ক্ষতি হতো না। তবু OWASP আর WSTG দুজনেই স্পষ্ট বলে, মুছে ফেলতে। মূল invariant হলো পুরোনো ID আর authenticated session হিসেবে গ্রহণ করা যাবে না. এই conceptual review-তে mutation testing বা automated verification চালানো হয়নি.
 
 **দুই: সব পুরোনো state নতুনে টানা যাবে না।** আমরা শুধু `Next` নিয়েছি, আর সেটাও `safeNext` দিয়ে যাচাই করা (বাইরের URL নয়, শুধু `/manage/`-এর নিচের path)। পুরোনো row থেকে কোন তথ্য নতুন ID-তে যাবে, সেটা নিজের সিদ্ধান্ত। যে তথ্য আক্রমণকারী প্রভাবিত করতে পারত, সেটা বিনা যাচাইয়ে টেনে আনা নতুন সমস্যা। (বাইরের URL-এ redirect-এর আসল গল্প অধ্যায় ১৮-এ।)
 
-**তিন: absolute ঘড়ি login থেকে।** `StartedAt` রিসেট হয়। যদি না হতো, আক্রমণকারী anonymous session বানিয়ে ২৯ মিনিট ধরে রেখে victim-কে login করালে victim-এর ৮ ঘণ্টা থেকে ২৯ মিনিট কম পেত। এটাও test-এ আছে।
+**তিন: absolute ঘড়ি login থেকে।** `StartedAt` login-এর সময় থেকে গণনা শুরু হবে. যদি anonymous session-এর শুরু থেকেই absolute clock গণনা করা হয়, আক্রমণকারী আগে session বানিয়ে রেখে victim-এর authenticated session-এর কার্যকর সময় কমিয়ে দিতে পারে.
 
 **চার: "login" একটাই ঘটনা নয়।** OWASP বলে, authentication-এর মুহূর্ত সবচেয়ে সাধারণ, কিন্তু যেকোনো privilege বদলের সময় ID নতুন করতে হবে: password বদল, ক্ষমতা বদল, সাধারণ user থেকে admin। KenaKata-য় আজ login-এর পথ একটাই, কিন্তু `changePassword` আগেই `Rotate` ডাকে (§৬)। পরে Google login (অধ্যায় ২১) আসবে, আর সেটাও একটা login, ওখানেও rotate। MFA শেষ হলে (অধ্যায় ২২) session-এর মান বাড়ে, ওখানেও। যেকোনো নতুন পথ যোগ করার সময় প্রশ্ন একটাই: **এখানে কি ID বদলাচ্ছে?**
 
@@ -603,30 +603,17 @@ Login-এর আগে browser-এ session ID `X` ছিল। Login সফল �
 
 ---
 
-## 🧪 পাঁচ মিনিটের পরীক্ষা
+## 🧠 Conceptual review checklist
 
-নিজের কোনো project-এর **staging**-এ (production-এ নয়):
+**এক: fixation.** Login-এর আগে পাওয়া anonymous ID `X` দিয়ে victim login করলে, server কি নতুন ID `Y` দেয়? Login-এর পরে `X` দিয়ে protected resource চাইলে কি প্রত্যাখ্যান করে? শুধু `Set-Cookie` header দেখা যথেষ্ট নয়, server-side `X`-ও অকার্যকর হতে হবে.
 
-**এক: fixation।** দুটো `curl` jar দিয়ে:
+**দুই: idle আর absolute.** আক্রমণকারী নিয়মিত request পাঠিয়ে idle timer সচল রাখলেও, absolute timeout-এ কি session শেষ হয়? Anonymous session-এর বয়স কি আলাদা সীমায় বাঁধা?
 
-### Conceptual verification: fixation
+**তিন: password বদল.** একই user-এর দুটি session থাকলে একটিতে password বদলের পরে policy অনুযায়ী অন্য session-গুলো কি বাতিল হয়? বর্তমান session-এর ID কি rotate হয়?
 
-1. আক্রমণকারী login পাতা থেকে anonymous ID `X` পায়.
-2. Victim-এর browser-এ `X` বসানো সম্ভব হয় কি না, তা threat model অনুযায়ী বিবেচনা করো.
-3. Victim `X` নিয়ে login করে.
-4. Victim-এর login response-এ নতুন ID `Y` আসে এবং server-side `X` অকার্যকর করে.
-5. আক্রমণকারী `X` দিয়ে protected resource চাইলে request প্রত্যাখ্যাত হয়; `Y`-ই একমাত্র authenticated session.
+**চার: log.** Log-এ raw session ID লেখা হচ্ছে কি? Session event correlate করতে salted hash বা অন্য non-replayable identifier ব্যবহার হচ্ছে কি? IP/User-Agent পরিবর্তনকে নিশ্চিত প্রমাণ না ধরে risk signal হিসেবে নেওয়া হচ্ছে কি?
 
-এটি ধারণাগত পরীক্ষা, executable test নয়. বাস্তব application-এ test করার সময় অনুমোদিত staging environment ব্যবহার করতে হবে.
-
-তৃতীয় ধাপে `200` এলে fixation আছে। দ্বিতীয় ধাপের response-এ `Set-Cookie` নেই মানেও সন্দেহজনক। (এই কৌশল WSTG-SESS-03-এর "forced cookies" পরীক্ষার ছোট রূপ।)
-
-**দুই: idle আর absolute।** Staging-এ idle ১ মিনিট আর absolute ৫ মিনিট করে একটা loop-এ প্রতি ৩০ সেকেন্ডে request পাঠাও। ৫ মিনিটে কি session কাটে, নাকি চলতেই থাকে?
-
-**তিন: password বদল।** দুটো browser-এ একই user দিয়ে login করো। একটায় password বদলাও। অন্যটার কী হলো?
-
-**চার: log।** Application log-এ session ID-র raw মান কোথাও আছে কি না, `grep` করে দেখো। আর কোনো log কি একই session-কে দুটো IP থেকে আসতে দেখাচ্ছে?
-
+এগুলো ধারণাগত review প্রশ্ন, executable test বা implementation verification নয়. বাস্তব system-এ নিশ্চিত হতে হলে আলাদা, অনুমোদিত implementation testing লাগবে.
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
 আরিফ আজ দুটো আক্রমণ ঠেকাল। দুটোতেই আক্রমণকারী session ID **জানত**: একটায় চুরি করে, অন্যটায় আগে থেকে বসিয়ে।
@@ -650,8 +637,8 @@ Browser তো cookie নিজে জুড়ে দেয়। আক্র�
 যাচাইয়ের অবস্থা সৎভাবে লেখা: কোনটা পুরো পাতা পড়ে, কোনটা শুধু search snippet দেখে।
 
 - [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html): **পুরো পাতা পড়া।** hijacking আর fixation-এর সংজ্ঞা, strict বনাম permissive mode, privilege বদলে ID নবায়ন (login, password বদল, role বদল), pre/post-login আলাদা cookie, idle আর absolute আর renewal timeout (সংখ্যাসহ), idle timeout সক্রিয় আক্রমণকারীকে থামায় না, ID-র সঙ্গে IP/User-Agent বাঁধার সীমা, session lifecycle log (salted hash), একই সময়ে একাধিক session আর remote logout, reauthentication after risk events, initial login timeout, cookie অখণ্ডতা (`__Host-`, `Domain`)।
-- [OWASP Cookie Theft Mitigation Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cookie_Theft_Mitigation_Cheat_Sheet.html): **পুরো পাতা পড়া।** cookie চুরি = authentication-এর সমতুল্য ক্ষতি, চুরির পথ (malware, phishing, application vulnerability), context-সংকেত, false positive আর negative, পুনরায় authenticate করা সবচেয়ে নির্ভরযোগ্য, CAPTCHA যথেষ্ট নয়, DBSC-র সীমা। (এই পাতা repository-র `references/owasp.md`-তে এখনো নেই।)
-- [OWASP WSTG-SESS-03: Testing for Session Fixation](https://wstg.owasp.org/latest/4-Web_Application_Security_Testing/06-Session_Management/03-Session_Fixation): **পুরো পাতা পড়া।** fixation লগইনের আগে cookie-তে state রাখলে ঘটে, cookie নবায়ন আর অখণ্ডতা (HSTS, `__Host-`/`__Secure-`), forced-cookie পরীক্ষা, remediation।
+- [OWASP Cookie Theft Mitigation Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cookie_Theft_Mitigation_Cheat_Sheet.html): **পুরো পাতা পড়া।** cookie চুরি = authentication-এর সমতুল্য ক্ষতি, চুরির পথ (malware, phishing, application vulnerability), context-সংকেত, false positive আর negative, পুনরায় authenticate করা সবচেয়ে নির্ভরযোগ্য, CAPTCHA যথেষ্ট নয়, DBSC-র সীমা। এই পাতাটি repository-র `references/owasp.md`-তেও তালিকাভুক্ত আছে.
+- [OWASP WSTG-SESS-03: Testing for Session Fixation](https://wstg.owasp.org/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/03-Testing_for_Session_Fixation): **পুরো পাতা পড়া।** fixation লগইনের আগে cookie-তে state রাখলে ঘটে, cookie নবায়ন আর অখণ্ডতা (HSTS, `__Host-`/`__Secure-`), forced-cookie পরীক্ষা, remediation।
 - [RFC 6265](https://www.rfc-editor.org/rfc/rfc6265): **§৮ পড়া।** §৮.৪-এ fixation-এর তিন ধাপ, §৮.৩-এ signed/encrypted cookie-ও transplant আর replay থেকে বাঁচে না।
 - [NIST SP 800-63B-4: Session Management](https://pages.nist.gov/800-63-4/sp800-63b/session/) আর [AAL পাতা](https://pages.nist.gov/800-63-4/sp800-63b/aal/): **দুটো পাতাই পুরো পড়া।** session secret তৈরি হয় authentication event-এর প্রতিক্রিয়ায়, cookie-র নিয়ম, timeout শেষ হলে session শেষ, session monitoring আর তার privacy, DBSC-র উল্লেখ, AAL1–3-এর timeout-সংখ্যা।
 - [W3C DBSC explainer](https://github.com/w3c/webappsec-dbsc/blob/main/README.md): **পড়া।** লক্ষ্য, non-goal, refresh প্রক্রিয়া। Spec উন্নয়নাধীন।
