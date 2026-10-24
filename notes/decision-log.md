@@ -104,3 +104,13 @@
 - মূল teaching objective: authentication সফল হওয়ার পর session কীভাবে continuity ধরে রাখে; cookie কীভাবে browser-এ credential বহন করে; server-side session state কীভাবে lookup, expiry ও revocation সমর্থন করে; cookie attributes কী ঝুঁকি কমায় এবং কোন ঝুঁকি থেকে যায়।
 - Framework-specific code, exact library API, compile/test history ও implementation-only cleanup detail chapter-এর teaching content নয়। এগুলো দরকার হলে আলাদা implementation guide-এ রাখা যাবে।
 - Security claims-এর review-তে cookie attributes, session ID entropy, replay, fixation, expiry, logout, session store leakage এবং browser-vs-server responsibility যাচাই করতে হবে। Chapter 4-এর Technical Review ও Security Review এখনো unchecked থাকবে যতক্ষণ source-based review সম্পন্ন না হয়।
+
+## 2026-10-25 — Chapter 3 ও 4 discrepancy review
+
+- Chapter 3 ও 4-এর branch-এর বর্তমান সংস্করণ যাচাই করা হয়েছে। দুটো অধ্যায়েই language-specific implementation code নেই; Mermaid diagram ও language-neutral/HTTP illustrative example ব্যবহার করা হয়েছে।
+- Chapter 3-এর password storage, salt, offline guessing ও Argon2id-সংক্রান্ত মূল দাবিগুলো OWASP Password Storage Cheat Sheet এবং NIST SP 800-63B-4-এর সঙ্গে source-basedভাবে মিলিয়ে দেখা হয়েছে। NIST-এর বর্তমান নির্দেশনায় password blocklist ও Unicode normalization-সংক্রান্ত দাবি আছে; Unicode-এর মূল specification আলাদা করে পুরো পড়া হয়েছে বলে দাবি করা হচ্ছে।
+- Chapter 4-এর session ID entropy/CSPRNG, session store-এ verifier hash, cookie বনাম session, replay ও browser/server responsibility-র মূল দাবিগুলো OWASP Session Management Cheat Sheet এবং RFC/MDN-এ বর্ণিত cookie behavior-এর সঙ্গে মিলিয়ে দেখা হয়েছে।
+- Chapter 4-এ কয়েকটি ভাষাগত/ধারণাগত discrepancy ঠিক করা হয়েছে: Argon2id latency-কে সর্বজনীন benchmark হিসেবে না দেখানো, language-specific random-generator নামের বদলে CSPRNG বলা, এবং hashed session verifier-সহ read-only store disclosure-কে “শূন্য ক্ষতি” না বলা।
+- Chapter 3 ও 4-এর Technical Review ও Security Review checkbox-কে conceptual/source-based review-এর অর্থে রাখা হয়েছে। এগুলো implementation audit, automated test, বা production security certification বোঝায় না।
+- এই review-তে কোনো application code execute বা implementation test করা হয়নি। পরবর্তী অধ্যায়ে যাওয়ার আগে chapter cross-reference ও review notes পুনরায় দেখা হবে।
+
