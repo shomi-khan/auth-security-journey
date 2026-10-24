@@ -106,11 +106,12 @@ sequenceDiagram
     B->>B: Script cookie value পড়তে চায়
     B-->>B: HttpOnly-এর কারণে cookie value পড়তে পারে না
     B->>K: Script একই origin-এ authenticated request শুরু করে
-    K-->>B: Session অনুযায়ী response
+    Note over K: Server-এর authorization ও business-rule checks এখনও প্রযোজ্য
+    K-->>B: Permission থাকলে response, নইলে reject
     B->>A: Script accessible page data পাঠানোর চেষ্টা
 ```
 
-Diagram-এর শেষ ধাপটি সব সময় সফল হবে এমন দাবি নয়। CSP, browser behavior, network policy, data-র accessibility এবং attacker-এর endpoint-এর ওপর তা নির্ভর করতে পারে। মূল শিক্ষা হলো, HttpOnly cookie value পড়া আটকায়, কিন্তু vulnerable page-এর script execution নিজে বন্ধ করে না।
+Diagram-এর শেষ ধাপটি সব সময় সফল হবে এমন দাবি নয়। CSP, browser behavior, network policy, data-র accessibility এবং attacker-এর endpoint-এর ওপর তা নির্ভর করতে পারে। Server-side authorization ও business-rule checks-ও এখনও প্রযোজ্য; XSS মানেই attacker স্বয়ংক্রিয়ভাবে সব operation করতে পারবে, তা নয়। তবে page context-এ চলা script user-এর বৈধ ক্ষমতা অপব্যবহারের চেষ্টা করতে পারে। মূল শিক্ষা হলো, HttpOnly cookie value পড়া আটকায়, কিন্তু vulnerable page-এর script execution নিজে বন্ধ করে না।
 
 ## ৫. HttpOnly থাকলেও কী কী ক্ষতি সম্ভব?
 
