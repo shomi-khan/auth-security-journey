@@ -308,7 +308,9 @@ Input validation business rule যাচাই করে। নিরাপদ o
 
 CSRF অধ্যায়ে আমরা জিজ্ঞেস করেছিলাম, “পাতায় যে script চলছে, সেটা কি আমাদের নিজের?” এবার উত্তরটা পরিষ্কার: browser একই origin-এর script-কে trusted page context-এ চালায়। যদি সেই বিশ্বাসটাই ভুল content-কে দেওয়া হয়, তাহলে cookie-র flag একা কতটা বাঁচাতে পারবে?
 
-পরের অধ্যায়ে আমরা আরেকটি প্রশ্নে যাব: **যখন browser cookie session ছাড়া অন্য client-ও KenaKata-র resource চাইতে শুরু করবে, তখন পরিচয় কীভাবে request-এর সঙ্গে যাবে?**
+## পরের অধ্যায়
+
+[অধ্যায় ৮: Token কেন দরকার?](../08-tokens/README.md)। Mobile app-ও যখন KenaKata-র resource চাইবে, তখন browser-এর cookie-session model-এর বাইরে পরিচয় request-এর সঙ্গে কীভাবে যাবে, সেই প্রশ্নে যাব। Token-কে cookie-এর চেয়ে স্বয়ংক্রিয়ভাবে নিরাপদ বিকল্প ধরে নেব না; কোন client-এ কোন credential model মানায়, আর তার নতুন ঝুঁকি কী, তা আলাদা করে দেখব।
 
 ## তথ্যসূত্র
 
