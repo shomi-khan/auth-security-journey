@@ -28,6 +28,14 @@ Source-based conceptual review of the Bengali theory-first chapter. The review c
 - RFC 9110 section 9.2.1: https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1
 - Go vulnerability report GO-2025-3955: https://pkg.go.dev/vuln/GO-2025-3955 (affects CrossOriginProtection.AddInsecureBypassPattern in Go 1.25.0, fixed in Go 1.25.1)
 
+## Final consistency pass (2026-10-25)
+
+- Rechecked the updated Chapter 6 against the chapter's theory-first policy and the preceding session/cookie and session-fixation chapters. Removed leftover references to Go-style record fields and helper names that implied a concrete implementation; described the required session-token lifecycle conceptually instead.
+- Clarified the login route table: `GET /login` issues a pre-session token for the subsequent `POST /login`; the token is validated on submission.
+- Made the Fetch Metadata unknown-value behavior explicit. OWASP recommends ignoring unrecognized Fetch Metadata values for forward compatibility; KenaKata intentionally rejects them as a stricter, product-specific policy. This can block legitimate requests if new values appear, so any real rollout needs log-only observation and compatibility monitoring before enforcement.
+- Rechecked the Chapter 6 internal link to Chapter 7 and the source list. The chapter still has only Draft checked; this pass does not change the review checkboxes.
+- This remains a documentation/source consistency pass, not a browser, application, proxy, or production test.
+
 ## Limitations
 
 No application code was compiled or executed. No automated tests, real-browser behavior, browser compatibility matrix, proxy behavior, multi-instance deployment, or production configuration was tested. A source-based conceptual review has been conducted and documented here. However, the chapter's Technical Review and Security Review checkboxes intentionally remain unchecked because the Chapter 6 repo notes explicitly direct that only Draft be checked at this stage. These checkboxes must not be interpreted as a claim that no review work occurred, nor as implementation audit or production security certification.
