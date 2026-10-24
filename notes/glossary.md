@@ -27,7 +27,15 @@ Browser যে ছোট ডেটা জমিয়ে রাখে এবং প
 ## CSRF
 
 সহজ ভাষায়:
-User login করা থাকা অবস্থায় অন্য সাইট থেকে তার নামে request পাঠানো। বিস্তারিত অধ্যায় ৬।
+Browser-এর স্বয়ংক্রিয় credential (যেমন session cookie) ব্যবহার করে user-এর ইচ্ছার বাইরে তার নামে কোনো site-এ request করানো। আক্রমণকারীকে cookie বা response পড়তে হবে এমন নয়। বিস্তারিত অধ্যায় ৬।
+
+## Synchronizer Token
+
+Server-side session-এর সঙ্গে যুক্ত একটি গোপন, অনুমান-অযোগ্য মান। Page সেটি form field বা request header-এ দেয়, আর server state-changing request গ্রহণের আগে session-এর মানের সঙ্গে মিলিয়ে দেখে। বিস্তারিত অধ্যায় ৬।
+
+## Fetch Metadata
+
+Browser-এর request header-এর একটি গোষ্ঠী, যেমন `Sec-Fetch-Site`, যা request কোন context থেকে এসেছে তা জানায়। এটি signal, authentication নয়; non-browser client header জাল করতে পারে। বিস্তারিত অধ্যায় ৬।
 
 ## XSS
 
