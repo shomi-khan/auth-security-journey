@@ -239,7 +239,7 @@ session ID-র গুণ নিয়ে OWASP-র Session Management Cheat Shee
 
 | | Cookie | `Authorization` header |
 |---|---|---|
-| কে পাঠায়? | **browser নিজে**, নিয়ম মেনে, স্বয়ংক্রিয়ভাবে | **আমাদের কোড**, প্রতিটা request-এ জুড়ে দিতে হয় |
+| কে পাঠায়? | **browser নিজে**, নিয়ম মেনে, স্বয়ংক্রিয়ভাবে | **client code**, প্রতিটা request-এ জুড়ে দিতে হয় |
 | JavaScript পড়তে পারে? | `HttpOnly` থাকলে না | যেখানে রাখা হবে সেখান থেকে পারে |
 | অন্য সাইট থেকে request এলে? | browser তবু পাঠাতে পারে (অধ্যায় ৬) | পাঠায় না, কারণ সেই সাইটের কাছে মানটা নেই |
 
@@ -312,18 +312,9 @@ flowchart TD
 
 Cookie-তে session ID থাকা মানে cookie নিজে server-side record নয়। Browser শুধু credential-টি বহন করে; server-ই ঠিক করে সেই credential এখনো বৈধ কি না।
 
-### `401`-এর ঋণ শোধ
+### Browser page আর API response
 
-অধ্যায় ১-এ লিখেছিলাম, `401` response-এ `WWW-Authenticate` header লাগে। অধ্যায় ২-এ বলেছিলাম, browser-এর প্রসঙ্গে সেটা কীভাবে বদলায়, সেটা অধ্যায় ৪-এ। এবার বলি।
-
-RFC 9110 (§15.5.2) অনুযায়ী `401` পাঠালে সেই response-এ অন্তত একটা challenge-সহ `WWW-Authenticate` header পাঠাতে হবে। HTTP-র এই কাঠামো `Basic` (অধ্যায় ১) বা `Bearer`-এর মতো scheme-এর জন্য বানানো, যেখানে client পরের request-এ `Authorization` header জুড়ে দেয়। Basic challenge পেলে browser নিজেই একটা পাসওয়ার্ডের জানালা খোলে, যেটা আমরা চাই না। আর cookie-ভিত্তিক session-এর জন্য এই তালিকায় আমি কোনো scheme খুঁজে পাইনি: IANA-র প্রাথমিক registration-এর তালিকায় Basic, Bearer, Digest আর Negotiate আছে। (পুরো আজকের registry আমি এখানে মেলাইনি।)
-
-তাই cookie-র জগতে সাধারণ চর্চা দুই ভাগে:
-
-- **browser-এর পাতা (GET):** `302` দিয়ে login পাতায় পাঠাই। এই উদাহরণে তাই করা হয়।
-- **অন্য request (যেমন POST বা JavaScript-এর ডাক):** `401`। অনেক framework এটা `WWW-Authenticate` ছাড়াই পাঠায়, যা RFC 9110-এর কঠোর পাঠে অসম্পূর্ণ। আমাদের কোডও তাই করছে। অধ্যায় ৮-এ `Bearer` (RFC 6750) এলে এই API-র `401`-এর একটা প্রমিত challenge পাওয়া যাবে।
-
-এই ছাড় জেনেবুঝে রাখা হলো। নীরবে ধরে নেওয়া হয়নি।
+Browser-এর HTML page চাইলে login page-এ redirect করা যেতে পারে; API request সাধারণত authentication error পায়, যাতে client নিজে সিদ্ধান্ত নিতে পারে কী দেখাবে। HTTP-এর `401` response-এর challenge-সংক্রান্ত নিয়ম আলাদা protocol detail, তাই এখানে তার implementation নিয়ে যাচ্ছি না। মূল কথা: response-এর আচরণ client-এর ধরন অনুযায়ী বেছে নিতে হয়, কিন্তু authentication ব্যর্থ হলে protected resource-এ প্রবেশ দেওয়া যাবে না।
 
 ---
 
@@ -521,7 +512,7 @@ flowchart LR
 
 অধ্যায় ৩-এর শেষ প্রশ্নটা ছিল: যে চিহ্ন প্রতিটা request-এ যায়, সেটা চুরি হলে আমরা কি আবার সেখানেই, যেখান থেকে বেরিয়ে এলাম?
 
-উত্তর: **একই ধরনের বিপদ, ছোট আকারে।** OWASP-র কথায়, authenticated session স্থাপিত হলে session ID সাময়িকভাবে ব্যবহৃত সবচেয়ে শক্ত authentication পদ্ধতির সমতুল্য। মানে বিপদটা নেই বলছি না। কিন্তু পাশাপাশি রাখলে তফাত পরিষ্কার:
+উত্তর: **একই ধরনের bearer-credential ঝুঁকি, তবে আলাদা সীমা ও trade-off-সহ।** OWASP-র কথায়, authenticated session স্থাপিত হলে session ID সাময়িকভাবে ব্যবহৃত সবচেয়ে শক্ত authentication পদ্ধতির সমতুল্য। মানে বিপদটা নেই বলছি না। কিন্তু পাশাপাশি রাখলে তফাত পরিষ্কার:
 
 | | password | session ID |
 |---|---|---|
@@ -540,7 +531,7 @@ flowchart LR
 
 - **server-কে মনে রাখতে হয়।** প্রতিটা request-এ একটা খোঁজ। store বন্ধ হলে সবাই login থেকে বঞ্চিত। একাধিক server চালালে সবাইকে একই store দেখতে হয় (database বা Redis-এর মতো কিছু), নইলে একটা server-এর বানানো session আরেকটা চেনে না।
 - **store নিজেই একটা লক্ষ্য।** hash রাখলে read-only ফাঁসে ক্ষতি কমে, কিন্তু store-এ লেখার সুযোগ পেলে আক্রমণকারী নিজের সারি বসিয়ে দিতে পারে।
-- **পুরোনো row জমে।** আমাদের কোড শুধু `Lookup`-এ মেয়াদ-শেষ row সরায়। production-এ আলাদা পরিষ্কারের কাজ (TTL বা সময় ধরে মোছা) লাগে।
+- **পুরোনো record জমে।** মেয়াদ শেষ হওয়া session record store থেকে পরিষ্কার করার ব্যবস্থাও দরকার।
 - **`SameSite=Lax`-এর ছাড়।** `Strict` শক্ত কিন্তু link ধরে আসা কর্মীদের ঘর্ষণ। `Lax` সহজ কিন্তু CSRF-এর পুরো সমাধান নয়।
 - **৮ ঘণ্টার মেয়াদ।** ছোট মেয়াদ নিরাপদ, কিন্তু রাফিকে রোজ সকালে login। দীর্ঘ মেয়াদ সুবিধাজনক, কিন্তু চুরির সুযোগ বড়।
 - **cookie শুধু browser-এর জিনিস।** browser নয় এমন client-এ cookie অস্বস্তিকর। সেই চাপ আসবে অধ্যায় ৮-এ।
@@ -648,7 +639,7 @@ flowchart LR
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
-আজ আমরা দেখলাম, session ID চুরি হলে ক্ষতি password-এর চেয়ে ছোট। কিন্তু ছোট মানে শূন্য নয়। ধরো কেউ রাফির cookie-টা পেয়ে গেল: কাফের Wi-Fi থেকে, shared কম্পিউটারের browser থেকে, কোনো ভুলে-লেখা log থেকে। server-এর চোখে এখন দুটো request হুবহু এক: একটা রাফির নিজের, একটা আক্রমণকারীর। একই cookie, একই মান।
+আজ আমরা দেখলাম, session ID চুরি হলে password চুরির মতোই গুরুতর হতে পারে। তবে session ID সাধারণত অন্য সাইটে password-এর মতো পুনর্ব্যবহারযোগ্য নয়, আর server সেটি বাতিল করতে পারে। ধরো কেউ রাফির cookie-টা পেয়ে গেল: কাফের Wi-Fi থেকে, shared কম্পিউটারের browser থেকে, কোনো ভুলে-লেখা log থেকে। server-এর চোখে এখন দুটো request হুবহু এক: একটা রাফির নিজের, একটা আক্রমণকারীর। একই cookie, একই মান।
 
 **server কীভাবে বুঝবে কোনটা আসল রাফি? আর আরও খারাপ: আক্রমণকারী যদি রাফির cookie চুরিই না করে, বরং নিজেই একটা session ID বানিয়ে রাফিকে দিয়ে সেটা দিয়ে login করিয়ে নেয়?**
 
