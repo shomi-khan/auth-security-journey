@@ -53,7 +53,7 @@ GET /manage/orders/1051/cancel HTTP/1.1
 Cookie: __Host-id=<browser-এর পাঠানো session cookie>
 ```
 
-এই কোডে কোনো ভুল নেই, অন্তত যে ভুল আমরা এতদিন খুঁজেছি। অধ্যায় ৪-এর `requireAuthentication` ঠিকঠাক কাজ করেছে। session বৈধ ছিল। `user-1` সত্যিই অর্ডার বাতিল করতে পারে, অর্থাৎ অধ্যায় ২-এর authorization-ও আপত্তি তোলেনি। অধ্যায় ৫-এর সব নতুন যন্ত্র (মেয়াদ, rotate, context signal) নিজের কাজ ঠিকঠাক করেছে।
+এই request-এ আগের স্তরগুলোর কোনো ভুল ছিল না, অন্তত যে ভুল আমরা এতদিন খুঁজেছি। অধ্যায় ৪-এর authentication check ঠিকঠাক কাজ করেছে। session বৈধ ছিল। `user-1` সত্যিই অর্ডার বাতিল করতে পারে, অর্থাৎ অধ্যায় ২-এর authorization-ও আপত্তি তোলেনি। অধ্যায় ৫-এর সব নতুন যন্ত্র (মেয়াদ, rotate, context signal) নিজের কাজ ঠিকঠাক করেছে।
 
 আর যে প্রশ্নটা অধ্যায় ৪ থেকে ঝুলছিল, আর অধ্যায় ৫-এর শেষে আরও তীক্ষ্ণ হলো, সেটা এখন ঘরের ভেতরে বসে আছে। server-এর চোখে দুটো request হুবহু এক: একটা রাফি নিজে করেছে, আরেকটা রাফির browser-কে দিয়ে অন্য কেউ করিয়েছে। **তফাতটা server কীভাবে ধরবে?**
 
@@ -189,7 +189,7 @@ flowchart TD
     O -- "না, খালি বা null" --> NO2["403, প্রত্যাখ্যান"]
 ```
 
-কোডে এটা এত ছোট:
+নীতিটা সংক্ষেপে:
 
 **KenaKata-র policy table** (এটি শিক্ষামূলক সিদ্ধান্ত, কোনো framework-এর universal default নয়):
 
@@ -199,6 +199,8 @@ flowchart TD
 | `cross-site`, `same-site`, `none` বা অচেনা value | `403` | `none` user-initiated navigation-এর সংকেত হতে পারে, কিন্তু একে একা sensitive action-এর অনুমতি হিসেবে ধরা হবে না |
 | `Sec-Fetch-Site` নেই, `Origin` exact configured origin-এর সঙ্গে মেলে | পরের স্তরে যাও | compatibility fallback |
 | `Sec-Fetch-Site` নেই এবং `Origin` missing, `null` বা mismatch | `403` | KenaKata fail-safe বেছে নিয়েছে |
+
+KenaKata-র policy ইচ্ছাকৃতভাবে কঠোর: OWASP-এর সাধারণ Fetch Metadata guidance forward compatibility-র জন্য অচেনা value ignore করতে বলে, কিন্তু এখানে unknown value-ও reject করা হচ্ছে। এতে ভবিষ্যতে নতুন value এলে বৈধ request-ও block হতে পারে; production-এ enforce করার আগে log-only rollout ও compatibility monitoring দরকার।
 
 `GET`, `HEAD` ও `OPTIONS`-এর মতো safe method-এ state বদলানো যাবে না। HTTP semantics-এ `TRACE`-ও safe method হিসেবে সংজ্ঞায়িত, তবে KenaKata-র এই দৃশ্যে সেটি চালু endpoint নয়। Safe method-এ state বদলানো থাকলে এই guard-কে পাশ কাটানো যায়, তাই handler-এর আচরণই প্রথম invariant.
 
@@ -245,7 +247,7 @@ sequenceDiagram
 
 token-এর ধর্ম (OWASP): প্রতি session-এ আলাদা, গোপন, অনুমান-অযোগ্য (CSPRNG)। synchronizer pattern-এ token **cookie-তে নয়**। URL-এ নয়, log-এ নয়, কারণ `GET` URL browser history, log আর `Referer`-এ ফাঁস হয়। token-কে কোনো *মেয়াদ* দেওয়ার দরকার নেই, session-এর সঙ্গেই তার জীবন (অধ্যায় ৫-এর idle ৩০ মিনিট আর absolute ৮ ঘণ্টা), আর OWASP স্পষ্ট বলে, CSRF token কোনো access token নয়। per-request token বেশি নিরাপদ হলেও "Back" বাটনে ভাঙে, তাই আমরা per-session।
 
-কোড। অধ্যায় ৫-এর `record`-এ (যেখানে এখন `Next`, `StartedAt`, `LastSeen`, `UA`, `Net` আছে) একটা ফিল্ড বাড়ে, আর session ID-র পাশে আরেকটা, **স্বাধীন** random মান বানানো হয়:
+সার্ভারের session record-এ CSRF token-এর জন্য আলাদা field রাখতে হবে। প্রতিটি নতুন session-এর সময় session ID থেকে **স্বাধীন** একটি random মান তৈরি করে সেই session-এর সঙ্গে যুক্ত করতে হবে:
 
 ```mermaid
 flowchart TD
@@ -258,9 +260,9 @@ flowchart TD
     F -->|না / নেই / session নেই| H["403, request প্রত্যাখ্যান"]
 ```
 
-কেন স্বাধীন? token পাতার HTML-এ যায়, আর session ID `HttpOnly` cookie-তে। token যদি session ID-র হুবহু রূপ বা তা থেকে বানানো হতো, পাতায় বসানো মান থেকে session ID-র দিকে একটা সূত্র তৈরি হতো। আলাদা random মানে সেই সূত্র নেই। `put` ডাকে login-এর আগের anonymous session আর login-এর মুহূর্তের `Rotate` দুটোই, তাই প্রতিটা session-এর নিজের token থাকে, আর `Rotate` নতুন session বানালে নতুন token-ও আসে, আলাদা কিছু করতে হয় না। অধ্যায় ৫-এর "login-এর সময় ID বদলাও" এখানে বিনা খরচে মিলে যায়। login-এর আগের session-এর token কেন লাগে, সেটা §৫-এ।
+কেন স্বাধীন? token পাতার HTML-এ যায়, আর session ID `HttpOnly` cookie-তে। token যদি session ID-র হুবহু রূপ বা তা থেকে বানানো হতো, পাতায় বসানো মান থেকে session ID-র দিকে একটা সূত্র তৈরি হতো। আলাদা random মানে সেই সূত্র নেই। Login-এর আগে anonymous session তৈরি হলে তারও নিজস্ব token থাকবে। Login সফল হলে পুরোনো anonymous session বাতিল করে নতুন session ID ও নতুন token তৈরি করতে হবে। এতে অধ্যায় ৫-এ শেখা session fixation প্রতিরক্ষার সঙ্গে CSRF token lifecycle-ও মিলে যায়। login-এর আগের session-এর token কেন লাগে, সেটা §৫-এ।
 
-middleware আর পাতা:
+Server-side validation ও page form:
 
 Token যাচাইয়ের security invariant:
 
@@ -301,7 +303,7 @@ flowchart LR
 
 | কাজ | HTTP method | Authentication | CSRF protection |
 | --- | --- | --- | --- |
-| Login page দেখানো | `GET /login` | anonymous pre-session থাকতে পারে | page-এ pre-session token |
+| Login page দেখানো | `GET /login` | anonymous pre-session থাকতে পারে | পরের login `POST`-এর জন্য pre-session token issue |
 | Login submit | `POST /login` | credentials যাচাইয়ের আগে anonymous | origin guard + pre-session token |
 | Order page দেখা | `GET /manage/orders/{id}` | session | safe method; state বদলাবে না |
 | Order বাতিল | `POST /manage/orders/{id}/cancel` | session + authorization | origin guard + session token |
@@ -321,7 +323,7 @@ Origin/Fetch Metadata policy state-changing request-এ প্রথম দি�
 
 KenaKata-র এখনকার একটাই দোকান, তাই ঝুঁকিটা কল্পনার। কিন্তু যেদিন একাধিক দোকান আসবে (অধ্যায় ১৫), রাফি অজান্তে অন্য কারও account-এ ক্রেতার তালিকা তুলে দিলে সেটা সত্যিকারের তথ্য ফাঁস।
 
-OWASP-র সুপারিশ: login-এর আগে একটা *pre-session* বানিয়ে তাতে token বসাও, আর login-এর পর সেটা **ধ্বংস করে নতুন session** দাও (নইলে fixation)। এখানে অধ্যায় ৫-এর কাজ আমাদের সোজা সুবিধা দেয়। সেখানে নীরার "login-এর পর ঠিক ওই পাতায় ফেরো" দাবির জন্য আরিফ একটা anonymous session বানিয়েছিল, আর login-এর মুহূর্তে `Rotate` পুরোনোটা মেরে নতুন দেয়। pre-session আমাদের আগেই আছে। সেই session-এর record-এ (§৪.৩) একটা token-ও আছে। login পাতা সেটা form-এ বসায়, login handler সেটা মেলায়:
+OWASP-র সুপারিশ: login-এর আগে একটা *pre-session* বানিয়ে তাতে token বসাও, আর login-এর পর সেটা **ধ্বংস করে নতুন session** দাও (নইলে fixation)। এখানে অধ্যায় ৫-এর নকশা আমাদের সোজা সুবিধা দেয়। নীরার "login-এর পর ঠিক ওই পাতায় ফেরো" দাবির জন্য আরিফ anonymous session তৈরি করেছিল, আর login-এর মুহূর্তে পুরোনো session বাতিল করে নতুন session ID দিয়েছিল। pre-session আমাদের আগেই আছে। সেই session-এর record-এ (§৪.৩) একটা token-ও আছে। login পাতা সেটা form-এ বসায়, login handler সেটা মেলায়:
 
 ```mermaid
 sequenceDiagram
@@ -353,9 +355,9 @@ Login flow-তে origin policy আর pre-session token দুটোই প্�
 | আক্রমণকারীর **নিজের** anonymous token, victim-এর anonymous cookie-তে | `403` |
 | সঠিক origin, pre-session ও credentials | Login সফল; নতুন session ID ও নতুন token। পুরোনো anonymous session ও token অকার্যকর |
 
-শেষ সারির শেষ অংশটা অধ্যায় ৫-এর fixation-এর সঙ্গে মিলে যায়। আক্রমণকারী `X` বসিয়ে রাখলে সে `X`-এর token-ও জানে (একই পাতা চেয়ে নিলেই পাওয়া যায়)। কিন্তু login-এর মুহূর্তে `Rotate` `X` মুছে দেয়, তাই ওই token আর কোনো কাজেই লাগে না।
+শেষ সারির শেষ অংশটা অধ্যায় ৫-এর fixation-এর সঙ্গে মিলে যায়। আক্রমণকারী `X` বসিয়ে রাখলে সে `X`-এর token-ও জানে (একই পাতা চেয়ে নিলেই পাওয়া যায়)। কিন্তু login-এর মুহূর্তে পুরোনো anonymous session `X` বাতিল করে নতুন session ID তৈরি করা হয়, তাই ওই token আর কোনো কাজেই লাগে না।
 
-এর দাম আছে। anonymous session ৩০ মিনিটে মরে (অধ্যায় ৫)। কেউ login পাতা খুলে ৪০ মিনিট পরে submit করলে এখন `403` পাবে, আর তার টাইপ করা email হারাবে। ভালো নকশায় সেই ক্ষেত্রে login পাতা নতুন token সহ আবার দেখানো হয়, email-টা ভরা অবস্থায়। আমাদের ছোট কোডে সেটা নেই। আর anonymous session নিজেই একটা পৃষ্ঠ, অধ্যায় ৫ §১৩-এ যা বলা হয়েছে: লক্ষ লক্ষ `GET /login` store ভরাতে পারে। token থাকলে সেই সমস্যা বাড়ে না, কিন্তু কমেও না।
+এর দাম আছে। anonymous session ৩০ মিনিটে মরে (অধ্যায় ৫)। কেউ login পাতা খুলে ৪০ মিনিট পরে submit করলে এখন `403` পাবে, আর তার টাইপ করা email হারাবে। ভালো নকশায় সেই ক্ষেত্রে login পাতা নতুন token সহ আবার দেখানো হয়, email-টা ভরা অবস্থায়। এই অধ্যায়ের conceptual flow-তে সেই user-experience detail নির্দিষ্ট করা হয়নি। আর anonymous session নিজেই একটা পৃষ্ঠ, অধ্যায় ৫ §১৩-এ যা বলা হয়েছে: লক্ষ লক্ষ `GET /login` store ভরাতে পারে। token থাকলে সেই সমস্যা বাড়ে না, কিন্তু কমেও না।
 
 **Logout?** সেটা এখন `POST`, আর origin guard ও session token দুটোর নিচে। নিরাপদ method দিয়ে logout হওয়া উচিত নয়; cross-site request বা token mismatch হলে session অক্ষত থাকবে; বৈধ same-origin request ও সঠিক token-এর পরই session বাতিল হবে। এগুলো প্রত্যাশিত behavior, চালানো test-এর ফল নয়.
 
