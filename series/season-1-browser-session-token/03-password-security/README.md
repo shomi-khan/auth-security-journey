@@ -112,7 +112,7 @@ flowchart LR
 
 ---
 
-## ৩. ভুল প্রশ্ন: "password কীভাবে লুকাব?"
+## 💡 ৩. ভুল প্রশ্ন: "password কীভাবে লুকাব?"
 
 আরিফের প্রথম প্রতিক্রিয়া ছিল স্বাভাবিক: "ঠিক আছে, password-গুলো encrypt করে রাখি।"
 
@@ -151,6 +151,25 @@ stored := hex.EncodeToString(sum[:])
 
 এখানে যুক্তিটা উল্টে যায়। সাধারণত "দ্রুত" মানে ভালো। Password hash-এর ক্ষেত্রে দ্রুত হওয়াই আক্রমণকারীর সবচেয়ে বড় সুবিধা।
 
+
+## 🧠 Decision Game: database dump ফাঁস হলে কোন control কাজে দেবে?
+
+আরিফের কাছে এখন তিনটি প্রস্তাব এসেছে। Database backup আবার ফাঁস হয়েছে, আর আক্রমণকারীর হাতে password hash আছে। কোন control সরাসরি offline password guessing-এর খরচ বাড়াবে?
+
+- **A.** `/login`-এ প্রতি IP-তে rate limit বসানো
+- **B.** প্রতিটি password-এর জন্য random salt এবং Argon2id ব্যবহার
+- **C.** Login ব্যর্থ হলে CAPTCHA দেখানো
+
+নিজে উত্তর বেছে নাও। এখানে প্রশ্নটা কোন control ভালো, তা নয়; প্রশ্নটা হলো আক্রমণকারী এখন server-এর বাইরে থাকলে কোন control তার কাছে পৌঁছাতে পারবে।
+
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
+
+**সঠিক উত্তর: B।** Database dump হাতে থাকলে আক্রমণকারী নিজের machine-এ password অনুমান করে hash মিলিয়ে দেখতে পারে। `/login`-এর rate limit আর CAPTCHA server-এ আসা request নিয়ন্ত্রণ করে, তাই offline guessing থামায় না। Random salt precomputed তালিকা ও একাধিক account-এ একই hash-এর সুবিধা কমায়; Argon2id প্রতিটি অনুমানকে সময় ও memory-র দিক থেকে ব্যয়বহুল করে।
+
+**Edge case:** Argon2id দুর্বল password-কে শক্ত করে দেয় না। `rafi1985`-এর মতো সহজ password তবু অনুমান করা যেতে পারে, শুধু প্রতি অনুমানের খরচ বাড়ে। তাই password length, blocklist এবং online attack-এর বিরুদ্ধে আলাদা control-ও দরকার।
+
+</details>
 ---
 
 ## ৪. Salt: প্রতিটা password আলাদা করে ছোঁয়া
@@ -280,6 +299,12 @@ func Verify(pw, encoded string) (bool, error) {
 	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &m, &t, &p); err != nil {
 		return false, errors.New("bad parameters")
 	}
+	// Database-এর encoded hash-ও অবিশ্বাস্য input হিসেবে ধরো।
+	// Parameter-এর সীমা না থাকলে tampered row অস্বাভাবিক memory/CPU খরচ করাতে পারে।
+	if m < 7*1024 || m > 64*1024 || t < 1 || t > 5 || p < 1 || p > 4 {
+		return false, errors.New("argon2 parameters out of bounds")
+	}
+
 	salt, err := b64.DecodeString(parts[4])
 	if err != nil {
 		return false, err
@@ -287,6 +312,9 @@ func Verify(pw, encoded string) (bool, error) {
 	want, err := b64.DecodeString(parts[5])
 	if err != nil {
 		return false, err
+	}
+	if len(salt) != saltLen || len(want) != keyLen {
+		return false, errors.New("unexpected salt or hash length")
 	}
 	got := argon2.IDKey([]byte(pw), salt, t, m, p, uint32(len(want)))
 	return subtle.ConstantTimeCompare(got, want) == 1, nil
@@ -309,6 +337,12 @@ $argon2id$v=19$m=19456,t=2,p=1$6ntZMPHCqYWOGNTS1t1w7Q$17RAHmtm7vQxx7rPGBzYLctpWO
 
 দুটো ছোট খুঁটিনাটি কোডে আছে। `subtle.ConstantTimeCompare` তুলনা করে এমনভাবে, যাতে কতটুকু অংশ মিলল তার ওপর সময় নির্ভর না করে। আর `rand.Read` এসেছে `crypto/rand` থেকে।
 
+
+### 🧪 Edge case: hash string-টাই যদি বদলে দেওয়া হয়?
+
+Encoded hash-এ `m`, `t`, আর `p` লেখা আছে বলে Verify সেগুলো পড়ে ব্যবহার করে। কিন্তু database-এর কোনো row বদলে গেলে ওই সংখ্যাগুলোও বদলাতে পারে। যদি verifier কোনো সীমা ছাড়া সেগুলো মেনে নেয়, login request-এ এমন parameter আসতে পারে যা অস্বাভাবিক RAM বা CPU খরচ করায়।
+
+তাই code-এ hash string parse করাই যথেষ্ট নয়: algorithm/version, parameter-এর গ্রহণযোগ্য সীমা, salt-এর দৈর্ঘ্য এবং output hash-এর দৈর্ঘ্য যাচাই করতে হবে, **তারপরই** Argon2id চালাতে হবে। উদাহরণের `7–64 MiB`, `t=1–5`, `p=1–4` হলো এই demo-র গ্রহণযোগ্য সীমা, universal standard নয়। বাস্তব system-এ নিজের supported configuration ও legacy hash অনুযায়ী সীমা নির্ধারণ করে test করতে হবে।
 ### এই নিরাপত্তার দাম: আমাদেরই server
 
 ইচ্ছাকৃত ধীর কাজ আমাদের নিজেদের জন্যও কাজ। একটা hash-এর জন্য ১৯ MiB memory লাগে। হাজার জন একসঙ্গে login চেষ্টা করলে আমাদের server-এ প্রায় ১৯ GB memory দরকার। এমন সংখ্যা কেউ ইচ্ছা করে ডাকলে সেটা DoS আক্রমণ। OWASP নিজেই সতর্ক করে, work factor অতি বেশি হলে আক্রমণকারী অসংখ্য login চেষ্টা দিয়ে server-এর CPU নিঃশেষ করে দিতে পারে।
@@ -341,7 +375,7 @@ flowchart TD
 
 ---
 
-## ৬. Login endpoint: ভালো hash-ও ভুল দরজায় নষ্ট হয়
+## ⚠️ ৬. Login endpoint: ভালো hash-ও ভুল দরজায় নষ্ট হয়
 
 Hash ঠিক হলো। কিন্তু `/login` নিজেই আক্রমণকারীকে অনেক কিছু জানিয়ে দিতে পারে, যদি আমরা অসাবধান থাকি।
 
@@ -523,7 +557,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 ---
 
-## ১০. Threat model: password-এর পাশে আক্রমণকারী
+## 🔍 ১০. Threat model: password-এর পাশে আক্রমণকারী
 
 এখন পুরো ছবিটা আক্রমণকারীর দৃষ্টিকোণ থেকে। এখানে credential হলো password, আর server যা রাখে, সেই hash হলো তার **যাচাইয়ের উপাত্ত** (verifier)। অধ্যায় ১-এর টেবিলে "server-এ থাকে যাচাইয়ের উপাত্ত" বলে যে ফাঁকা জায়গা রেখেছিলাম, সেটা এখন ভরা।
 
@@ -555,7 +589,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 ---
 
-## ১২. এই সমাধান কী সমাধান করে না
+## 🛑 ১২. এই সমাধান কী সমাধান করে না
 
 - **দুর্বল password।** Argon2id `rafi1985`-কে আটকাতে পারে না, শুধু প্রতি অনুমানের দাম বাড়ায়। Policy আর blocklist আলাদা কাজ করে।
 - **Phishing, keylogger, malware।** আক্রমণকারী যদি user-এর টাইপ করা মুহূর্তেই password পেয়ে যায়, hash-এর আর কোনো ভূমিকা নেই। Password phishing-resistant নয় (NIST)। এর উত্তর passkey আর WebAuthn, অধ্যায় ২২।
@@ -628,9 +662,20 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 - Password আর তার hash আলাদা জিনিস: একটা credential, অন্যটা যাচাইয়ের উপাত্ত। আর পুরোনো হওয়ার জন্য hash-এর algorithm আর parameter সংরক্ষিত থাকে।
 - ফাঁসের পর ক্রম গুরুত্বপূর্ণ: আগে নতুন সংরক্ষণ চালু, তারপর reset। আর reset-এর পথ নিজেই একটা নতুন দরজা।
 
-## পাঁচ মিনিটের পরীক্ষা
+## 🎯 নিজের বোঝাপড়া যাচাই
 
-**এক।** নিজের machine-এ একই কাজ মাপো। `golang.org/x/crypto/argon2` প্যাকেজ লাগবে:
+ধরা যাক, database-এ `$argon2id$...` hash আছে, কিন্তু password খুব সহজ। আক্রমণকারীর কাছে dump আছে, তবে application server-এ প্রবেশাধিকার নেই। কোন কথাটি সবচেয়ে সঠিক?
+
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
+
+Argon2id ও salt offline guessing-কে ব্যয়বহুল করে, কিন্তু দুর্বল password-কে অসম্ভব করে না। Server-side rate limit এই offline কাজ থামাতে পারবে না, কারণ অনুমানগুলো server-এর বাইরে চলছে। শক্ত passphrase/blocklist, সঠিক password hashing, এবং online আক্রমণের জন্য আলাদা throttling দরকার।
+
+</details>
+
+## 🧪 পাঁচ মিনিটের পরীক্ষা
+
+**এক।** নিজের machine-এ একই কাজ মাপো. `golang.org/x/crypto/argon2` প্যাকেজ লাগবে:
 
 ```go
 package main
