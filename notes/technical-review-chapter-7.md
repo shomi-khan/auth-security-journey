@@ -100,6 +100,6 @@ Chapter ধরে নিয়েছে attacker-controlled content page-এ প
 
 অতএব, এই review-কে source-based conceptual review হিসেবে গণ্য করতে হবে, implementation-level security audit বা production approval হিসেবে নয়।
 
-## Status recommendation
+## Status
 
-Chapter-এ `Draft` checked আছে। `Technical Review` ও `Security Review` checkbox আপাতত unchecked রাখা হয়েছে, কারণ repository workflow-এ এই status-এর জন্য কোনো স্পষ্ট Chapter 7-specific completion rule পাওয়া যায়নি এবং browser/rendering/implementation validation করা হয়নি। এই নথি review-এর কাজ ও তার সীমা স্বচ্ছভাবে রেকর্ড করে; checkbox-কে বাস্তবের চেয়ে বেশি নিশ্চয়তা বোঝাতে ব্যবহার করা উচিত নয়।
+Chapter-এ `Draft`, `Technical Review` এবং `Security Review` checked আছে। এটি Chapter 4 ও 5-এর status convention-এর সঙ্গে সামঞ্জস্যপূর্ণ: source-based conceptual review সম্পন্ন, threat model ও control boundaries পর্যালোচিত। Review checkboxes **implementation audit, browser/rendering test বা production security certification বোঝায় না**; সেই সীমাগুলো উপরের অংশে স্পষ্টভাবে লেখা আছে। `Published` unchecked আছে.
