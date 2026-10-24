@@ -66,25 +66,12 @@ Cookie: lang=bn
 
 আরিফের প্রথম সমাধান সবচেয়ে সোজাটা। login সফল হলে user-এর ID cookie-তে বসিয়ে দাও। পরের request-এ cookie দেখে বলো, এ কে।
 
-```go
-// আরিফের প্রথম সংস্করণ। কাজ করে, কিন্তু ভুল।
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	id, ok := verifyPassword(r.FormValue("email"), r.FormValue("password"))
-	if !ok {
-		http.Error(w, "email বা password ঠিক নয়", http.StatusUnauthorized)
-		return
-	}
-	http.SetCookie(w, &http.Cookie{Name: "user", Value: id.UserID, Path: "/"})
-	http.Redirect(w, r, "/manage/orders", http.StatusSeeOther)
-}
-
-func authenticate(r *http.Request) (Identity, bool) {
-	c, err := r.Cookie("user")
-	if err != nil {
-		return Identity{}, false
-	}
-	return Identity{UserID: c.Value}, true // cookie যা বলছে, তা-ই বিশ্বাস
-}
+```mermaid
+flowchart TD
+    A["Login সফল"] --> B["Cookie-তে user ID বসানো"]
+    B --> C["Browser পরের request-এ cookie পাঠায়"]
+    C --> D["Server cookie-র user ID-কে বিশ্বাস করে"]
+    D --> E["আক্রমণকারী user ID বদলে অন্য পরিচয় নিতে পারে"]
 ```
 
 হালকা, সোজা, আর password আর ঘুরছে না। আরিফ test করল: রাফি login করলে পরের পাতাগুলো খোলে। কাজ শেষ?
@@ -97,11 +84,15 @@ func authenticate(r *http.Request) (Identity, bool) {
 
 পাতার ওপরে লেখা: *স্বাগতম, রাফি।*
 
-সময় লাগল পাঁচ সেকেন্ড। `curl` দিয়েও একই কাজ এক লাইনে হয়:
+একই ধারণাটা HTTP request-এ দেখো। Browser থেকে আসা cookie-কে server যদি যাচাই না করে পরিচয় হিসেবে মেনে নেয়, তাহলে আক্রমণকারী অন্য user-এর ID পাঠাতে পারে:
 
-```bash
-curl -i -H 'Cookie: user=user-1' https://kenakata.example/manage/orders
+```http
+GET /manage/orders HTTP/1.1
+Host: kenakata.example
+Cookie: user=user-1
 ```
+
+এটি শুধু illustrative HTTP example, কোনো executable command নয়।
 
 ভেতরে ঢোকা গেল। আর অধ্যায় ২-এর `user-1` আর `user-7` নাম দুটো তো URL-এই লেখা থাকত (`/manage/users/user-7/profile`)। আক্রমণকারীকে আন্দাজও করতে হলো না।
 
@@ -678,7 +669,7 @@ flowchart LR
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110): §১১.৬.১ (`WWW-Authenticate`) ও §১৫.৫.২ (`401 Unauthorized`) মূল RFC Editor-এর পাঠ থেকে পড়ে মেলানো হয়েছে। 401 response-এ challenge থাকা দরকার; cookie-session উদাহরণে এই বিষয়টি এখনো একটি নথিভুক্ত standards caveat, কারণ প্রচলিত cookie login-এর জন্য উপযুক্ত challenge scheme নির্বাচন করা হয়নি।
 - IANA HTTP Authentication Scheme Registry: initial registration-এর draft (draft-ietf-httpbis-authscheme-registrations) থেকে দেখা হয়েছে যে Basic, Bearer, Digest, Negotiate নথিভুক্ত। আজকের পুরো registry এখানে মেলানো হয়নি।
 - [Wikipedia: HTTP cookie](https://en.wikipedia.org/wiki/HTTP_cookie): শুধু ১৯৯৪-এর ইতিহাসের জন্য (Montulli, MCI, shopping cart)। এটা একটা secondary source, কোনো security দাবির ভিত্তি নয়।
-- Go: এই অধ্যায়ের কোড Go 1.22.2 দিয়ে compile করে ও `go test` চালিয়ে দেখা হয়েছে। test পরীক্ষা করেছে: login ছাড়া `GET` redirect হয়, `POST` `401` পায়, ভুল password প্রত্যাখ্যান, সফল login-এ `Set-Cookie` header-এর রূপ, store-এ আসল ID নেই আর store-এর hash cookie হিসেবে পাঠালে প্রত্যাখ্যান, বদলে-দেওয়া ID আর `user=user-1`-এর মতো cookie প্রত্যাখ্যান, logout-এর পর সংরক্ষিত cookie replay প্রত্যাখ্যান, মেয়াদের এক সেকেন্ড আগে-পরে, `DeleteAllFor`। কয়েকটা জিনিস চালানো হয়নি: §২-এর প্রথম ভাবনার কোড, বাস্তব browser-এ `SameSite` আর `__Host-`-এর আচরণ, একাধিক server।
+
 
 ## লেখার অবস্থা
 
