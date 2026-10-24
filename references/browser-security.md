@@ -68,7 +68,8 @@ Cookie কখন request-এর সঙ্গে যায়, আর `fetch` বা
 
 - কোন অধ্যায়: ৫।
 - কেন পড়া useful: login-এর আগে জানা session ID-তে login করানো যায় কি না এবং login-এর সময় ID rotate হচ্ছে কি না, তা যাচাই করার test guidance।
-- [OWASP WSTG-SESS-03: Testing for Session Fixation](https://wstg.owasp.org/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/03-Testing_for_Session_Fixation/)
+- [OWASP WSTG-SESS-03: Session Fixation, latest development guide](https://wstg.owasp.org/latest/4-Web_Application_Security_Testing/06-Session_Management/03-Session_Fixation/)
+- [OWASP WSTG v4.2: Testing for Session Fixation, stable version](https://wstg.owasp.org/v4.2/4-Web_Application_Security_Testing/06-Session_Management_Testing/03-Testing_for_Session_Fixation/)
 
 ## Device Bound Session Credentials (DBSC)
 
