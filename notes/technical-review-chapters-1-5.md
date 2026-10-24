@@ -41,7 +41,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 
 ## পরবর্তী ধাপ
 
-- Chapter 3-এর malformed-hash test case যোগ করে parser-এর positive ও negative behavior চালানো।
+- Chapter 3-এর current diagram-first draft-এর conceptual review সম্পন্ন; parser implementation audit এই series-এর scope নয়।
 - Chapter 1–5-এর code snippet-গুলোকে “compile করা যায়” বলে দাবি করার আগে প্রতিটি snippet-এর scope স্পষ্ট করা এবং সম্ভব হলে runnable companion test রাখা।
 - Chapter 4-এর 401/API response design নিয়ে সিদ্ধান্ত নথিভুক্ত করা।
 - বাকি যাচাই শেষ না হওয়া পর্যন্ত chapter status checkbox unchecked রাখা।
@@ -60,4 +60,4 @@ Chapter 3 has been simplified to emphasize the security concepts: why passwords 
 
 The former implementation-specific notes about Argon2id parameter parsing, PHC string parsing, and code-level Unicode normalization were written for an earlier code-oriented draft. They are historical context, not mandatory implementation work for the current teaching draft. Review should verify conceptual accuracy, relevant threat boundaries, meaningful failure paths, and source-backed claims. It should not turn the chapter into an implementation manual or imply production security certification.
 
-Chapter 3's Technical Review and Security Review checkboxes remain unchecked until this conceptual review is actually completed. No code tests were run.
+Chapter 3's Technical Review and Security Review checkboxes are now checked for conceptual, source-based review only. No code tests, parser implementation audit, production parameter tuning, load benchmark, or deployment test were run.
