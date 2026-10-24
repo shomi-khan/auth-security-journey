@@ -10,7 +10,7 @@
 
 না। Password হলো login-এর সময় user-এর পরিচয় যাচাই করার credential। সেটি প্রতিটি product বা order request-এ পাঠানোর দরকার নেই।
 
-ধরো, রাফি তার order list দেখতে চায়। যদি প্রতিবার email আর password পাঠাতে হয়, তাহলে password বারবার নেটওয়ার্কে যাবে এবং প্রতিটি API request-কে password যাচাইয়ের কাজ করতে হবে। এর বদলে login সফল হওয়ার পর server client-কে একটি access token দিতে পারে। এরপর client protected API request-এ সেই token পাঠায়।
+ধরো, রাফি তার order list দেখতে চায়। যদি প্রতিটি request-এ email আর password পাঠাতে হয়, তাহলে password বারবার পাঠাতে হবে এবং server-কে প্রতিটি request-এ password যাচাই করতে হবে। HTTPS চলার সময় password সাধারণত network-এ encrypted থাকে, তাই কথাটা এই নয় যে প্রতিবার পাঠালেই তা খোলা অবস্থায় দেখা যাবে। বরং password-কে বেশি request, log বা ভুল handling-এর মধ্যে না ছড়িয়ে login-এর সময় যাচাই করে, পরে আলাদা credential ব্যবহার করা একটি প্রচলিত design। KenaKata-র mobile flow-তে login সফল হলে server client-কে access token দিতে পারে; এরপর client protected API request-এ সেই token পাঠায়।
 
 Token মানে কোনো জাদুর চাবি নয়। এটি আরেকটি sensitive credential, যেটি server নির্দিষ্ট সীমার মধ্যে গ্রহণ করবে কি না, তা যাচাই করতে হয়।
 
@@ -144,6 +144,6 @@ Access token-এর কথা বলেছি, কিন্তু token-এর f
 ## লেখার অবস্থা
 
 - [x] Draft
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (source-based conceptual review; no implementation/browser tests)
+- [x] Security Review (source-based threat-model review; not a production audit)
 - [ ] Published
