@@ -46,7 +46,7 @@ Browser-এর same-origin policy সাধারণত এক origin-এর scr
 
 ## ৩. Stored, Reflected, আর DOM-based XSS
 
-এই নামগুলো আলাদা attack family-এর নাম মনে হলেও এগুলো মূলত input page-এ কীভাবে পৌঁছায় বা execution কোথায় ঘটে, সেই দিকগুলো বোঝায়। এক incident-এ server-side ও DOM-related আচরণ একসঙ্গেও থাকতে পারে।
+এখানে দুটো আলাদা প্রশ্ন আছে। **Stored** ও **reflected** বোঝায় attacker-controlled input ভুক্তভোগীর কাছে কীভাবে পৌঁছায়; **server-side** ও **DOM-based** বোঝায় unsafe handling কোথায় ঘটে। তাই এগুলো সব সময় পরস্পর-বিচ্ছিন্ন তিনটি বাক্স নয়: stored বা reflected input browser-side code-এ unsafeভাবে handle হলে DOM-based XSS-ও হতে পারে। এক incident-এ একাধিক বর্ণনা প্রযোজ্য হতে পারে।
 
 ### Stored XSS: লেখা জমে থাকে, আক্রমণ পরে চলে
 
@@ -56,9 +56,7 @@ KenaKata-র উদাহরণ: order note save হয়েছে। পরে
 
 ### Reflected XSS: request-এর content response-এ ফিরে আসে
 
-Attacker এমন URL বা request তৈরি করে, যার input server response-এ নিরাপদভাবে encode না করে ফিরিয়ে দেয়। উদাহরণস্বরূপ, search page-এ query text দেখানো হয়। Attacker crafted search link পাঠায়; ভুক্তভোগী link খুললে query response-এর অংশ হয়ে page-এ আসে।
-
-এখানে input দীর্ঘদিন database-এ থাকতে হবে এমন নয়। সাধারণত victim-কে crafted link বা request-এ যেতে প্রলুব্ধ করতে হয়।
+Reflected XSS-এ attacker-controlled input কোনো request-এর মাধ্যমে ভুক্তভোগীর browser-এ পৌঁছায় এবং অল্প সময়ের মধ্যে page-এ প্রতিফলিত হয়; তা database-এ দীর্ঘদিন জমা থাকা দরকার নেই। একটি সাধারণ server-side উদাহরণে search query response-এর HTML-এ unsafeভাবে বসে। তবে reflected input browser-side JavaScript-ও unsafeভাবে handle করতে পারে, তাই “reflected” বললেই vulnerability server-side-এ ঘটেছে বোঝায় না। সাধারণত victim-কে crafted link বা request-এ যেতে প্রলুব্ধ করতে হয়।
 
 ### DOM-based XSS: browser-side code ভুলভাবে data-কে code বানায়
 
@@ -68,16 +66,20 @@ Server-rendered website-এও JavaScript থাকতে পারে, তা�
 
 ```mermaid
 flowchart TD
-    A["Attacker-controlled input"] --> B{"Page-এ কীভাবে পৌঁছায়?"}
-    B -->|"Server-এ save, পরে render"| C["Stored XSS path"]
-    B -->|"Request থেকে response-এ ফিরে আসে"| D["Reflected XSS path"]
-    B -->|"Browser-side code input নিয়ে DOM sink-এ দেয়"| E["DOM-based XSS path"]
-    C --> F["Unsafe interpretation হলে script চলে"]
-    D --> F
-    E --> F
+    A["Attacker-controlled input"] --> B["Input-এর delivery path"]
+    B --> C["Stored: পরে আবার দেখানো হয়"]
+    B --> D["Reflected: request থেকে response/page-এ ফেরে"]
+    C --> E{"Unsafe handling কোথায়?"}
+    D --> E
+    E --> F["Server response তৈরির সময়"]
+    E --> G["Browser-side DOM processing-এ"]
+    F --> H["XSS হতে পারে"]
+    G --> H
 ```
 
-**মনে রাখার সহজ উপায়:** Stored মানে input পরে আবার render হয়; reflected মানে request-এর input response-এ ফিরে আসে; DOM-based মানে browser-side code attacker-controlled data-কে unsafe DOM/code sink-এ দেয়। এগুলোকে শুধু payload-এর চেহারা দেখে শ্রেণিবদ্ধ করো না।
+Diagram-টি ধারণাগত: Stored/reflected input delivery-র ধরন, আর server-side/DOM-based unsafe handling-এর জায়গা বোঝায়। একই ঘটনার ক্ষেত্রে একাধিক label প্রযোজ্য হতে পারে।
+
+**মনে রাখার সহজ উপায়:** Stored মানে input পরে আবার দেখানো হয়; reflected মানে request-এর input response/page-এ ফিরে আসে; DOM-based মানে browser-side code attacker-controlled data-কে unsafeভাবে process করে। এগুলোকে সব সময় পরস্পর-বিচ্ছিন্ন category মনে কোরো না।
 
 ## ৪. HttpOnly কী রক্ষা করে?
 
@@ -175,7 +177,7 @@ Browser-side code যখন untrusted string-কে HTML হিসেবে pars
 
 কোনো API-র নাম মুখস্থ করাই লক্ষ্য নয়। মনে রাখার নিয়মটি হলো:
 
-- **Text দরকার হলে text হিসেবে বসাও**, HTML হিসেবে parse করো না।
+- **Text দরকার হলে text হিসেবে বসাও**, HTML হিসেবে parse করো না। DOM-এ text বসানোর একটি সাধারণ নিরাপদ পছন্দ হলো `textContent`।
 - HTML দরকার হলে trusted sanitizer-এর মাধ্যমে allow করা markup ব্যবহার করো।
 - Untrusted input-কে JavaScript code হিসেবে চালিও না।
 - Browser-side code URL fragment বা query parameter থেকে data নিলে, সেই data কোথায় যায় তা trace করো।
