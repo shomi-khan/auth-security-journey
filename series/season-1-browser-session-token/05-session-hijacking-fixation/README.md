@@ -478,15 +478,19 @@ Login সফল হলে পুরোনো ID নষ্ট করো, এক�
 // Rotate: login সফল হলে পুরোনো ID মেরে নতুন ID বানায়।
 // পুরোনো session থেকে শুধু Next নেয়। StartedAt আবার শুরু: absolute ঘড়ি login থেকে।
 func (s *Store) Rotate(old, userID, ua string, ip netip.Addr) (string, error) {
+	now := s.now()
 	var next string
+	oldKey := digest(old)
 	s.mu.Lock()
-	if r, ok := s.rows[digest(old)]; ok {
-		next = r.Next
-		delete(s.rows, digest(old)) // পুরোনো ID মরে গেল
+	if r, ok := s.rows[oldKey]; ok {
+		// Expired anonymous session-এর Next নতুন authenticated session-এ টানা যাবে না।
+		if s.alive(r, now) && !r.Authenticated() {
+			next = r.Next
+		}
+		delete(s.rows, oldKey) // পুরোনো ID মরে গেল, expired হলেও
 	}
 	s.mu.Unlock()
 
-	now := s.now()
 	return s.put(record{
 		UserID: userID, Next: next,
 		StartedAt: now, LastSeen: now,
