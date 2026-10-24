@@ -33,6 +33,10 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 - কোন অধ্যায়: ৭।
 - কেন পড়া useful: HttpOnly নিয়ে কথা বলার আগে XSS-এর পাতা পড়ো, যাতে flag-টাকে পুরো XSS-এর সমাধান বলে না বসে।
 - [Cross Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [DOM based XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html)
+- [Content Security Policy Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
+
+Chapter 7-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-depth ভূমিকা ব্যাখ্যা করতে এই দুইটি উৎসও পড়ো। CSP-কে output encoding বা sanitization-এর বিকল্প হিসেবে দেখাবে না।
 
 ## Authorization Cheat Sheet
 
