@@ -16,8 +16,10 @@ status: draft
 Server-এর log-এ request এল। কিন্তু cookie ছাড়া।
 
 ```text
-POST /manage/orders/1042/refund   cookie নেই   401
+POST /manage/orders/1051/cancel   cookie নেই   401
 ```
+
+এই opening ঘটনাটি KenaKata-র fictional staging scene, বাস্তব browser test-এর report নয়। আধুনিক browser-এ cookie কীভাবে পাঠানো হয়, সেটি নির্দিষ্ট supported-browser matrix-এ আলাদা করে যাচাই করতে হবে.
 
 আরিফ একটু অবাক হয়ে বসে রইল। তারপর হাসল। অধ্যায় ৪-এ সে `SameSite=Lax` লিখেছিল "যেহেতু সবাই লেখে" গোছের মনোভাবে। আজ ওই একটা শব্দ শুভকে, আর রাফিকে, বাঁচাল। Lax-এর নিয়মে অন্য site থেকে আসা `POST`-এ browser cookie পাঠায় না।
 
