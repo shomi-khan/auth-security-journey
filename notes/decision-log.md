@@ -165,3 +165,10 @@
 - Chapter 8-এর Draft OAuth authorization-code flow, JWT internals, SPA token storage, expiry/replay timeline এবং refresh-token lifecycle আগেভাগে শেখায় না; এগুলো timeline অনুযায়ী পরের অধ্যায়ে থাকবে।
 - Chapter 8 এখন Draft। Technical Review ও Security Review এখনও করা হয়নি। Mermaid source-এর basic fence/section check হয়েছে, কিন্তু Mermaid renderer বা browser-এ diagram render করে দেখা হয়নি।
 - Source basis: RFC 6750-এর bearer-token definition, Authorization header, transport ও disclosure guidance; RFC 6749 শুধু OAuth-context access-token reference হিসেবে রাখা হয়েছে। RFC 6750-এর OAuth scope এবং KenaKata-র first-party login-এর মধ্যে পার্থক্য স্পষ্ট করা হয়েছে.
+
+## 2026-10-25 — Chapter 8 Technical ও Security Review
+
+- Chapter 8-এর source-based conceptual review করা হয়েছে। Password প্রতিটি request-এ পাঠানোর আলোচনায় HTTPS transport encryption-এর পার্থক্য স্পষ্ট করা হয়েছে; bearer token ব্যবহার করলেই নিরাপত্তা স্বয়ংক্রিয়ভাবে বাড়ে এমন দাবি রাখা হয়নি।
+- Mermaid sequence diagram-এ missing/invalid token-এর 401 path এবং valid token-এর পরে authorization decision, permission না থাকলে 403 path আলাদা করা হয়েছে। Intended API/audience যাচাইয়ের কথাও স্পষ্ট করা হয়েছে।
+- RFC 6750-এর bearer-token semantics, Authorization header, invalid-token/insufficient-scope behavior এবং token disclosure/TLS/URL risks source হিসেবে দেখা হয়েছে। KenaKata-র first-party login-কে OAuth flow বলা হয়নি।
+- Review record: `notes/technical-review-chapter-8.md`। Chapter 8 Draft, source-based Technical Review ও Security Review হিসেবে চিহ্নিত; Published নয়। Mermaid renderer, browser বা mobile implementation test চালানো হয়নি.
