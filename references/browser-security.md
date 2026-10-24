@@ -55,7 +55,7 @@ Browser কোন পাতা থেকে request গেছে, সেই স�
 - [WHATWG: Fetch Standard, forbidden request-header names](https://fetch.spec.whatwg.org/): `Sec-` prefix-যুক্ত header browser API থেকে set/modify করা যায় না।
 - [RFC 9110 §9.2.1: Safe Methods](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1): safe method-এর semantics; `GET`-এ state change করা যাবে না।
 - [RFC 7617 §2.2: Reusing Credentials](https://www.rfc-editor.org/rfc/rfc7617.html#section-2.2): HTTP Basic-এর credential reuse ও preemptive sending-এর protocol rule; নির্দিষ্ট browser behavior আলাদাভাবে যাচাই করতে হবে।
-- [Go `net/http` `CrossOriginProtection`](https://pkg.go.dev/net/http@go1.25#CrossOriginProtection): Go 1.25-এর optional implementation reference; default policy-কে application-এর fail-safe policy ধরে নেবে না।
+- [Go `net/http` `CrossOriginProtection`](https://pkg.go.dev/net/http@go1.25#CrossOriginProtection): Go 1.25-এর optional implementation reference। Go 1.25 documentation অনুযায়ী `Sec-Fetch-Site` ও `Origin` দুটোই অনুপস্থিত হলে request allow করা হয়; KenaKata-র fail-safe policy এর থেকে ইচ্ছাকৃতভাবে কঠোর। ব্যবহার করলে current Go version ও default behavior যাচাই করো।
 - [Go vulnerability report GO-2025-3955](https://pkg.go.dev/vuln/GO-2025-3955): `CrossOriginProtection.AddInsecureBypassPattern`-এর নির্দিষ্ট issue, Go 1.25.0-এ প্রভাবিত এবং 1.25.1-এ সংশোধিত।
 
 KenaKata-র Chapter 6 policy হলো: state-changing request-এ `Sec-Fetch-Site` অনুপস্থিত থাকলে configured target origin-এর সঙ্গে `Origin` হুবহু মেলানো হবে; দুটো signal-ই অনুপস্থিত বা `Origin: null` হলে fail-safe reject। `same-site` ও `none`-কেও sensitive state-changing action-এর জন্য নিজে থেকে trust করা হবে না। এটি KenaKata-র threat-model decision, browser standard-এর universal requirement নয়।
