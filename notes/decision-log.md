@@ -158,3 +158,10 @@
 - KenaKata-র first-party mobile login-কে OAuth flow বলা হবে না। OAuth/PKCE/OIDC অধ্যায় ১৬–২১-এ থাকবে; JWT অধ্যায় ৯, SPA token storage অধ্যায় ১০, expiry/replay অধ্যায় ১১, refresh-token lifecycle অধ্যায় ১২–১৪-এ থাকবে।
 - RFC 6750 Chapter 8-এ bearer-token model বোঝাতে ব্যবহার হবে, তবে OAuth-specific semantics-কে KenaKata-র বর্তমান architecture-এর সত্য হিসেবে আগেভাগে প্রয়োগ করা হবে না।
 - Chapter 8-এর scope ও source plan series/season-1-browser-session-token/08-tokens/08-repo-notes.md-এ আছে। এই এন্ট্রি সিদ্ধান্তের রেকর্ড; chapter draft বা review সম্পন্ন হওয়ার দাবি নয়.
+
+## 2026-10-25 — Chapter 8-এর প্রথম Draft
+
+- Chapter 8-এর first-party mobile access-token story, cookie-session comparison, illustrative Authorization: Bearer request, token validation বনাম authorization, bearer-token disclosure/replay risk, failure paths, exercises এবং RFC references যোগ করা হয়েছে।
+- Chapter 8-এর Draft OAuth authorization-code flow, JWT internals, SPA token storage, expiry/replay timeline এবং refresh-token lifecycle আগেভাগে শেখায় না; এগুলো timeline অনুযায়ী পরের অধ্যায়ে থাকবে।
+- Chapter 8 এখন Draft। Technical Review ও Security Review এখনও করা হয়নি। Mermaid source-এর basic fence/section check হয়েছে, কিন্তু Mermaid renderer বা browser-এ diagram render করে দেখা হয়নি।
+- Source basis: RFC 6750-এর bearer-token definition, Authorization header, transport ও disclosure guidance; RFC 6749 শুধু OAuth-context access-token reference হিসেবে রাখা হয়েছে। RFC 6750-এর OAuth scope এবং KenaKata-র first-party login-এর মধ্যে পার্থক্য স্পষ্ট করা হয়েছে.
