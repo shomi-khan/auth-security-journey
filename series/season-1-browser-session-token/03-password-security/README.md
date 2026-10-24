@@ -258,96 +258,23 @@ RFC 9106-এর §৪ ও §৭.৪ সরাসরি পড়ে দুটো
 
 KenaKata-র মতো ছোট একটা server-এর জন্য আরিফ বেছে নিল OWASP-র মাঝের সারি: **19 MiB, `t=2`, `p=1`**।
 
-```go
-package passwd
-
-import (
-	"crypto/rand"
-	"crypto/subtle"
-	"encoding/base64"
-	"errors"
-	"fmt"
-	"strings"
-
-	"golang.org/x/crypto/argon2"
-	"golang.org/x/text/unicode/norm"
-)
-
-const (
-	memoryKiB = 19 * 1024 // 19 MiB
-	passes    = 2
-	lanes     = 1
-	saltLen   = 16 // 128 bit
-	keyLen    = 32
-)
-
-var b64 = base64.RawStdEncoding
-
-// Hash: $argon2id$v=19$m=19456,t=2,p=1$<salt>$<hash>
-func Hash(pw string) (string, error) {
-	pw = norm.NFC.String(pw) // registration, reset ও অন্য সব write path-এ একই normalization
-	salt := make([]byte, saltLen)
-	if _, err := rand.Read(salt); err != nil {
-		return "", err
-	}
-	key := argon2.IDKey([]byte(pw), salt, passes, memoryKiB, lanes, keyLen)
-	return fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
-		argon2.Version, memoryKiB, passes, lanes,
-		b64.EncodeToString(salt), b64.EncodeToString(key)), nil
-}
-
-// Verify: stored string থেকে salt আর parameter পড়ে আবার hash করে, তারপর মেলায়।
-func Verify(pw, encoded string) (bool, error) {
-	pw = norm.NFC.String(pw) // Hash-এর সঙ্গে একই normalization, নইলে login mismatch হতে পারে
-	parts := strings.Split(encoded, "$") // ["", "argon2id", "v=19", "m=..,t=..,p=..", salt, hash]
-	if len(parts) != 6 || parts[1] != "argon2id" {
-		return false, errors.New("unsupported hash format")
-	}
-	var version int
-	var m, t uint32
-	var p uint8
-	if _, err := fmt.Sscanf(parts[2], "v=%d", &version); err != nil || version != argon2.Version {
-		return false, errors.New("unsupported argon2 version")
-	}
-	// Sscanf সফল হলেও field-এর শেষে অতিরিক্ত অক্ষর থাকতে পারে। পুরো field canonical কি না যাচাই করি।
-	if parts[2] != fmt.Sprintf("v=%d", version) {
-		return false, errors.New("malformed argon2 version")
-	}
-	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &m, &t, &p); err != nil {
-		return false, errors.New("bad parameters")
-	}
-	if parts[3] != fmt.Sprintf("m=%d,t=%d,p=%d", m, t, p) {
-		return false, errors.New("malformed argon2 parameters")
-	}
-	// Database-এর encoded hash-ও অবিশ্বাস্য input হিসেবে ধরো।
-	// Parameter-এর সীমা না থাকলে tampered row অস্বাভাবিক memory/CPU খরচ করাতে পারে।
-	if m < 7*1024 || m > 64*1024 || t < 1 || t > 5 || p < 1 || p > 4 {
-		return false, errors.New("argon2 parameters out of bounds")
-	}
-
-	salt, err := b64.DecodeString(parts[4])
-	if err != nil {
-		return false, err
-	}
-	want, err := b64.DecodeString(parts[5])
-	if err != nil {
-		return false, err
-	}
-	if len(salt) != saltLen || len(want) != keyLen {
-		return false, errors.New("unexpected salt or hash length")
-	}
-	got := argon2.IDKey([]byte(pw), salt, t, m, p, uint32(len(want)))
-	return subtle.ConstantTimeCompare(got, want) == 1, nil
-}
-
-// NeedsRehash: stored hash-এর parameter আজকের parameter থেকে আলাদা কি না।
-func NeedsRehash(encoded string) bool {
-	want := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$", argon2.Version, memoryKiB, passes, lanes)
-	return !strings.HasPrefix(encoded, want)
-}
+```mermaid
+flowchart TD
+    P["Password গ্রহণ"] --> N["একই NFC normalization policy প্রয়োগ"]
+    N --> S["প্রতি password-এর জন্য cryptographic random salt"]
+    S --> A["Argon2id<br/>memory + time cost"]
+    A --> H["PHC string তৈরি"]
+    H --> DB["Algorithm + version + parameters + salt + hash সংরক্ষণ"]
+    DB --> L["Login-এ stored PHC string পড়া"]
+    L --> V{"Format ও parameter গ্রহণযোগ্য?"}
+    V -->|"না"| F["Fail closed: login ব্যর্থ"]
+    V -->|"হ্যাঁ"| X["Stored salt ও parameter দিয়ে Argon2id চালাও"]
+    X --> C{"Hash মেলে?"}
+    C -->|"হ্যাঁ"| OK["Password যাচাই সফল"]
+    C -->|"না"| NO["Password যাচাই ব্যর্থ"]
 ```
 
-এই code-এর আগের সংস্করণ Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে চালানো হয়েছিল। এই review-তে parser-এর canonical-field check ও NFC normalization বদলানোর পর সেই test আবার চালানো হয়নি, তাই নিচের sample output-কে এই সর্বশেষ সংস্করণের নতুন test result হিসেবে ধরো না। একটা আগের আসল ফল এরকম:
+PHC string-এর একটি illustrative উদাহরণ নিচে দেওয়া হলো। এটি বর্তমান কোনো implementation চালিয়ে তৈরি বা যাচাই করা test result নয়:
 
 ```
 $argon2id$v=19$m=19456,t=2,p=1$6ntZMPHCqYWOGNTS1t1w7Q$17RAHmtm7vQxx7rPGBzYLctpWOwUS4GG8oybUXxYO6Y
@@ -355,7 +282,7 @@ $argon2id$v=19$m=19456,t=2,p=1$6ntZMPHCqYWOGNTS1t1w7Q$17RAHmtm7vQxx7rPGBzYLctpWO
 
 এই এক লাইনে পুরো গল্প আছে। কোন algorithm, কোন version, কোন parameter, কোন salt, আর ফলাফল hash। Salt-এর জন্য আলাদা column লাগেনি। আর পরে parameter বা algorithm বদলাতে চাইলে পুরোনো hash নিজেই বলে দেয় সে কোন নিয়মে বানানো। এই আকারের নাম **PHC string format**, আর OWASP এটাকে এই কারণেই সুপারিশ করে।
 
-দুটো ছোট খুঁটিনাটি কোডে আছে। `subtle.ConstantTimeCompare` তুলনা করে এমনভাবে, যাতে কতটুকু অংশ মিলল তার ওপর সময় নির্ভর না করে। আর `rand.Read` এসেছে `crypto/rand` থেকে।
+দুটি implementation detail গুরুত্বপূর্ণ: salt অবশ্যই cryptographically secure random generator থেকে আসতে হবে, আর hash comparison-এর ক্ষেত্রে timing leakage এড়াতে উপযুক্ত constant-time verification ব্যবহার করতে হবে। এগুলো ধারণাগত শর্ত, production-ready implementation নির্দেশনা নয়।
 
 
 ### 🧪 Edge case: hash string-টাই যদি বদলে দেওয়া হয়?
