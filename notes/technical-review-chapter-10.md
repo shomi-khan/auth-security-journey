@@ -46,3 +46,19 @@ Chapter 10-এর source-based conceptual Technical Review ও Security Review�
 - Mermaid diagrams were reviewed as source text only; no Mermaid renderer was run.
 - No browser, mobile, application or automated tests were run.
 - This record is not a production security audit or certification.
+
+
+## Follow-up review findings (2026-10-25)
+
+GitHub PR #1-এ Chapter 10-সংক্রান্ত submitted review, inline thread বা issue comment পাওয়া যায়নি। নিচের দুটি gap স্বাধীনভাবে chapter review-তে শনাক্ত করে এই follow-up commit-এ সংশোধন করা হয়েছে:
+
+1. **Persistent-login ambiguity:** Decision Game-এ browser restart-এর পর login টিকে থাকার requirement ছিল, কিন্তু BFF-এর session cookie/session lifetime সেটি কীভাবে প্রভাবিত করে তা বলা হয়নি। Cookie example-এ Max-Age/Expires না থাকার অর্থও স্পষ্ট ছিল না। Chapter এখন session cookie-এর সীমা, persistent cookie-এর Max-Age/Expires, server-side session lifetime-এর সামঞ্জস্য এবং logout-এ server-side invalidation-এর প্রয়োজন ব্যাখ্যা করে।
+2. **OAuth scope boundary:** RFC 10017-এর BFF pattern OAuth-specific। Chapter এখন §6.1-কে তুলনামূলক architecture reference এবং §7.1-কে single-domain non-OAuth context-এর reference হিসেবে আলাদা করে; KenaKata-র বর্তমান flow-কে OAuth BFF implementation বা RFC compliance হিসেবে উপস্থাপন করে না।
+3. **Terminology:** Comparison table-এ “OAuth/access token browser-এ নেই” বদলে “API access token browser-এ নেই (এই BFF variant-এ)” লেখা হয়েছে, যাতে বর্তমান non-OAuth product story-র সঙ্গে অসঙ্গতি না থাকে।
+
+## Follow-up verification
+
+- Confirmed PR #1 remains open and unmerged before update.
+- Confirmed all targeted text anchors existed before editing.
+- After commit, re-fetch the changed files and PR head to verify branch update and review-status checkboxes.
+- No browser/session persistence test, automated test suite, or Mermaid renderer was run.

@@ -197,3 +197,6 @@
 - Cookie-ভিত্তিক authentication-এ Chapter 6-এর KenaKata-specific CSRF policy বহাল। BFF token browser থেকে আড়াল করলেও XSS-এর মাধ্যমে authenticated action-এর ঝুঁকি রয়ে যায়।
 - Source basis: RFC 10017 (August 2026 Internet Best Current Practice), OWASP HTML5 Security / Session Management / CSRF cheat sheets এবং MDN cookie/Web Storage documentation.
 - Chapter 10-এর Technical ও Security Review source-based conceptual review; browser test, Mermaid renderer test বা production audit নয়। Review record: notes/technical-review-chapter-10.md.
+
+
+- Chapter 10 follow-up review (2026-10-25): clarified that the illustrative cookie lacks Max-Age/Expires and therefore does not promise persistence across browser restarts; persistent login depends on cookie lifetime plus server-side session lifetime and server-side invalidation on logout. Clarified RFC 10017 §6.1 (OAuth BFF) vs §7.1 (single-domain non-OAuth context) so KenaKata is not implied to implement OAuth.

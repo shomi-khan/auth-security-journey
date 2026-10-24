@@ -70,4 +70,4 @@
 - কী বিষয়: Browser-based OAuth applications-এর threat model, architecture patterns এবং token storage।
 - কোন অধ্যায়: ১০-এ browser storage ও BFF pattern-এর reference হিসেবে; Season 2-এর OAuth অধ্যায়গুলোতেও প্রাসঙ্গিক।
 - কেন পড়া useful: আগস্ট ২০২৬-এ প্রকাশিত Internet Best Current Practice। Browser-based token storage, BFF, in-memory ও persistent storage-এর trade-off এবং malicious JavaScript-এর সীমা বুঝতে পড়ো। Chapter 10-এ KenaKata-র first-party SPA-কে OAuth client বলা হচ্ছে না।
-- [RFC 10017](https://www.rfc-editor.org/rfc/rfc10017.html)
+- [RFC 10017](https://www.rfc-editor.org/rfc/rfc10017.html) (বিশেষ করে §6.1 BFF architecture এবং §7.1 single-domain, non-OAuth applications-এর আলোচনা)

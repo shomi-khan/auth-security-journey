@@ -6,7 +6,7 @@
 
 এটা শুধু storage API বেছে নেওয়ার প্রশ্ন নয়। **যে জায়গায় credential রাখি, সেটি কোন attacker-এর কাছে কতটা exposed হবে, সেটাই আসল প্রশ্ন।**
 
-> এই অধ্যায়ে KenaKata-র SPA একটি first-party browser client। OAuth flow এখানে এখনো চালু হয়নি। OAuth-specific browser architecture-এর জন্য RFC 10017-কে তুলনামূলক reference হিসেবে ব্যবহার করব, কিন্তু KenaKata-র বর্তমান login-কে OAuth বলা হবে না।
+> এই অধ্যায়ে KenaKata-র SPA একটি first-party browser client; OAuth flow এখানে এখনো চালু হয়নি। RFC 10017 মূলত OAuth-ভিত্তিক browser client নিয়ে। এর §6.1-এর BFF pattern-কে এখানে architecture-এর তুলনামূলক উদাহরণ হিসেবে ব্যবহার করছি, আর §7.1-এ single-domain, non-OAuth application নিয়ে আলাদা আলোচনা আছে। তাই RFC-তে বর্ণিত OAuth BFF flow-কে KenaKata-র বর্তমান login-এর implementation বা compliance দাবি হিসেবে পড়বে না।
 
 ## ১. আগে threat model ঠিক করি
 
@@ -76,7 +76,7 @@ Token শুধু SPA-র JavaScript memory-তে রাখা হয়, persist
 Set-Cookie: __Host-kenakata-session=<opaque-session-id>; Path=/; Secure; HttpOnly; SameSite=Lax
 ```
 
-এটি শুধু উদাহরণ, production-ready configuration নয়। __Host- prefix ব্যবহারে Secure, Path=/ এবং Domain attribute না থাকার মতো শর্ত মানতে হয়। SameSite=Lax CSRF-এর পূর্ণ প্রতিরক্ষা নয়; Chapter 6-এর request-origin validation ও CSRF token policy-ও প্রাসঙ্গিক।
+এটি শুধু উদাহরণ, production-ready configuration নয়। এখানে Max-Age বা Expires নেই, তাই এটি session cookie-এর উদাহরণ; browser restart-এর পরেও login থাকবে, এমন নিশ্চয়তা দেয় না। Browser session restore-এর আচরণ browser অনুযায়ী আলাদা হতে পারে। __Host- prefix ব্যবহারে Secure, Path=/ এবং Domain attribute না থাকার মতো শর্ত মানতে হয়। SameSite=Lax CSRF-এর পূর্ণ প্রতিরক্ষা নয়; Chapter 6-এর request-origin validation ও CSRF token policy-ও প্রাসঙ্গিক।
 
 **সুবিধা**
 - JavaScript সরাসরি HttpOnly cookie value পড়তে পারে না। ফলে XSS দিয়ে cookie value কপি করে নেওয়ার একটি পথ বন্ধ হয়।
@@ -140,7 +140,7 @@ sequenceDiagram
 | sessionStorage | একই tab session-এ সাধারণত হ্যাঁ | হ্যাঁ | না, token নিজে থেকে নয় | কম persistence, কিন্তু XSS থেকে সুরক্ষা নয় |
 | In-memory | সাধারণত না | চলমান app context-এ token access সম্ভব হতে পারে | না, token নিজে থেকে নয় | কম persistent exposure, reload-এর পর পুনরুদ্ধারের design দরকার |
 | HttpOnly cookie | Cookie lifetime/configuration অনুযায়ী | Cookie value সরাসরি পড়তে পারে না | হ্যাঁ, matching request-এ | XSS token theft-এর একটি পথ কমায়, CSRF প্রতিরক্ষা দরকার |
-| BFF + session cookie | Server-side session অনুযায়ী | OAuth/access token browser-এ নেই | Session cookie হ্যাঁ | Token browser থেকে সরানো যায়, কিন্তু backend complexity ও CSRF রয়ে যায় |
+| BFF + session cookie | Server-side session ও cookie lifetime অনুযায়ী | API access token browser-এ নেই (এই BFF variant-এ) | Session cookie হ্যাঁ | Token browser থেকে সরানো যায়, কিন্তু backend complexity ও CSRF রয়ে যায় |
 
 এখানে “JavaScript token পড়তে পারে?” প্রশ্নটি কেবল token value চুরি নিয়ে। XSS-এর সময় attacker যদি token পড়তে না-ও পারে, সে page-এর অনুমোদিত ক্ষমতা ব্যবহার করে action চালানোর চেষ্টা করতে পারে। তাই শুধু table দেখে XSS impact শূন্য ধরে নিও না।
 
@@ -175,7 +175,7 @@ flowchart TD
 1. **SPA সরাসরি API-তে access token পাঠাবে।** Token browser-এর JavaScript পরিচালনা করবে। Persistent storage এড়িয়ে in-memory access token বিবেচনা করা যায়, তবে reload, token renewal ও login continuity-এর design লাগবে। localStorage বা sessionStorage-এ credential রেখে XSS-কে হালকা করে দেখা যাবে না।
 2. **SPA একটি BFF-এর সঙ্গে কথা বলবে।** Browser-এ session cookie থাকবে, আর BFF server-side-এ token সামলাবে। এতে token exfiltration-এর ঝুঁকি কমে, কিন্তু backend complexity ও cookie-based CSRF defense-এর প্রয়োজন বাড়ে।
 
-এই অধ্যায়েই refresh-token rotation, reuse detection, expiry বা revocation-এর পূর্ণ lifecycle ঠিক করছি না। সেগুলো অধ্যায় ১১–১৪-এ আসবে। একইভাবে OAuth authorization flow-ও এখন চালু করছি না; Season 2-এ সেটি আলাদা করে শেখানো হবে।
+এই অধ্যায়েই refresh-token rotation, reuse detection, expiry বা revocation-এর পূর্ণ lifecycle ঠিক করছি না। সেগুলো অধ্যায় ১১–১৪-এ আসবে। একইভাবে OAuth authorization flow-ও এখন চালু করছি না; Season 2-এ সেটি আলাদা করে শেখানো হবে। Persistent cookie ও server-side session-এর lifetime এখানে শুধু login-persistence trade-off বোঝানোর জন্য এসেছে, পূর্ণ session-lifecycle design হিসেবে নয়.
 
 ### 🧠 Decision Game: নীরার requirement বদলালে সিদ্ধান্ত বদলাবে?
 
@@ -188,7 +188,7 @@ flowchart TD
 
 প্রথমে শুধু persistence requirement পূরণ করতে localStorage-এ refresh token রাখা উচিত বলে ধরে নেওয়া যাবে না। Refresh token দীর্ঘমেয়াদি ও শক্তিশালী credential হতে পারে; একই origin-এর malicious JavaScript সেটি পড়তে পারলে ক্ষতি বড় হতে পারে।
 
-যদি team BFF-এর বাড়তি operational complexity সামলাতে পারে, server-side token storage ও cookie-based session একটি শক্তিশালী option। তবে BFF থাকলেও CSRF defense এবং XSS prevention দরকার।
+যদি team BFF-এর বাড়তি operational complexity সামলাতে পারে, server-side token storage ও cookie-based session একটি শক্তিশালী option। তবে browser বন্ধের পর login টিকিয়ে রাখতে হলে cookie-তে উপযুক্ত Max-Age/Expires এবং server-side session-এর উপযুক্ত lifetime লাগতে পারে; দুটির মেয়াদ সামঞ্জস্যপূর্ণ হতে হবে। দীর্ঘ lifetime চুরি হওয়া বা ভুলভাবে ব্যবহার হওয়া session-এর ঝুঁকিও বাড়ায়। Logout-এ শুধু browser-side state মুছে না দিয়ে server-side session-ও invalidate করতে হবে। BFF থাকলেও CSRF defense এবং XSS prevention দরকার।
 
 যদি browser-কে সরাসরি token client হিসেবেই রাখতে হয়, তাহলে persistent storage-এর exposure, token lifetime, renewal design, XSS defenses ও user experience একসঙ্গে বিচার করতে হবে। In-memory storage persistent token theft কমাতে পারে, কিন্তু reload-এর পর login কীভাবে চলবে, সেটাও সমাধান করতে হবে।
 
