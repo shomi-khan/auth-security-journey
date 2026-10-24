@@ -10,3 +10,9 @@
 - Logout করলে সব JWT সঙ্গে সঙ্গে invalid হয়ে যায়
 - Token-এর মধ্যে role থাকলেই authorization complete
 - Refresh Token মানেই নিরাপদ token
+
+- Idle timeout থাকলেই hijack করা session বেশিক্ষণ চলতে পারে না
+- Strict mode থাকলেই session fixation অসম্ভব
+- Login-এর পর session record-এ শুধু user ID বসালেই চলে; session ID rotate করতে হয় না
+- IP আর User-Agent মিলিয়ে রাখলেই session hijacking বন্ধ
+- DBSC এলে cookie theft আর replay-এর ঝুঁকি শেষ
