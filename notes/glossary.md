@@ -60,7 +60,17 @@ Resource ডাকতে যে token দেখানো হয়। মেয়া�
 ## JWT
 
 সহজ ভাষায়:
-JSON Web Token। Token লেখার একটা format। কী নিশ্চিত করে আর কী করে না, সেটা অধ্যায় ৯।
+JSON Web Token। Claims বহনের একটি format; নিজে থেকে encryption বা নিরাপত্তার নিশ্চয়তা নয়। Signed JWT-এর payload সাধারণত decode করে পড়া যায়। বিস্তারিত অধ্যায় ৯।
+
+## JWS
+
+সহজ ভাষায়:
+JSON Web Signature। Content-এ signature বা MAC-ভিত্তিক integrity protection দেওয়ার format। এটি নিজে content গোপন করে না।
+
+## JWE
+
+সহজ ভাষায়:
+JSON Web Encryption। Content encrypt করে গোপনীয়তা দেওয়ার format। JWE আর JWS একই জিনিস নয়।
 
 ## OAuth 2.0
 
