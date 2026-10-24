@@ -180,3 +180,11 @@
 - Validation guidance-এ server-defined algorithm policy, trusted key, issuer, intended audience এবং প্রযোজ্য time claims থাকবে। এটি conceptual guidance, কোনো universal copy-paste validation recipe নয়।
 - OAuth access-token profile, SPA storage, expiry/replay timeline ও refresh-token lifecycle পরের অধ্যায়ের scope-এই থাকবে।
 - Source basis: RFC 7519 (JWT), RFC 7515 (JWS), RFC 8725 (JWT Best Current Practices)। Draft লেখার পর source-based Technical ও Security Review আলাদা করে করতে হবে; browser/app test বা production certification দাবি করা যাবে না।
+
+
+## 2026-10-25 — Chapter 9 Technical ও Security Review
+
+- Chapter 9-এর source-based conceptual review-এ JWT বনাম access token, JWS-এর signing input ও integrity protection, Base64URL encoding বনাম encryption, JWS/JWE serialization-এর পার্থক্য, trusted key/algorithm policy, issuer/audience/time claims এবং authorization boundary যাচাই করা হয়েছে।
+- Mermaid signing-input diagram সংশোধন করা হয়েছে। JWT-সম্পর্কিত ভুল ধারণাগুলো `notes/misconceptions.md`-এ যোগ করা হয়েছে।
+- Review record: `notes/technical-review-chapter-9.md`। Chapter 9-এর Technical Review ও Security Review source-based review হিসেবে checked; Published নয়।
+- Mermaid renderer, browser, mobile বা application implementation test চালানো হয়নি। এটি production security audit বা certification নয়।
