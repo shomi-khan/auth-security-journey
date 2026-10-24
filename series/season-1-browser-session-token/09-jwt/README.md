@@ -28,19 +28,22 @@ flowchart LR
     B[Payload / Claims] --> E[Base64URL encode]
     D --> F[Encoded header]
     E --> G[Encoded payload]
-    F --> H[Encoded header . Encoded payload . Signature]
+    F --> H[Signing input: encoded header . encoded payload]
     G --> H
-    C[Signing key এবং signing process] --> I[Signature]
-    I --> H
+    C[Signing key এবং signing process] --> I[Signature / MAC]
+    H --> I
+    F --> J[Compact JWS]
+    G --> J
+    I --> J
 ```
 
 - **Header:** token-এর metadata, যেমন এটি কোন ধরনের object এবং কোন signing algorithm ব্যবহার করা হয়েছে বলে দাবি করছে।
 - **Payload:** claims, অর্থাৎ token-এর ভেতরে রাখা statements।
-- **Signature:** নির্দিষ্ট key ও algorithm দিয়ে header এবং payload-এর encoded অংশের ওপর তৈরি integrity protection।
+- **Signature / MAC:** নির্দিষ্ট key ও algorithm দিয়ে encoded header ও payload-কে যুক্ত করা signing input-এর ওপর তৈরি integrity protection। JWS-এ algorithm অনুযায়ী এটি digital signature অথবা MAC হতে পারে।
 
 Header ও payload সাধারণত Base64URL encoding করা থাকে। **Encoding encryption নয়।** যে কেউ token-এর এই অংশ decode করে পড়তে পারে। তাই password, secret, বা এমন ব্যক্তিগত তথ্য payload-এ রাখা যাবে না, যা token দেখে ফেলা কেউ জানতে পারুক তা চাই না।
 
-Signature-ও payload-কে গোপন করে না। এটি সঠিকভাবে যাচাই করা হলে বোঝাতে সাহায্য করে যে protected content বদলানো হয়নি এবং গ্রহণযোগ্য key-এর সঙ্গে মেলে। Signature যাচাই না করে শুধু payload decode করে বিশ্বাস করা নিরাপদ নয়।
+Signature/MAC-ও payload-কে গোপন করে না। এটি সঠিকভাবে যাচাই করা হলে বোঝাতে সাহায্য করে যে protected content বদলানো হয়নি এবং ব্যবহৃত key ও algorithm গ্রহণযোগ্য। Key-টি সত্যিই trusted কি না, সেটি application-এর trust policy-র বিষয়। Signature যাচাই না করে শুধু payload decode করে বিশ্বাস করা নিরাপদ নয়।
 
 > তিন অংশের উদাহরণটি signed JWS-এর পরিচিত রূপ। JWT সবসময় তিন অংশের হবে, এমন নয়। Encrypted JWT-এর জন্য JWE Compact Serialization-এ পাঁচটি অংশ থাকে। Signed আর encrypted আলাদা বৈশিষ্ট্য।
 
@@ -98,7 +101,7 @@ JWT-এর নিরাপদ ব্যবহার নিয়ে RFC 7519 format
 |---|---|
 | Claims-এর compact representation | হ্যাঁ, এটি format-এর উদ্দেশ্য |
 | Payload গোপন থাকা | না, সাধারণ signed JWS payload পড়া যায় |
-| Content বদলানো হয়েছে কি না বোঝার উপায় | সঠিক signature/MAC যাচাই করলে integrity protection পাওয়া যায় |
+| Content বদলানো হয়েছে কি না বোঝার উপায় | JWS-এর signature/MAC সঠিকভাবে যাচাই করলে integrity protection পাওয়া যায় |
 | Token trusted issuer-এর কাছ থেকে এসেছে | কেবল সঠিক trust/key এবং issuer validation করলে |
 | Token এই API-র জন্য | না, audience ও প্রাসঙ্গিক policy যাচাই করতে হয় |
 | Token এখনো valid | না, expiry ও অন্যান্য প্রযোজ্য condition যাচাই করতে হয় |
