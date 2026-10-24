@@ -61,3 +61,10 @@ Chapter 3 has been simplified to emphasize the security concepts: why passwords 
 The former implementation-specific notes about Argon2id parameter parsing, PHC string parsing, and code-level Unicode normalization were written for an earlier code-oriented draft. They are historical context, not mandatory implementation work for the current teaching draft. Review should verify conceptual accuracy, relevant threat boundaries, meaningful failure paths, and source-backed claims. It should not turn the chapter into an implementation manual or imply production security certification.
 
 Chapter 3's Technical Review and Security Review checkboxes are now checked for conceptual, source-based review only. No code tests, parser implementation audit, production parameter tuning, load benchmark, or deployment test were run.
+
+
+## 2026-10-25 — Chapter 4 theory-first rewrite
+
+Chapter 4's Go snippets, executable shell command, and code-specific test history were removed from the teaching chapter. The replacement focuses on the browser/server/session mental model, cookie attributes, server-side expiry and revocation, session-store exposure, and the limits of each control. Mermaid diagrams and language-neutral HTTP examples are now the primary explanatory tools.
+
+Chapter 4 Technical Review and Security Review remain unchecked pending a focused source-based review of the revised chapter's conceptual claims, cookie behavior, session lifecycle, and threat boundaries. No implementation tests or browser tests were run for this revision.
