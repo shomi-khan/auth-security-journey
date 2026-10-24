@@ -19,9 +19,9 @@
 | Login, logout, session lifecycle, permission decision | Mermaid flowchart |
 | Browser, application server, authorization server-এর মধ্যে interaction | Mermaid sequence diagram |
 | একাধিক বিকল্প বা threat-এর trade-off | Comparison table; দরকার হলে flowchart |
-| Diagram-এ বোঝানো কঠিন ছোট decision logic | অল্প pseudocode, সঙ্গে ব্যাখ্যা |
+| Diagram-এ বোঝানো কঠিন এবং মূল theory বোঝার জন্য অপরিহার্য decision logic | অল্প, language-neutral pseudocode; অন্য উপায় যথেষ্ট না হলে |
 | HTTP request/response, header, cookie বা token-এর গঠন বোঝানো | ছোট illustrative example; runnable implementation নয় |
-| নির্দিষ্ট language/framework-এর implementation detail | সাধারণত বাদ। Security concept বোঝার জন্য অপরিহার্য হলে language-neutral ব্যাখ্যা ও authoritative reference ব্যবহার করো |
+| নির্দিষ্ট tool/library-এর parameter, parser, API বা implementation detail | সাধারণত বাদ। Core security property ব্যাখ্যার জন্য অপরিহার্য হলে শুধু প্রয়োজনীয় অংশ রাখো এবং authoritative source উল্লেখ করো |
 
 ## Diagram লেখার নিয়ম
 
@@ -33,12 +33,28 @@
 - Diagram-এর পরে সেটি কী শেখায়, কী দেখায় না, এবং গুরুত্বপূর্ণ trade-off কী, তা ব্যাখ্যা করো।
 - Mermaid rendering না হলেও মূল ব্যাখ্যা যেন বোঝা যায়; diagram-ই যেন একমাত্র তথ্যের উৎস না হয়।
 
+## মূল theory-তে থাকা, tool-specific rabbit hole এড়ানো
+
+প্রতিটি section লেখার আগে জিজ্ঞেস করো: **পাঠক এখান থেকে কোন security concept শিখবে?** উত্তর যদি শুধু কোনো tool-এর configuration মুখস্থ করা হয়, section-টি ছোট করো বা বাদ দাও।
+
+- Concept: কী সমস্যা হচ্ছে, এবং কেন?
+- Mechanism: security control কীভাবে সমস্যাটি কমায়?
+- Boundary: এটি কী সমাধান করে না?
+- Threat: কোন আক্রমণ বা failure mode এখনও গুরুত্বপূর্ণ?
+- Trade-off: user experience, performance, availability বা complexity-তে কী দাম দিতে হয়?
+- Practical connection: engineer বাস্তব architecture-এ কোন সিদ্ধান্ত নিতে পারবে?
+
+কোনো tool-specific detail কেবল তখনই রাখো, যখন সেটি ভুল security assumption ঠেকাতে বা মূল mechanism বোঝাতে সত্যিই দরকার। বিস্তারিত reference-এ পাঠানো যেতে পারে; chapter-কে reference manual বানিও না।
+
 ## Chapter review checklist
 
-- [ ] উদাহরণটি কি security concept শেখাচ্ছে, নাকি অপ্রয়োজনীয় implementation syntax দেখাচ্ছে?
+- [ ] উদাহরণটি কি মূল security concept শেখাচ্ছে, নাকি tool-specific implementation detail-এ ডুবে যাচ্ছে?
 - [ ] Mermaid flowchart বা sequence diagram কি logic-টি আরও পরিষ্কারভাবে বোঝাতে পারে?
 - [ ] গুরুত্বপূর্ণ failure path ও security boundary কি দেখানো হয়েছে?
 - [ ] Security invariant কি স্পষ্ট?
+- [ ] Tool-specific detail বাদ দিলেও কি পাঠক core theory বুঝতে পারবে?
+- [ ] কোনো algorithm বা library-র parameter-কে কি ভুল করে universal rule হিসেবে দেখানো হচ্ছে?
+- [ ] Review-তে কি implementation-level exhaustive validation-এর বদলে chapter-এর claims, threat model ও conceptual accuracy-তে অগ্রাধিকার দেওয়া হয়েছে?
 - [ ] Diagram বা pseudocode থেকে কি পাঠক ভুল security assumption করতে পারে?
 - [ ] উদাহরণটি কি production-ready বলে ভুল বোঝার সুযোগ আছে?
 - [ ] Protocol বা standard-সংক্রান্ত দাবি কি authoritative source দিয়ে যাচাই করা হয়েছে?
