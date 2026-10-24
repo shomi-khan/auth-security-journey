@@ -59,7 +59,7 @@
 
 এগুলো আলাদা প্রোটোকল পরিবার নয়। মেয়াদ, বাতিল করা, আর access token কেমন হতে পারে — এই প্রশ্নে খুলে দেখো।
 
-- [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750)। অধ্যায় ৮, ৯, ১৬।
+- [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750)। অধ্যায় ৮-এ bearer-token model ও Authorization header-এর মৌলিক ধারণা; অধ্যায় ৯ ও ১৬-এ প্রাসঙ্গিক OAuth/JWT context। Chapter 8-এ এই RFC ব্যবহার করা মানে KenaKata-র first-party mobile login-কে OAuth flow বলে দাবি করা নয়।
 - [RFC 7009 — Token Revocation](https://www.rfc-editor.org/rfc/rfc7009)। অধ্যায় ১৪।
 - [RFC 7662 — Token Introspection](https://www.rfc-editor.org/rfc/rfc7662)। অধ্যায় ১৪ আর ২৩।
 - [RFC 9068 — JWT Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068)। অধ্যায় ৯ আর ১৬। প্রতিটা JWT-কে access token ধরে নিয়ো না। এই প্রোফাইলটা কখন লাগে, পড়ে দেখো।
