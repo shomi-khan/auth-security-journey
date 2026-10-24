@@ -23,7 +23,7 @@
         ↓
 ৭. Security accuracy check
         ↓
-৮. Diagram / Code যোগ করা
+৮. Diagram / উদাহরণ যোগ করা
         ↓
 ৯. Chapter status update
         ↓
@@ -37,7 +37,7 @@
 ৫. **Chapter লেখা।** ওই অধ্যায়ের `README.md`-এ placeholder সরাও। ভাষা বাংলা। Technical term ইংরেজিতে থাকবে।
 ৬. **Technical accuracy।** নাম, প্রবাহ, আর “এটা কী করে” — [`references/`](references/README.md)-এর সোর্স খুলে মিলাও। ব্লগের কথাকে spec-এর উপরে বসাবে না।
 ৭. **Security accuracy।** একই সোর্স। “JWT secure” এই ধরনের কথা লিখবে না, যদি না সঙ্গে থাকে কোন threat, কোন property, কোথায় সীমা, কী trade-off। নতুন ভুল ধারণা ধরা পড়লে ছোট করে [misconceptions](notes/misconceptions.md)-এ যোগ করো। ব্যাখ্যা অধ্যায়েই থাকবে।
-৮. **Diagram বা code।** লাগলে যোগ করো। না লাগলে যোগ করবে না। ছোট Mermaid ছবি অধ্যায়ের ভিতরেই ভালো। বারবার লাগলে [diagrams/](diagrams/authentication/)-এ রাখো। Go উদাহরণ [examples/go/](examples/go/authentication/)-এ: ছোট, একটা ধারণা, একা পড়লে বোঝা যায়। KenaKata-র পুরো backend এখানে বানাবে না।
+৮. **Diagram বা illustrative example।** [উদাহরণ ও Diagram লেখার নীতি](docs/code-example-policy.md) মেনে চলো। Mermaid flowchart ও sequence diagram হবে প্রধান মাধ্যম; pseudocode কেবল প্রয়োজন হলে। Go code বা অন্য language-specific implementation code থাকবে না। Diagram অধ্যায়ের ভিতরে রাখো, যদি না সেটি একাধিক অধ্যায়ে পুনর্ব্যবহারের প্রয়োজন হয়।
 ৯. **Chapter status।** নিচের বাক্সে টিক তখনই, যখন সেই ধাপ সত্যি শেষ। `Published`-এ টিক মানে অধ্যায় প্রকাশিত।
 ১০. **Season README আর root README।** অধ্যায় প্রকাশিত না হওয়া পর্যন্ত সূচিপত্রে `[ ] লেখা হয়নি` থাকবে। প্রকাশিত হলে `[x]` করো, আর “লেখা হয়নি” সরিয়ে দাও।
 
@@ -143,13 +143,13 @@ Chapter 1-এ যে পদ্ধতিগুলো পাঠককে সক্
 
 এই technique-গুলো checklist হিসেবে যান্ত্রিকভাবে বসাবে না। Chapter-এর বিষয়, গল্প ও পাঠকের সম্ভাব্য ভুল বোঝাবুঝি অনুযায়ী বেছে নাও।
 
-### Diagram, table, code ও ছোট বিরতি
+### Diagram, table ও ছোট বিরতি
 
 - Flow বা trust boundary বোঝাতে ছোট **Mermaid diagram** ব্যবহার করো, যখন তা ব্যাখ্যাকে পরিষ্কার করে।
 - দুটি ধারণা বা পদ্ধতির পার্থক্য গুরুত্বপূর্ণ হলে **comparison table** ব্যবহার করো।
-- **Code বা request/response example** দাও যখন implementation detail ছাড়া ঝুঁকি বা আচরণ বোঝা কঠিন।
+- HTTP request/response, header, cookie বা token-এর গঠন বোঝাতে প্রয়োজনমতো ছোট illustrative example দাও; runnable implementation code নয়। বিস্তারিত [উদাহরণ ও Diagram লেখার নীতি](docs/code-example-policy.md)-তে।
 - বড় ধারণাকে ছোট section-এ ভাগ করো। একটানা দীর্ঘ ব্যাখ্যার বদলে গল্প, diagram, প্রশ্ন এবং ব্যাখ্যার মধ্যে স্বাভাবিক বিরতি রাখো।
-- প্রতিটি visual বা code block-এর সঙ্গে কী লক্ষ্য করতে হবে, তা ব্যাখ্যা করো। শুধু দেখতে সুন্দর বলে diagram বা code যোগ করো না।
+- প্রতিটি diagram বা illustrative example-এর সঙ্গে কী লক্ষ্য করতে হবে, তা ব্যাখ্যা করো। শুধু দেখতে সুন্দর বলে visual যোগ করো না।
 - অপ্রয়োজনীয় meme, বাহুল্যপূর্ণ decoration বা জোর করে humour যোগ করবে না। হালকা, স্বাভাবিক ভাষা ভালো; technical accuracy ও পাঠকের মনোযোগই অগ্রাধিকার।
 
 ### Chapter review-এর সময় engagement যাচাই
@@ -160,7 +160,7 @@ Chapter শেষ হলে নিজেকে জিজ্ঞেস করো:
 - Decision Game কি chapter-এর মূল concept প্রয়োগ করতে বলছে, নাকি শুধু definition মনে করতে বলছে?
 - উত্তরটি কি reasoning-সহ ব্যাখ্যা করা হয়েছে?
 - অন্তত একটি গুরুত্বপূর্ণ limitation বা প্রাসঙ্গিক edge case কি পরীক্ষা করা হয়েছে?
-- diagram, table, code ও emoji কি বোঝাপড়া সহজ করছে?
+- diagram, table ও emoji কি বোঝাপড়া সহজ করছে?
 - একই format বারবার ব্যবহার করে chapter-গুলো কি একঘেয়ে হয়ে যাচ্ছে?
 - কোনো visual বা game কি technical accuracy-কে সরল করতে গিয়ে ভুল ধারণা তৈরি করছে?
 
