@@ -58,3 +58,10 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 - কোন অধ্যায়: ১৬–২১।
 - কেন পড়া useful: RFC 6749 আর RFC 9700-এর পাশে পড়ো। Cheat sheet আর RFC 9700 না মিললে RFC 9700 মানবে। মিল না থাকলে অধ্যায়ে সেটা লুকিয়ে ফেলবে না।
 - [OAuth 2.0 Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/OAuth2_Cheat_Sheet.html)
+
+## Cookie Theft Mitigation Cheat Sheet
+
+- কী বিষয়: চুরি হওয়া session cookie-র অপব্যবহার শনাক্ত করা, context signal-এর সীমা, reauthentication এবং DBSC।
+- কোন অধ্যায়: ৫।
+- কেন পড়া useful: IP বা User-Agent বদলকে নিশ্চিত প্রমাণ ভাবা যাবে না; false positive ও false negative দুটোই আছে। সন্দেহ হলে account-bound authenticator দিয়ে reauthentication বেশি নির্ভরযোগ্য।
+- [Cookie Theft Mitigation Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cookie_Theft_Mitigation_Cheat_Sheet.html)
