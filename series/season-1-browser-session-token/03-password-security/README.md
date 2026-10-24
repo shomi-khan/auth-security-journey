@@ -213,83 +213,37 @@ Salt বানানোর নিয়ম: cryptographically secure random উ�
 
 সংখ্যাগুলো hardware ও configuration অনুযায়ী আলাদা হবে, তাই নির্দিষ্ট অনুপাতকে সর্বজনীন ধরে নেওয়া ঠিক নয়। মূল ধারণাটি হলো: password hash যাচাইয়ের প্রতিটি অনুমানকে ইচ্ছাকৃতভাবে ব্যয়বহুল করতে হবে। বৈধ user-এর কাছে এর মূল্য সামান্য বিলম্ব; আক্রমণকারীর কাছে তা অনেক বেশি মোট খরচ।
 
-### তিন প্রার্থী
+### কোন password-hashing পদ্ধতি, আর কেন?
 
-OWASP-র বর্তমান Password Storage Cheat Sheet যেভাবে সাজিয়েছে:
+Password storage-এর জন্য এমন পদ্ধতি দরকার, যা প্রতিটি অনুমানকে ইচ্ছাকৃতভাবে ব্যয়বহুল করে। সাধারণ-purpose hash যেমন SHA-256 দ্রুত কাজ করার জন্য তৈরি; password guessing-এর ক্ষেত্রে সেই গতি আক্রমণকারীর সুবিধা।
 
-**Argon2id** প্রথম পছন্দ। ২০১৫ সালের Password Hashing Competition-এর বিজয়ী Argon2-র যে রূপটা GPU আর side-channel দুই ধরনের আক্রমণের বিরুদ্ধেই ভারসাম্য রাখে। এটা শুধু সময় নয়, **memory-ও** দামি করে। প্রতিটা অনুমানের জন্য একটা বড় memory অংশ দরকার, তাই হাজার হাজার অনুমান একসঙ্গে চালানো GPU-র জন্য কঠিন হয়ে যায়। তিনটা parameter: memory (`m`), কয়বার ঘুরবে (`t`), আর parallelism (`p`)।
+**Argon2id** আধুনিক password storage-এর একটি ভালো default পছন্দ। এটি সময়ের পাশাপাশি memory-ও ব্যবহার করে, ফলে অনেক অনুমান একসঙ্গে চালানো আক্রমণকারীর জন্য ব্যয়বহুল হয়। **scrypt** এবং **PBKDF2**-ও নির্দিষ্ট পরিস্থিতিতে ব্যবহারযোগ্য; **bcrypt** পুরোনো system-এ দেখা যেতে পারে, তবে legacy সীমাবদ্ধতা বুঝে নিতে হয়। এই নামগুলো মুখস্থ করাই অধ্যায়ের লক্ষ্য নয়। মূল ধারণা হলো, password সংরক্ষণের জন্য সাধারণ দ্রুত hash নয়, password-guessing প্রতিরোধে তৈরি উপযুক্ত algorithm ব্যবহার করতে হয়।
 
-**scrypt** Argon2id না পাওয়া গেলে দ্বিতীয় পছন্দ, এটাও memory-hard।
+Algorithm বেছে নেওয়ার পর তার configuration-ও গুরুত্বপূর্ণ। খুব কম খরচ আক্রমণকারীকে বেশি অনুমানের সুযোগ দেয়; অতিরিক্ত খরচ বৈধ login-কে ধীর করতে পারে এবং server-এর resource নিঃশেষ করার ঝুঁকি তৈরি করতে পারে। তাই বাস্তব system-এ রক্ষণাবেক্ষণাধীন, বিশ্বস্ত library-এর সুপারিশ অনুসরণ করে নিজের workload-এ configuration যাচাই করতে হয়। এখানে কোনো একটি parameter set-কে সব system-এর জন্য সঠিক বলা হচ্ছে না।
 
-**bcrypt** এখন OWASP-র তালিকায় শুধু legacy system-এর জন্য। ন্যূনতম work factor ১০, আর password ৭২ byte-এর বেশি হলে সমস্যা। (আরেকটা বিকল্প PBKDF2: FIPS-140 মানতে হলে ছাড়া এটা প্রথম পছন্দ নয়।)
+### Stored hash record: পরে যাচাই করার মতো তথ্য
 
-আর একটা ছোট কিন্তু শিক্ষণীয় ব্যাপার: OWASP-র আগের সংস্করণগুলোতে bcrypt ছিল দ্বিতীয় পছন্দ। পাতাটা বদলেছে। আমাদের repository-র `references/` ফাইল ঠিক এই কারণেই বলে, মনে থাকা পরামর্শ অধ্যায়ে জমিয়ে রাখা যাবে না। যে সোর্স থেকে লিখছি, সেটা প্রতিবার আবার খুলে দেখতে হয়।
-
-### bcrypt-এর ৭২ byte আর বাংলা password
-
-bcrypt-এর প্রচলিত implementation-গুলো password-এর প্রথম ৭২ byte-ই ব্যবহার করে। OWASP তাই এই সীমা সম্পর্কে সতর্ক করে। কোনো library অতিরিক্ত দীর্ঘ password প্রত্যাখ্যান করতে পারে, আবার কোনোটি নীরবে truncate করতে পারে।
+Password সংরক্ষণের সময় server শুধু hash রাখে না; ব্যবহৃত algorithm ও তার configuration-সহ যাচাইয়ের জন্য দরকারি metadata-ও সংরক্ষণ করে। অনেক system-এ এগুলো একটি encoded record-এ থাকে। এতে ভবিষ্যতে algorithm বা configuration উন্নত করার সময় পুরোনো password hash কোন পদ্ধতিতে তৈরি হয়েছিল, তা বোঝা যায়।
 
 ```mermaid
 flowchart TD
-    P["Password"] --> B["bcrypt"]
-    B --> L{"UTF-8 encoded password<br/>৭২ byte-এর বেশি?"}
-    L -->|"হ্যাঁ"| E["কিছু implementation reject করে;<br/>কিছু truncate করতে পারে"]
-    L -->|"না"| V["bcrypt যাচাই"]
-    E --> R["সীমা ও library behavior বুঝে নাও"]
+    P["User password"] --> S["প্রতি password-এর জন্য আলাদা random salt"]
+    S --> H["Password storage-এর জন্য তৈরি ধীর hash"]
+    H --> R["Hash + salt + algorithm/configuration-এর তথ্য সংরক্ষণ"]
+    R --> L["পরের login-এ password আবার যাচাই"]
+    L --> V{"Stored record গ্রহণযোগ্য এবং password মেলে?"}
+    V -->|হ্যাঁ| OK["Login সফল"]
+    V -->|না| NO["Login ব্যর্থ"]
 ```
 
-সব implementation একইভাবে আচরণ করে না। কোনোটি চুপচাপ ছেঁটে ফেললে user ভাবে তার পুরো password যাচাই হচ্ছে, অথচ শুধু প্রথম অংশ ব্যবহৃত হচ্ছে। NIST-এর নির্দেশনা স্পষ্ট: verifier-কে পুরো password যাচাই করতে হবে, ছাঁটা চলবে না।
+এখানে দুটি মূল কথা মনে রাখো: salt গোপন রাখার জিনিস নয়, আর database-এ hash থাকলেই password ভাঙা অসম্ভব হয়ে যায় না। এই record-এর নির্দিষ্ট format কী, বা কোনো library-তে তার প্রতিটি field কীভাবে validate করতে হয়, সেগুলো implementation detail। বাস্তব system-এ record-কে অবিশ্বাস্য input ধরে supported library-এর নির্দেশনা অনুসরণ করতে হবে; অজানা বা অগ্রহণযোগ্য record দিয়ে যাচাই চালানো যাবে না।
 
-এখানে একটা স্থানীয় বিষয় আছে। UTF-8-এ বাংলা অক্ষর সাধারণত ৩ byte নেয়। অর্থাৎ ২৪টা বাংলা অক্ষরেই ৭২ byte পূর্ণ। বাংলায় একটা লম্বা passphrase বেছে নিলে bcrypt-এর সীমা সবার আগে তাকেই ধাক্কা দেয়। Argon2id-তে এমন ছোট সীমা নেই।
+### 🧪 Edge case: database-এর record-ও কি বিশ্বাস করব?
 
-### Argon2id parameter
+ধরো, কেউ database-এর একটি password-hash record বদলে দিল। Stored data-তে algorithm বা configuration-এর তথ্য থাকলেও সেটি অন্ধভাবে বিশ্বাস করা যাবে না। ভুল বা অস্বাভাবিক তথ্য ব্যবহার করলে login যাচাই নিজেই অতিরিক্ত resource খরচ করাতে পারে, অথবা password যাচাইয়ের নিয়ম দুর্বল হয়ে যেতে পারে।
 
-OWASP-র ন্যূনতম configuration-গুলো সমমানের সুরক্ষা দেয়, শুধু CPU আর RAM-এর মধ্যে বদল:
+মূল নিরাপত্তার নিয়মটি সহজ: **শুধু সমর্থিত ও গ্রহণযোগ্য password-hash record দিয়েই যাচাই চালাও; অন্যথায় login ব্যর্থ করো।** ঠিক কোন field, format বা সীমা validate করতে হবে, তা ব্যবহৃত standard ও library-র documentation-এর বিষয়। এই অধ্যায়ে নির্দিষ্ট parser-এর implementation শেখানো হচ্ছে না।
 
-| `m` (memory) | `t` (iteration) | `p` (parallelism) |
-|---|---|---|
-| 46 MiB | 1 | 1 |
-| **19 MiB** | **2** | **1** |
-| 12 MiB | 3 | 1 |
-| 9 MiB | 4 | 1 |
-| 7 MiB | 5 | 1 |
-
-RFC 9106-এর §৪ ও §৭.৪ সরাসরি পড়ে দুটো recommendation মেলে: বেশি memory থাকলে 2 GiB, `t=1`, `p=4`; memory সীমিত হলে 64 MiB, `t=3`, `p=4`। এগুলো RFC-র প্রস্তাবিত configuration, OWASP-এর নিচের দিকের baseline-এর বিকল্প দাবি নয়। বাস্তব server-এ কতটা memory ও latency সম্ভব, সেটা মেপে parameter বেছে নিতে হবে। OWASP-র সাধারণ নিয়ম, একটা hash বানাতে এক সেকেন্ডের কম লাগা উচিত।
-
-KenaKata-র মতো ছোট একটা server-এর জন্য আরিফ বেছে নিল একটি উপযুক্ত, আধুনিক password-hashing পদ্ধতি।
-
-```mermaid
-flowchart TD
-    P["Password গ্রহণ"] --> N["একই NFC normalization policy প্রয়োগ"]
-    N --> S["প্রতি password-এর জন্য cryptographic random salt"]
-    S --> A["Argon2id<br/>memory + time cost"]
-    A --> H["PHC string তৈরি"]
-    H --> DB["Algorithm + version + parameters + salt + hash সংরক্ষণ"]
-    DB --> L["Login-এ stored PHC string পড়া"]
-    L --> V{"Format ও parameter গ্রহণযোগ্য?"}
-    V -->|"না"| F["Fail closed: login ব্যর্থ"]
-    V -->|"হ্যাঁ"| X["Stored salt ও parameter দিয়ে Argon2id চালাও"]
-    X --> C{"Hash মেলে?"}
-    C -->|"হ্যাঁ"| OK["Password যাচাই সফল"]
-    C -->|"না"| NO["Password যাচাই ব্যর্থ"]
-```
-
-PHC string-এর একটি illustrative উদাহরণ নিচে দেওয়া হলো। এটি বর্তমান কোনো implementation চালিয়ে তৈরি বা যাচাই করা test result নয়:
-
-```
-$argon2id$v=19$m=19456,t=2,p=1$6ntZMPHCqYWOGNTS1t1w7Q$17RAHmtm7vQxx7rPGBzYLctpWOwUS4GG8oybUXxYO6Y
-```
-
-এই এক লাইনে পুরো গল্প আছে। কোন algorithm, কোন version, কোন parameter, কোন salt, আর ফলাফল hash। Salt-এর জন্য আলাদা column লাগেনি। আর পরে parameter বা algorithm বদলাতে চাইলে পুরোনো hash নিজেই বলে দেয় সে কোন নিয়মে বানানো। এই আকারের নাম **PHC string format**, আর OWASP এটাকে এই কারণেই সুপারিশ করে।
-
-দুটি implementation detail গুরুত্বপূর্ণ: salt অবশ্যই cryptographically secure random generator থেকে আসতে হবে, আর hash comparison-এর ক্ষেত্রে timing leakage এড়াতে উপযুক্ত constant-time verification ব্যবহার করতে হবে। এগুলো ধারণাগত শর্ত, production-ready implementation নির্দেশনা নয়।
-
-
-### 🧪 Edge case: hash string-টাই যদি বদলে দেওয়া হয়?
-
-Encoded hash-এ `m`, `t`, আর `p` লেখা আছে বলে Verify সেগুলো পড়ে ব্যবহার করে। কিন্তু database-এর কোনো row বদলে গেলে ওই সংখ্যাগুলোও বদলাতে পারে। যদি verifier কোনো সীমা ছাড়া সেগুলো মেনে নেয়, login request-এ এমন parameter আসতে পারে যা অস্বাভাবিক RAM বা CPU খরচ করায়।
-
-তাই hash string parse করাই যথেষ্ট নয়: algorithm/version, parameter-এর গ্রহণযোগ্য সীমা, salt-এর দৈর্ঘ্য এবং output hash-এর দৈর্ঘ্য যাচাই করতে হবে, **তারপরই** Argon2id চালাতে হবে। কোনো উদাহরণে দেখানো parameter range একটি নির্দিষ্ট design-এর সীমা হতে পারে, universal standard নয়। বাস্তব system-এ নিজের supported configuration ও legacy hash অনুযায়ী সীমা নির্ধারণ করে test করতে হবে।
 ### এই নিরাপত্তার দাম: আমাদেরই server
 
 ইচ্ছাকৃত ধীর কাজ আমাদের নিজেদের জন্যও কাজ। প্রতিটি password verification-এ নির্দিষ্ট পরিমাণ CPU ও memory লাগে। হাজার জন একসঙ্গে login চেষ্টা করলে আমাদের server-এ প্রায় ১৯ GB memory দরকার। এমন সংখ্যা কেউ ইচ্ছা করে ডাকলে সেটা DoS আক্রমণ। OWASP নিজেই সতর্ক করে, work factor অতি বেশি হলে আক্রমণকারী অসংখ্য login চেষ্টা দিয়ে server-এর CPU নিঃশেষ করে দিতে পারে।
@@ -362,7 +316,7 @@ sequenceDiagram
     U->>S: email + password (HTTPS)
     S->>S: policy যাচাই (দৈর্ঘ্য, blocklist)
     S->>S: নতুন random salt, Argon2id চালানো
-    S->>DB: PHC string সংরক্ষণ (algorithm, parameter, salt, hash)
+    S->>DB: hash record সংরক্ষণ (algorithm, configuration, salt, hash)
     Note over U,DB: Login
     U->>S: email + password (HTTPS)
     S->>DB: email দিয়ে stored hash আনা (না পেলে dummy hash)
@@ -409,9 +363,9 @@ flowchart TD
 
 ### বাংলা password আর Unicode
 
-NIST বলে Unicode অক্ষর গ্রহণ করা উচিত, আর password-এর দৈর্ঘ্য নির্ধারণে code point-ভিত্তিক গণনা ব্যবহার করা যায়। একই সঙ্গে সতর্ক করে: hash করার আগে NFC নামের normalization চালানো উচিত।
+NIST password-এ Unicode অক্ষর সমর্থন করার এবং একইভাবে উপস্থাপিত password-কে সামঞ্জস্যপূর্ণভাবে যাচাই করার গুরুত্ব তুলে ধরে। বাংলাসহ বিভিন্ন ভাষায় একই রকম দেখতে password অক্ষর ভিন্ন internal representation-এ আসতে পারে। ফলে password তৈরি করার সময় একরকমভাবে সামলানো হলেও login-এর সময় অন্যরকম হলে user নিজের সঠিক password দিয়েও ঢুকতে নাও পারে।
 
-বাংলায় এটা সত্যিকারের সমস্যা। একই দেখতে লাগা অক্ষর দুভাবে সংরক্ষিত হতে পারে। যেমন "ো" একটা একক code point (U+09CB) হতে পারে, আবার "ে" আর "া" দুটো আলাদা code point (U+09C7 ও U+09BE) পরপর বসেও একই রূপ দিতে পারে। সব keyboard, ফোন আর browser একই রূপে সংরক্ষণ করবে, এমন নিশ্চয়তা নেই। NIST নিজেও সতর্ক করে, কিছু endpoint কিছু অক্ষর আলাদাভাবে উপস্থাপন করতে পারে। Normalization না করলে user এক device-এ password বানিয়ে অন্য device-এ ঢুকতে পারবে না, আর বুঝতেও পারবে না কেন। Unicode NFC normalization-এর নিয়মটি implementation-এর উপযুক্ত library দিয়ে প্রয়োগ করতে হবে। Password policy, hash তৈরি ও যাচাই, তিন ক্ষেত্রেই একই normalization বজায় রাখতে হবে। Registration, password change/reset এবং login-এর প্রতিটি পথেই একই নিয়ম প্রয়োগ করতে হবে; শুধু policy-তে normalize করে hash বা verify-তে বাদ দিলে হবে না।
+এই সমস্যার মূল শিক্ষা: **password গ্রহণ, সংরক্ষণ এবং যাচাইয়ের সময় একই normalization policy ধারাবাহিকভাবে প্রয়োগ করতে হবে।** কোন library বা normalization form ব্যবহার হবে, সেটি implementation-এর সিদ্ধান্ত; এই অধ্যায়ে Unicode-এর অভ্যন্তরীণ গঠন মুখস্থ করানো লক্ষ্য নয়।
 
 ### বৈধ user-এর খরচ
 
@@ -555,7 +509,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 | কেন এসেছে? | Authentication-এর জন্য এমন একটা প্রমাণ দরকার, যা সহজে বহন করা যায় আর যেকোনো device থেকে দেওয়া যায় |
 | কী সমাধান করে? | বেনামি প্রবেশ। Database ফাঁসে plaintext-এ সরাসরি ক্ষতি (hashing-এর ফলে) |
 | কী সমাধান করে না? | দুর্বল password, phishing, keylogger, server-এ ঢোকা আক্রমণকারী, database-এ লেখার সুযোগ, reuse-এর ক্ষতি, recovery-র নিরাপত্তা, পরিচয় ধরে রাখা (§১২) |
-| কোথায় থাকে? | User-এর মাথায় বা password manager-এ। Server-এর memory-তে login-এর কয়েক মিলিসেকেন্ড। Database-এ শুধু hash (PHC string) |
+| কোথায় থাকে? | User-এর মাথায় বা password manager-এ। Server-এর memory-তে login-এর কয়েক মিলিসেকেন্ড। Database-এ hash এবং যাচাইয়ের জন্য দরকারি metadata |
 | কে ব্যবহার করে? | User দেয়। Server যাচাই করে। Hash শুধু server-এর যাচাই-কাজে লাগে |
 | কীভাবে আক্রান্ত হয়? | অনুমান (brute force, stuffing, spraying), database ফাঁসের পর offline cracking, phishing, enumeration, lockout-কে অস্ত্র বানানো, reset-এর পথ |
 | ভেঙে পড়লে ক্ষতি? | ওই user-এর পরিচয়ে কাজ। Reuse থাকলে অন্য account-ও (§১০) |
@@ -574,7 +528,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 - Server-কে password **জানতে** হয় না, শুধু **চিনতে** হয়। যে system password ফিরিয়ে দিতে পারে, সে ভুল জিনিস রাখছে।
 - Dump হাতে এলে আক্রমণকারী আমাদের নিয়ন্ত্রণের বাইরে, **offline**। তখন একমাত্র বাধা প্রতি অনুমানের খরচ।
 - Salt প্রতিটা password-কে আলাদা করে। Salt গোপন নয়। ধীর, memory-hard hash (Argon2id) প্রতিটা অনুমান দামি করে। দুটোই দরকার, আর একা কেউ যথেষ্ট নয়।
-- Hash-এর শক্তি password-এর শক্তিকে ছাড়িয়ে যায় না। দৈর্ঘ্য আর blocklist composition rule-এর চেয়ে বেশি কাজের। বাংলা password-এর জন্য NFC আর ৭২ byte-এর সীমা বিশেষ গুরুত্বপূর্ণ।
+- Hash-এর শক্তি password-এর শক্তিকে ছাড়িয়ে যায় না। দৈর্ঘ্য আর blocklist composition rule-এর চেয়ে বেশি কাজের। বাংলা password-সহ Unicode password সামঞ্জস্যপূর্ণভাবে সামলানো গুরুত্বপূর্ণ।
 - Online আর offline দুটো আলাদা যুদ্ধক্ষেত্র। Rate limit আর MFA শুধু online-এ কাজ করে।
 - সাধারণ বার্তা আর সমান সময় (dummy hash) enumeration আটকায়। Lockout নিজেই অস্ত্র হতে পারে।
 - Password আর তার hash আলাদা জিনিস: একটা credential, অন্যটা যাচাইয়ের উপাত্ত। আর পুরোনো হওয়ার জন্য hash-এর algorithm আর parameter সংরক্ষিত থাকে।
@@ -608,7 +562,7 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 
 বাস্তব system-এ Argon2id parameter বাছাই করতে hardware ও concurrent login load অনুযায়ী benchmark দরকার। এই সিরিজে আমরা implementation code না লিখে এই trade-off-এর কারণ শিখছি।
 
-**দুই।** কাল্পনিক একটি database dump-এ `password` column দেখলে কী প্রশ্ন করবে? সেখানে plaintext, দ্রুত hash, নাকি `$argon2id$...`-এর মতো PHC string আছে? এরপর log-এ password বা credential-সংক্রান্ত তথ্য থাকার ঝুঁকি ব্যাখ্যা করো।
+**দুই।** কাল্পনিক একটি database dump-এ `password` column দেখলে কী প্রশ্ন করবে? সেখানে plaintext password আছে, নাকি password-guessing কঠিন করার জন্য তৈরি hash আছে? এরপর log-এ password বা credential-সংক্রান্ত তথ্য থাকার ঝুঁকি ব্যাখ্যা করো।
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
@@ -628,13 +582,13 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 
 ## তথ্যসূত্র
 
-- [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html): Argon2id-র ন্যূনতম configuration, scrypt, bcrypt (legacy, ৭২ byte), PBKDF2, salt, pepper, work factor, hash হালনাগাদের কৌশল, PHC string format-এর সুপারিশ। এই লেখার সময় পাতাটা পুরো পড়ে মেলানো হয়েছে।
+- [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html): Argon2id-র ন্যূনতম configuration, scrypt, bcrypt (legacy, নির্দিষ্ট input-length limitation), PBKDF2, salt, pepper, work factor, hash হালনাগাদের কৌশল, encoded hash record format-এর সুপারিশ। এই লেখার সময় পাতাটা পুরো পড়ে মেলানো হয়েছে।
 - [NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management](https://pages.nist.gov/800-63-4/sp800-63b.html): §3.1.1 Passwords (দৈর্ঘ্য, composition rule নিষেধ, নিয়মিত বদল নিষেধ, blocklist, password manager আর paste, Unicode আর NFC, salt ও hash সংরক্ষণ, keyed hashing), §3.2.2 Rate Limiting, §3.2.7 Replay Resistance (password replay-resistant নয়)। লেখার সময় পড়ে মেলানো হয়েছে।
 - [OWASP Credential Stuffing Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Credential_Stuffing_Prevention_Cheat_Sheet.html): brute force, credential stuffing আর password spraying-এর পার্থক্য, MFA, proxy দিয়ে ছড়ানো আক্রমণ, ফাঁস-হওয়া password শনাক্তকরণ, অস্বাভাবিক ঘটনায় user-কে জানানো, unpredictable username। পড়ে মেলানো হয়েছে।
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ বার্তা, response-এর সময়ে তথ্য ফাঁস, dummy hash। (এই খসড়া লেখার সময় শুধু প্রাসঙ্গিক অংশ দেখা হয়েছে। Technical Review-এ পূর্ণ পাঠ মেলাতে হবে।)
-- [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): §৩.১-এ parameter-এর সংজ্ঞা এবং §৪ ও §৭.৪-এ Argon2id parameter বাছাইয়ের recommendation সরাসরি পড়ে মেলানো হয়েছে। RFC-র 2 GiB ও 64 MiB recommendation-কে OWASP-এর 19 MiB, `t=2`, `p=1` baseline-এর সঙ্গে এক করে দেখা যাবে না; hardware অনুযায়ী benchmark জরুরি।
-- [PHC string format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md): `$argon2id$v=19$m=...,t=...,p=...$salt$hash` গঠন। (OWASP-র পাতা যে লিঙ্ক দেয়, সেটা। সরাসরি পড়া হয়নি।)
-- Password hashing implementation-এর সঠিকতা শুধু diagram বা PHC string দেখে প্রমাণ করা যায় না। Production system-এ ব্যবহারের আগে নির্বাচিত, রক্ষণাবেক্ষণাধীন password-hashing library-এর official documentation অনুসরণ করতে হবে এবং parameter parsing, malformed PHC string, ভুল password, account না পাওয়া, Unicode normalization ও rehash flow আলাদাভাবে যাচাই করতে হবে। এই সিরিজের উদাহরণগুলো implementation নয়, শেখার মডেল।
+- [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): Argon2-র নকশা ও password hashing-এ memory-hard পদ্ধতির ভূমিকার প্রাথমিক specification। এই অধ্যায়ে RFC-র configuration-গুলো মুখস্থ করানো বা নির্দিষ্ট deployment-এর parameter বেছে দেওয়া লক্ষ্য নয়।
+- Password hashing implementation-এর সঠিকতা শুধু diagram দেখে প্রমাণ করা যায় না। বাস্তব system-এ রক্ষণাবেক্ষণাধীন library-এর official documentation অনুসরণ করতে হবে। এই সিরিজের উদাহরণগুলো implementation নয়, শেখার মডেল; এখানে লক্ষ্য algorithm, salt, offline guessing এবং trade-off-এর মূল ধারণা বোঝা।
+
 - Robert Morris, Ken Thompson, *Password Security: A Case History*, Communications of the ACM, ১৯৭৯: Unix-এর password file-এ salt-এর ঐতিহাসিক উদাহরণ। (ঐতিহাসিক সূত্র, স্পেসিফিকেশন নয়। সরাসরি মেলানো হয়নি।)
 - Unicode Standard Annex #15, *Unicode Normalization Forms* (NFC): NIST-এর নির্দেশনার সূত্রে। (সরাসরি পড়া হয়নি।)
 
