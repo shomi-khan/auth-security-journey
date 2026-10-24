@@ -53,7 +53,7 @@ Signature-ও payload-কে গোপন করে না। এটি সঠ�
   "sub": "user-42",
   "role": "Owner",
   "aud": "kenakata-api",
-  "exp": 1790000000
+  "exp": 1893456000
 }
 ```
 
@@ -103,6 +103,23 @@ JWT-এর নিরাপদ ব্যবহার নিয়ে RFC 7519 format
 | Token এই API-র জন্য | না, audience ও প্রাসঙ্গিক policy যাচাই করতে হয় |
 | Token এখনো valid | না, expiry ও অন্যান্য প্রযোজ্য condition যাচাই করতে হয় |
 | User-এর সব resource-এ access | না, authorization আলাদা সিদ্ধান্ত |
+
+## 🧠 Decision Game: কোন token বিশ্বাস করবে?
+
+আরিফের সামনে দুটি token এসেছে। দুটির payload decode করে একই লেখা দেখা যায়: `"role": "Owner"`। Token A-এর signature ও server-এর নির্ধারিত validation checks সফল। Token B-এর signature যাচাই করা হয়নি, শুধু payload decode করা হয়েছে।
+
+**কোন token-এর claim-কে API-র decision-এ ব্যবহার করা যেতে পারে?**
+
+<details>
+<summary>উত্তর ও reasoning দেখো</summary>
+
+Token A-ও কেবল তখনই গ্রহণযোগ্য, যখন প্রযোজ্য validation checks সফল হয়েছে, যেমন trusted key, allowed algorithm, issuer, intended audience এবং সময়-সংক্রান্ত শর্ত। এরপরও requested resource ও action-এর authorization আলাদা করে যাচাই করতে হবে।
+
+Token B-কে বিশ্বাস করা যাবে না। Payload decode করলে শুধু লেখা দেখা যায়, token সত্যি বা অক্ষত কি না তা প্রমাণ হয় না। আর Token A-তে `role: Owner` লেখা থাকলেও সেটি সব resource-এ access-এর blanket permission নয়।
+
+**Edge case:** Signature সফল হলেও token ভুল API-র জন্য তৈরি হলে KenaKata সেটি গ্রহণ করবে না। তাই signature একাই যথেষ্ট নয়।
+
+</details>
 
 ## ৬. KenaKata-র সিদ্ধান্ত
 
