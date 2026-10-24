@@ -44,7 +44,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 - Chapter 3-এর current diagram-first draft-এর conceptual review সম্পন্ন; parser implementation audit এই series-এর scope নয়।
 - Chapter 1–5-এর code snippet-গুলোকে “compile করা যায়” বলে দাবি করার আগে প্রতিটি snippet-এর scope স্পষ্ট করা এবং সম্ভব হলে runnable companion test রাখা।
 - Chapter 4-এর 401/API response design নিয়ে সিদ্ধান্ত নথিভুক্ত করা।
-- Chapter 1–2 ও 4–5-এর বাকি যাচাই সম্পন্ন না হওয়া পর্যন্ত সেগুলোর review checkbox unchecked রাখা।
+- Chapter 1–2 ও 4-এর remaining conceptual/source review status আলাদাভাবে বজায় রাখা। Chapter 5-এর conceptual/source-based review সম্পন্ন হয়েছে; browser/deployment ও implementation verification এখনও বাকি।
 
 
 ## 2026-10-25 — Chapter 3 diagram-first migration note
@@ -79,4 +79,14 @@ Chapter 4 Technical Review and Security Review remain unchecked pending a focuse
 - [x] Removed code-specific claims and clarified that a stolen session can be as serious as password theft within the application, while typically not reusable across unrelated sites.
 - [x] Refreshed the citation note for draft-ietf-httpbis-rfc6265bis-22: as of 2026-10-25, its RFC Editor state is blocked pending final approval, so it must still be described as a draft, not a published RFC.
 
-The Chapter 4 Technical Review and Security Review checkboxes are checked for conceptual, source-based review only. No code tests, live browser compatibility tests, production deployment tests, or exhaustive implementation audit were performed. Chapter 5 and the other remaining review items are still separate work.
+The Chapter 4 Technical Review and Security Review checkboxes are checked for conceptual, source-based review only. No code tests, live browser compatibility tests, production deployment tests, or exhaustive implementation audit were performed. At the time of this Chapter 4 entry, Chapter 5 review was still separate work; the later Chapter 5 source-based review is recorded below.
+
+## 2026-10-25 — Chapter 5 source-based Technical and Security Review completed
+
+- Chapter 5-এর session hijacking ও fixation-এর পার্থক্য, session ID-র bearer-credential model, idle বনাম overall/absolute timeout, revocation, risk-based context signals, login-time rotation, password-change behavior এবং DBSC-র সীমা authoritative sources-এর সঙ্গে মিলিয়ে পর্যালোচনা করা হয়েছে।
+- Current cookie standard RFC 10025 (July 2026) ব্যবহার করা হয়েছে; RFC 6265-কে historical context হিসেবে চিহ্নিত করা হয়েছে। RFC 10025-এর Security Considerations cookie signing/encryption থাকা সত্ত্বেও transplant ও replay-এর ঝুঁকি এবং fixation-এর তিন-ধাপের model ব্যাখ্যা করে।
+- Chapter 5-এর log example-এ raw session ID বা আট অক্ষরের prefix-এর বদলে sid_hash correlation value দেখানো হয়েছে; explanatory text-এ keyed HMAC-ভিত্তিক correlation-এর নীতি স্পষ্ট করা হয়েছে। বাস্তব implementation-এ HMAC key management, access control ও retention এখনও আলাদা design concern।
+- Renewal timeout-এর ব্যাখ্যা সংশোধন করা হয়েছে যাতে পুরোনো ID-কে দীর্ঘ সময় একসঙ্গে বৈধ রাখাকে নিরাপদ default হিসেবে না দেখানো হয়। Password-change flow-তে rotation/revocation ব্যর্থ হলে পুরোনো session সচল না রেখে সব session invalidate করে reauthentication চাওয়ার failure path দেখানো হয়েছে।
+- OWASP WSTG-এর latest development guide ও versioned stable v4.2 reference আলাদা করা হয়েছে। NIST-এর overall reauthentication timeout-কে application-এর absolute session timeout-এর সঙ্গে এক করে দেখানো হয়নি। DBSC-এর hardware/key protection-কে platform-dependent এবং চলমান compromised-device attack-এর বিরুদ্ধে সীমিত হিসেবে বর্ণনা করা হয়েছে।
+- Chapter 5-এর Technical Review ও Security Review checkbox source-based conceptual review-এর অর্থে checked হয়েছে। কোনো application code, automated test, browser compatibility matrix, distributed-store consistency বা production deployment পরীক্ষা করা হয়নি; এটি production security certification নয়।
+
