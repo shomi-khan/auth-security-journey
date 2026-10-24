@@ -51,12 +51,14 @@ Token হলো credential/representation, জাদুকরী নিরাপ
 
 ## Review checklist
 
-- [ ] Chapter 8-এ mobile app timeline-এ সঠিক স্থানে আছে।
-- [ ] Existing web cookie session মুছে ফেলা হয়নি।
-- [ ] Token-কে cookie-র চেয়ে intrinsically safer বলা হয়নি।
-- [ ] OAuth/PKCE/OIDC flow Chapter 8-এ আগেভাগে ঢোকেনি।
-- [ ] Bearer-token theft/replay risk বলা হয়েছে, কিন্তু expiry/revocation-এর পরের অধ্যায়গুলো পুনরায় লেখা হয়নি।
-- [ ] Authentication, token validation ও authorization আলাদা।
-- [ ] Failure path এবং security invariant দৃশ্যমান।
-- [ ] No language-specific implementation code.
-- [ ] Technical Review ও Security Review claims/source যাচাইয়ের পরই mark হবে; browser/app tests না করলে সেগুলো চালানো হয়েছে এমন দাবি করা হবে না.
+- [x] Chapter 8-এ mobile app timeline-এ সঠিক স্থানে আছে।
+- [x] Existing web cookie session মুছে ফেলা হয়নি।
+- [x] Token-কে cookie-র চেয়ে intrinsically safer বলা হয়নি।
+- [x] OAuth/PKCE/OIDC flow Chapter 8-এ আগেভাগে ঢোকেনি।
+- [x] Bearer-token theft/replay risk বলা হয়েছে, কিন্তু expiry/revocation-এর পরের অধ্যায়গুলো পুনরায় লেখা হয়নি।
+- [x] Authentication, token validation ও authorization আলাদা।
+- [x] Failure path এবং security invariant দৃশ্যমান।
+- [x] No language-specific implementation code.
+- [x] Technical Review ও Security Review source-based conceptual review-এর পর mark করা হয়েছে; browser/app tests চালানো হয়নি এবং সেগুলো চালানো হয়েছে এমন দাবি করা হয়নি.
+
+Review record: `notes/technical-review-chapter-8.md`.
