@@ -29,24 +29,20 @@ status: draft
 
 | id | email | password |
 |---|---|---|
-| `user-1` | `rafi@example.com` | `rafi1985` |
-| `user-4` | `shuvo@example.com` | `shuvo@123` |
-| `user-7` | `tuli@example.com` | `Tuli2024!` |
+| `user-1` | `rafi@example.com` | `[দুর্বল উদাহরণ password]` |
+| `user-4` | `shuvo@example.com` | `[দুর্বল উদাহরণ password]` |
+| `user-7` | `tuli@example.com` | `[দুর্বল উদাহরণ password]` |
 
 (email আর password কাল্পনিক, আর ইচ্ছা করেই দুর্বল।)
 
-```go
-// আরিফের প্রথম সংস্করণ। কাজ করে, কিন্তু ভুল। কেন ভুল, সেটা সামনে।
-func verifyPassword(email, pw string) (Identity, bool) {
-	var id, stored string
-	err := db.QueryRow(
-		"SELECT id, password FROM users WHERE email = $1", email,
-	).Scan(&id, &stored)
-	if err != nil || stored != pw {
-		return Identity{}, false
-	}
-	return Identity{UserID: id}, true
-}
+```mermaid
+flowchart TD
+    R["Login request: email + password"] --> Q["Email দিয়ে account খোঁজো"]
+    Q --> U["Database থেকে stored password আনো"]
+    U --> C{"পাঠানো password<br/>stored password-এর সমান?"}
+    C -->|"হ্যাঁ"| OK["Login সফল"]
+    C -->|"না"| NO["Login ব্যর্থ"]
+    DB["Database-এ plaintext password রাখা"] -. "Dump ফাঁস হলে" .-> A["আক্রমণকারী সব password সরাসরি পড়ে"]
 ```
 
 (`db` আর `Identity` আগের অধ্যায়ের কাল্পনিক অংশ। query-তে `$1` ব্যবহার হয়েছে, মানে user-এর পাঠানো email সরাসরি SQL-এর ভেতরে বসানো হয়নি। সেটা আলাদা একটা ঝুঁকি, আর এখানে ঠিকই আছে।)
