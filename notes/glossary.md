@@ -45,7 +45,7 @@ Browser-এর request header-এর একটি গোষ্ঠী, যেম�
 ## Token
 
 সহজ ভাষায়:
-Client যেটা দেখিয়ে বলে, এই request কোন পরিচয়ের। Cookie session-এর বাইরে এই কথাটা অধ্যায় ৮-এ আসে।
+কোনো client request-এ বহন করা মান, যা server-কে পরিচয় বা নির্দিষ্ট access grant যাচাই করতে সাহায্য করে। Token নিজে সবসময় user identity বোঝায় না, আর token থাকা মানেই সব resource বা কাজের অনুমতি নয়। Cookie session-এর বাইরে access-token model অধ্যায় ৮-এ আসে।
 
 ## Access Token
 
