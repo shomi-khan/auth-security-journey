@@ -1,3 +1,10 @@
+---
+chapter: 7
+season: 1
+title: "XSS এবং HttpOnly-এর সীমাবদ্ধতা"
+status: draft
+---
+
 # XSS এবং HttpOnly-এর সীমাবদ্ধতা
 
 একটা input field-এ customer-এর লেখা এসেছিল। আরিফ সেটাকে database-এ রেখেছিল, পরে order page-এ দেখিয়েছিল। সব ঠিকঠাক চলছিল, যতক্ষণ না একদিন page-টা আর শুধু লেখা দেখাল না। Browser-কে একটা কাজও করিয়ে ফেলল।
@@ -315,6 +322,6 @@ CSRF অধ্যায়ে আমরা জিজ্ঞেস করেছি
 ## লেখার অবস্থা
 
 - [x] Draft
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (source-based conceptual review; implementation audit নয়)
+- [x] Security Review (threat model, control boundaries ও failure paths পর্যালোচিত; production certification নয়)
 - [ ] Published
