@@ -256,7 +256,7 @@ OWASP-র ন্যূনতম configuration-গুলো সমমানের
 
 RFC 9106-এর §৪ ও §৭.৪ সরাসরি পড়ে দুটো recommendation মেলে: বেশি memory থাকলে 2 GiB, `t=1`, `p=4`; memory সীমিত হলে 64 MiB, `t=3`, `p=4`। এগুলো RFC-র প্রস্তাবিত configuration, OWASP-এর নিচের দিকের baseline-এর বিকল্প দাবি নয়। বাস্তব server-এ কতটা memory ও latency সম্ভব, সেটা মেপে parameter বেছে নিতে হবে। OWASP-র সাধারণ নিয়ম, একটা hash বানাতে এক সেকেন্ডের কম লাগা উচিত।
 
-KenaKata-র মতো ছোট একটা server-এর জন্য আরিফ বেছে নিল OWASP-র মাঝের সারি: **19 MiB, `t=2`, `p=1`**।
+KenaKata-র মতো ছোট একটা server-এর জন্য আরিফ বেছে নিল একটি উপযুক্ত, আধুনিক password-hashing পদ্ধতি।
 
 ```mermaid
 flowchart TD
@@ -292,7 +292,7 @@ Encoded hash-এ `m`, `t`, আর `p` লেখা আছে বলে Verify �
 তাই hash string parse করাই যথেষ্ট নয়: algorithm/version, parameter-এর গ্রহণযোগ্য সীমা, salt-এর দৈর্ঘ্য এবং output hash-এর দৈর্ঘ্য যাচাই করতে হবে, **তারপরই** Argon2id চালাতে হবে। কোনো উদাহরণে দেখানো parameter range একটি নির্দিষ্ট design-এর সীমা হতে পারে, universal standard নয়। বাস্তব system-এ নিজের supported configuration ও legacy hash অনুযায়ী সীমা নির্ধারণ করে test করতে হবে।
 ### এই নিরাপত্তার দাম: আমাদেরই server
 
-ইচ্ছাকৃত ধীর কাজ আমাদের নিজেদের জন্যও কাজ। একটা hash-এর জন্য ১৯ MiB memory লাগে। হাজার জন একসঙ্গে login চেষ্টা করলে আমাদের server-এ প্রায় ১৯ GB memory দরকার। এমন সংখ্যা কেউ ইচ্ছা করে ডাকলে সেটা DoS আক্রমণ। OWASP নিজেই সতর্ক করে, work factor অতি বেশি হলে আক্রমণকারী অসংখ্য login চেষ্টা দিয়ে server-এর CPU নিঃশেষ করে দিতে পারে।
+ইচ্ছাকৃত ধীর কাজ আমাদের নিজেদের জন্যও কাজ। প্রতিটি password verification-এ নির্দিষ্ট পরিমাণ CPU ও memory লাগে। হাজার জন একসঙ্গে login চেষ্টা করলে আমাদের server-এ প্রায় ১৯ GB memory দরকার। এমন সংখ্যা কেউ ইচ্ছা করে ডাকলে সেটা DoS আক্রমণ। OWASP নিজেই সতর্ক করে, work factor অতি বেশি হলে আক্রমণকারী অসংখ্য login চেষ্টা দিয়ে server-এর CPU নিঃশেষ করে দিতে পারে।
 
 তাই `/login` এখন একটা ভারী endpoint। একসঙ্গে কতগুলো password-hash calculation চলতে পারবে, তার সীমা রাখতে হয়; online rate limit এই কারণেও দরকার। নিরাপত্তা এক জায়গায় খরচ বাঁচায়, অন্য জায়গায় খরচ চাপায়।
 
@@ -612,7 +612,7 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
-ধরে নিলাম আরিফ এবার সব ঠিকঠাক করল। Password Argon2id-তে, salt আছে, policy আছে, dummy hash আছে। রাফি login করল, আর server সফলভাবে তাকে চিনল। এ পর্যন্ত খরচ হলো ৪০–৫০ মিলিসেকেন্ড আর ১৯ MiB memory, ইচ্ছা করেই।
+ধরে নিলাম আরিফ এবার সব ঠিকঠাক করল। Password Argon2id-তে, salt আছে, policy আছে, dummy hash আছে। রাফি login করল, আর server সফলভাবে তাকে চিনল। Password যাচাই ইচ্ছাকৃতভাবেই সাধারণ hash-এর চেয়ে বেশি resource ব্যবহার করে।
 
 এবার রাফির dashboard একটা পেজ খুলতে পাঠায় দশটা request। প্রতিটায় এই খরচ দিয়ে password যাচাই করা যাবে না। অধ্যায় ১-এর সেই "প্রতি request-এ password" নকশা এখন শুধু অনিরাপদ নয়, অচল। আবার যাচাই না করলে server কীসের ভরসায় বলবে, "এই request-টাও রাফির"?
 
