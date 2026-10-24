@@ -23,8 +23,8 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 ## CSRF Prevention Cheat Sheet
 
 - কী বিষয়: Cross-site request forgery আটকানোর চর্চা।
-- কোন অধ্যায়: ৬।
-- কেন পড়া useful: CSRF কীভাবে আটকানোর কথা OWASP বলছে, সেটা অধ্যায়ের আগে পড়ো। কোন উপায় এখনকার ব্রাউজারে কী করে, সেটা browser-security রেফারেন্সের সঙ্গে মিলাও।
+- কোন অধ্যায়: ৬ এবং ১০।
+- কেন পড়া useful: CSRF কীভাবে আটকানোর কথা OWASP বলছে, সেটা অধ্যায়ের আগে পড়ো। কোন উপায় এখনকার ব্রাউজারে কী করে, সেটা browser-security রেফারেন্সের সঙ্গে মিলাও। Chapter 6-এ synchronizer token, Fetch Metadata, origin verification, login CSRF এবং client-side CSRF-এর সীমা ব্যবহার করা হয়েছে।
 - [Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
 
 ## XSS Prevention Cheat Sheet
