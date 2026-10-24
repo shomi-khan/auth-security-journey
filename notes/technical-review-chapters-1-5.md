@@ -4,7 +4,7 @@
 Branch: `improvements/chapters-engagement`  
 Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 
-এই নোটটি review-এর অগ্রগতি ধরে রাখে। এটি security certification নয়। নিচের সংশোধনগুলো branch-এ করা হয়েছে, কিন্তু এই review-তে chapter-এর সব code snippet একত্র করে compile করা, automated test চালানো, বা বাস্তব browser-এ পরীক্ষা করা হয়নি। তাই পাঁচটি অধ্যায়ের `Technical Review` ও `Security Review` checkbox এখনো অসম্পূর্ণ থাকবে।
+এই নোটটি review-এর অগ্রগতি ধরে রাখে। এটি security certification নয়। Chapter 3-এর current diagram-first draft-এর conceptual Technical Review ও Security Review সম্পন্ন হয়েছে: core claims authoritative sources-এর সঙ্গে মিলিয়ে দেখা হয়েছে, threat model, limitations, failure paths ও diagrams পর্যালোচনা করা হয়েছে। কোনো code test, parser audit, production deployment test বা browser test করা হয়নি। অন্য অধ্যায়ের review status আলাদা থাকবে।
 
 ## পূর্ববর্তী code-oriented draft-এ করা সংশোধন (historical)
 
