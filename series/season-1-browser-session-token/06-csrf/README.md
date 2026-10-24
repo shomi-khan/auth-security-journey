@@ -36,7 +36,7 @@ POST /manage/orders/1042/refund   cookie নেই   401
 
 (IP নমুনা, ডকুমেন্টেশনের জন্য আলাদা করা range থেকে। সময় UTC, অধ্যায় ৫-এর মতোই। `sid_hash` raw session ID নয়; এটি keyed HMAC-ভিত্তিক দীর্ঘ correlation value-এর illustrative উদাহরণ। বাস্তবে key management, retention ও log access আলাদা করে সুরক্ষিত রাখতে হয়।)
 
-প্রতিটা সংকেত আরিফ মিলিয়ে দেখল। IP রাফির দোকানের Wi-Fi-র একই `/24`। User-Agent রাফির browser-এর। অধ্যায় ৫-এ যে context signal বানিয়েছিল, `Suspicious()`, সেটা একটা শব্দও করেনি। রাফি সকাল থেকে কাজ করছিল, শেষ request তিন মিনিট আগের, তাই ৩০ মিনিটের idle ঘড়িও ঠিক ছিল, ৮ ঘণ্টার absolute ঘড়িও। Session সম্পূর্ণ বৈধ। কেউ cookie চুরি করেনি। রাফির password Argon2id-র পেছনে।
+প্রতিটা সংকেত আরিফ মিলিয়ে দেখল। IP রাফির দোকানের Wi-Fi-র একই `/24`। User-Agent রাফির browser-এর। অধ্যায় ৫-এ যে context-signal policy ছিল, সেটি কোনো সতর্কতা দেয়নি। রাফি সকাল থেকে কাজ করছিল, শেষ request তিন মিনিট আগের, তাই ৩০ মিনিটের idle ঘড়িও ঠিক ছিল, ৮ ঘণ্টার absolute ঘড়িও। Session সম্পূর্ণ বৈধ। কেউ cookie চুরি করেনি। রাফির password Argon2id-র পেছনে।
 
 শুধু একটা জিনিস খাপ খাচ্ছে না। `referer`। `courier-track.example` KenaKata-র কোনো পাতা নয়।
 
@@ -210,13 +210,7 @@ flowchart TD
 
 **`Vary` header।** এটা response-এ বসে, সিদ্ধান্তের পরে। প্রতিরক্ষায় কিছু বদলায় না। কিন্তু response যদি এই header-ভেদে আলাদা হয়, cache যেন তা গুলিয়ে না ফেলে। OWASP এটা rollout-এর পরামর্শে রাখে।
 
-**Go-র standard library।** Go 1.25 থেকে `net/http`-এ `CrossOriginProtection` আছে। ডকুমেন্টেশন অনুযায়ী সেটা `Sec-Fetch-Site`, অথবা সেটা না থাকলে `Origin` আর `Host`-এর hostname মিলিয়ে cross-origin ধরে, safe method সবসময় ছেড়ে দেয়, আর **দুটো header-ই না থাকা request-কে same-origin বা browser-নয় ধরে ঢুকতে দেয়**। মানে ডিফল্টে সেটা fail-open, আমাদের কোডের উল্টো। ব্যবহার সরল:
-
-Framework বা standard library-তে built-in CSRF protection থাকলে সেটি custom protection-এর চেয়ে ভালো starting point হতে পারে, কিন্তু তার default policy বুঝে নিতে হবে। উদাহরণ হিসেবে Go 1.25-এর `CrossOriginProtection` documentation-এ `Sec-Fetch-Site` ও `Origin`-ভিত্তিক যাচাই আছে, কিন্তু দুই header-ই অনুপস্থিত হলে request allow করার default-ও আছে। KenaKata-র fail-safe সিদ্ধান্তের সঙ্গে এটি এক নয়। এই সিরিজ কোনো Go library শেখাচ্ছে না; optional implementation references [browser-security.md](../../../../references/browser-security.md)-তে রাখা হয়েছে.
-
-Go 1.25.0-এর `AddInsecureBypassPattern`-সংক্রান্ত advisory GO-2025-3955-ও যাচাই করা হয়েছে; প্রভাবিত সংস্করণ `go1.25.0`, সংশোধিত সংস্করণ `go1.25.1`। এই advisory-কে সব `CrossOriginProtection` ব্যবহারেই সমানভাবে প্রযোজ্য বলা যাবে না; এটি নির্দিষ্ট bypass-pattern method-এর ঝুঁকি.
-
-এই টুকরোটা আমি **চালাইনি**, কারণ আমার পরীক্ষার পরিবেশ Go 1.22.2 (অধ্যায় ৪-এর মতোই)। শুধু ডকুমেন্টেশন পড়েছি। আরেকটা কথা: pkg.go.dev-র ওই পাতার ওপরে `CrossOriginProtection`-এর একটা vulnerability (GO-2025-3955, bypass pattern নিয়ে) তালিকাভুক্ত দেখেছি। advisory পড়িনি। `AddInsecureBypassPattern` ব্যবহার করতে চাইলে আগে Go-র সর্বশেষ patch আর advisory দেখে নিয়ো।
+**Framework-এর built-in protection।** কোনো framework-এ CSRF protection থাকলে সেটি সাধারণত ভালো starting point, তবে তার default policy ও compatibility behavior বুঝে নিতে হবে। বিশেষ করে metadata header অনুপস্থিত হলে request allow হবে, reject হবে, না token যাচাইয়ে যাবে, সেটা স্পষ্ট করে নাও। KenaKata-র সিদ্ধান্ত হলো state-changing request-এ `Sec-Fetch-Site` অনুপস্থিত থাকলে exact configured `Origin` fallback; দুটোই অনুপস্থিত বা `Origin: null` হলে fail-safe reject।
 
 **rollout।** OWASP-র পরামর্শ: আগে "শুধু log" মোডে চালিয়ে কী কী আটকাত তা পর্যালোচনা করো, তারপর enforce করো। speculative navigation (prefetch/prerender) আর header-মুছে-দেওয়া proxy legitimate request-এ false positive তৈরি করতে পারে। এই chapter কোনো production rollout বা browser test দাবি করছে না.
 
@@ -292,9 +286,9 @@ OWASP বলে, অতি সংবেদনশীল কাজে re-authentic
 
 ```mermaid
 flowchart LR
-    Req["request"] --> G["crossSiteGuard<br/>কোথা থেকে এল?"]
-    G --> A["requireAuthentication<br/>কে? (অধ্যায় ৪)"]
-    A --> T["requireCSRFToken<br/>পাতার token আছে?"]
+    Req["request"] --> G["Origin / Fetch Metadata policy<br/>কোথা থেকে এল?"]
+    G --> A["Session authentication<br/>কে? (অধ্যায় ৪)"]
+    A --> T["CSRF token validation<br/>পাতার token আছে?"]
     T --> H["handler<br/>অর্ডার বাতিল"]
     G -. "403" .-> X["প্রত্যাখ্যান"]
     A -. "401 বা login-এ redirect" .-> X
@@ -313,7 +307,7 @@ flowchart LR
 
 Middleware-এর ক্রম implementation-এ বদলাতে পারে, কিন্তু security invariant বদলাবে না: state-changing handler-এর আগে origin policy, session/authentication, CSRF token এবং resource authorization প্রযোজ্য হবে। Login-এর ক্ষেত্রে authenticated session এখনও নেই, তাই anonymous pre-session token ব্যবহার করা হয়.
 
-`crossSiteGuard` সবচেয়ে বাইরে। `/login` নিজের token নিজে মেলায় (পরের অংশ), কারণ ওখানে `requireCSRFToken` চলে না, চলার মতো authenticated session তখনো নেই।
+Origin/Fetch Metadata policy state-changing request-এ প্রথম দিকেই প্রযোজ্য। `/login`-এ authenticated session এখনও নেই, তাই login CSRF ঠেকাতে anonymous pre-session-এর token আলাদাভাবে যাচাই হয়।
 
 এগুলো conceptual flow, executable implementation নয়। তাই এখানে compile/test ফলের দাবি করা হচ্ছে না। গুরুত্বপূর্ণ failure path হলো: safe method দিয়ে state change করার route থাকলে CSRF guard সেটিকে আটকাবে না; আর আক্রমণকারীর নিজের session-এর token victim-এর session-এ মেলার কথা নয়, কারণ token session-নির্দিষ্ট।
 
