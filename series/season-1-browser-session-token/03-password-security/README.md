@@ -260,6 +260,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/argon2"
+	"golang.org/x/text/unicode/norm"
 )
 
 const (
@@ -274,6 +275,7 @@ var b64 = base64.RawStdEncoding
 
 // Hash: $argon2id$v=19$m=19456,t=2,p=1$<salt>$<hash>
 func Hash(pw string) (string, error) {
+	pw = norm.NFC.String(pw) // registration, reset ও অন্য সব write path-এ একই normalization
 	salt := make([]byte, saltLen)
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
@@ -286,6 +288,7 @@ func Hash(pw string) (string, error) {
 
 // Verify: stored string থেকে salt আর parameter পড়ে আবার hash করে, তারপর মেলায়।
 func Verify(pw, encoded string) (bool, error) {
+	pw = norm.NFC.String(pw) // Hash-এর সঙ্গে একই normalization, নইলে login mismatch হতে পারে
 	parts := strings.Split(encoded, "$") // ["", "argon2id", "v=19", "m=..,t=..,p=..", salt, hash]
 	if len(parts) != 6 || parts[1] != "argon2id" {
 		return false, errors.New("unsupported hash format")
@@ -486,6 +489,7 @@ NIST-এর SP 800-63B-4, যা আগের SP 800-63B-কে প্রতি�
 
 ```go
 func checkPolicy(email, pw string) error {
+	pw = norm.NFC.String(pw) // policy ও hash একই normalized password দেখবে
 	n := utf8.RuneCountInString(pw) // অক্ষর গোনা code point ধরে, byte ধরে নয়
 	switch {
 	case n < 15:
@@ -506,7 +510,7 @@ func checkPolicy(email, pw string) error {
 
 NIST বলে Unicode অক্ষর গ্রহণ করা উচিত, আর প্রতিটা code point একটা অক্ষর হিসেবে গোনা হবে (তাই উপরে `utf8.RuneCountInString`)। একই সঙ্গে সতর্ক করে: hash করার আগে NFC নামের normalization চালানো উচিত।
 
-বাংলায় এটা সত্যিকারের সমস্যা। একই দেখতে লাগা অক্ষর দুভাবে সংরক্ষিত হতে পারে। যেমন "ো" একটা একক code point (U+09CB) হতে পারে, আবার "ে" আর "া" দুটো আলাদা code point (U+09C7 ও U+09BE) পরপর বসেও একই রূপ দিতে পারে। সব keyboard, ফোন আর browser একই রূপে সংরক্ষণ করবে, এমন নিশ্চয়তা নেই। NIST নিজেও সতর্ক করে, কিছু endpoint কিছু অক্ষর আলাদাভাবে উপস্থাপন করতে পারে। Normalization না করলে user এক device-এ password বানিয়ে অন্য device-এ ঢুকতে পারবে না, আর বুঝতেও পারবে না কেন। Go-তে `golang.org/x/text/unicode/norm` প্যাকেজের `norm.NFC.String(pw)` দিয়ে এটা করা যায়, policy-র আগে আর hash-এর আগে।
+বাংলায় এটা সত্যিকারের সমস্যা। একই দেখতে লাগা অক্ষর দুভাবে সংরক্ষিত হতে পারে। যেমন "ো" একটা একক code point (U+09CB) হতে পারে, আবার "ে" আর "া" দুটো আলাদা code point (U+09C7 ও U+09BE) পরপর বসেও একই রূপ দিতে পারে। সব keyboard, ফোন আর browser একই রূপে সংরক্ষণ করবে, এমন নিশ্চয়তা নেই। NIST নিজেও সতর্ক করে, কিছু endpoint কিছু অক্ষর আলাদাভাবে উপস্থাপন করতে পারে। Normalization না করলে user এক device-এ password বানিয়ে অন্য device-এ ঢুকতে পারবে না, আর বুঝতেও পারবে না কেন। Go-তে `golang.org/x/text/unicode/norm` প্যাকেজের `norm.NFC.String(pw)` দিয়ে এটা করা যায়। নিচের `checkPolicy`, `Hash` ও `Verify`-তে একই normalization দেখানো হয়েছে। Registration, password change/reset এবং login-এর প্রতিটি পথেই একই নিয়ম প্রয়োগ করতে হবে; শুধু policy-তে normalize করে hash বা verify-তে বাদ দিলে হবে না।
 
 ### বৈধ user-এর খরচ
 
@@ -745,7 +749,7 @@ func main() {
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ বার্তা, response-এর সময়ে তথ্য ফাঁস, dummy hash। (এই খসড়া লেখার সময় শুধু প্রাসঙ্গিক অংশ দেখা হয়েছে। Technical Review-এ পূর্ণ পাঠ মেলাতে হবে।)
 - [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): §৩.১-এ parameter-এর সংজ্ঞা এবং §৪ ও §৭.৪-এ Argon2id parameter বাছাইয়ের recommendation সরাসরি পড়ে মেলানো হয়েছে। RFC-র 2 GiB ও 64 MiB recommendation-কে OWASP-এর 19 MiB, `t=2`, `p=1` baseline-এর সঙ্গে এক করে দেখা যাবে না; hardware অনুযায়ী benchmark জরুরি।
 - [PHC string format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md): `$argon2id$v=19$m=...,t=...,p=...$salt$hash` গঠন। (OWASP-র পাতা যে লিঙ্ক দেয়, সেটা। সরাসরি পড়া হয়নি।)
-- `golang.org/x/crypto/argon2` আর `golang.org/x/crypto/bcrypt`: এই অধ্যায়ের কোড Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে compile করে চালিয়ে দেখা হয়েছে (hash বানানো, যাচাই, ভুল password, না-থাকা user, `NeedsRehash`, bcrypt-এর ৭২ byte error)। `norm.NFC` আর `checkPolicy`-র মতো ছোট টুকরো আলাদা করে চালানো হয়নি।
+- `golang.org/x/crypto/argon2` আর `golang.org/x/crypto/bcrypt`: এই অধ্যায়ের কোড Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে compile করে চালিয়ে দেখা হয়েছে (hash বানানো, যাচাই, ভুল password, না-থাকা user, `NeedsRehash`, bcrypt-এর ৭২ byte error)। `norm.NFC`-এর integration এবং `checkPolicy`-র মতো ছোট টুকরো আলাদা করে চালানো হয়নি।
 - Robert Morris, Ken Thompson, *Password Security: A Case History*, Communications of the ACM, ১৯৭৯: Unix-এর password file-এ salt-এর ঐতিহাসিক উদাহরণ। (ঐতিহাসিক সূত্র, স্পেসিফিকেশন নয়। সরাসরি মেলানো হয়নি।)
 - Unicode Standard Annex #15, *Unicode Normalization Forms* (NFC): NIST-এর নির্দেশনার সূত্রে। (সরাসরি পড়া হয়নি।)
 
