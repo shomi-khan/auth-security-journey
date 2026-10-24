@@ -44,7 +44,7 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 - Chapter 3-এর current diagram-first draft-এর conceptual review সম্পন্ন; parser implementation audit এই series-এর scope নয়।
 - Chapter 1–5-এর code snippet-গুলোকে “compile করা যায়” বলে দাবি করার আগে প্রতিটি snippet-এর scope স্পষ্ট করা এবং সম্ভব হলে runnable companion test রাখা।
 - Chapter 4-এর 401/API response design নিয়ে সিদ্ধান্ত নথিভুক্ত করা।
-- বাকি যাচাই শেষ না হওয়া পর্যন্ত chapter status checkbox unchecked রাখা।
+- Chapter 1–2 ও 4–5-এর বাকি যাচাই সম্পন্ন না হওয়া পর্যন্ত সেগুলোর review checkbox unchecked রাখা।
 
 
 ## 2026-10-25 — Chapter 3 diagram-first migration note
