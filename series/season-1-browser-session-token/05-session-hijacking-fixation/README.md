@@ -125,7 +125,7 @@ Infostealer malware-এর মতো আক্রমণ browser-এর session d
 3. **চোখ রাখো:** detection। (§৭)
 4. **ক্ষমতা সীমিত রাখো:** least privilege (অধ্যায় ২, যা আজ কাজে লেগেছে), আর সংবেদনশীল কাজে আরেক ধাপ (অধ্যায় ২২)।
 
-আজ রাতে আরিফের প্রথম কাজ ছিল সবচেয়ে সোজাটা। `sessions.DeleteAllFor("user-4")`, মানে শুভর সব session কেটে দেওয়া। তারপর শুভকে বলা, নতুন passphrase নাও। কেন password-ও? কারণ যে malware cookie নিতে পারে, সে একই মেশিনে keystroke-ও পড়তে পারে। Cookie চুরির খবর পেলে ধরে নিতে হয়, password-ও যেতে পারে। (অধ্যায় ৩-এর সেই ক্রম: আগে পুরোনো secret অকার্যকর, তারপর নতুন।) তারপর সে অন্য সব user-এর log খুঁজে দেখল, কোনো session-এর ID দুটো আলাদা network থেকে এসেছে কি না। আর কোনোটা পাওয়া গেল না, কিন্তু "পাওয়া গেল না" মানে "ঘটেনি" নয়। সে শুধু সেই নিঃশব্দ ধরনের আক্রমণগুলোর কথা ভাবল, যেগুলোর কোনো log-ই হয় না।
+আজ রাতে আরিফের প্রথম কাজ ছিল সবচেয়ে সোজাটা। শুভর user account-এর সঙ্গে যুক্ত সব session বাতিল করে দেওয়া। মানে শুভর সব session কেটে দেওয়া। তারপর শুভকে বলা, নতুন passphrase নাও। কেন password-ও? কারণ যে malware cookie নিতে পারে, সে একই মেশিনে keystroke-ও পড়তে পারে। Cookie চুরির খবর পেলে ধরে নিতে হয়, password-ও যেতে পারে। (অধ্যায় ৩-এর সেই ক্রম: আগে পুরোনো secret অকার্যকর, তারপর নতুন।) তারপর সে অন্য সব user-এর log খুঁজে দেখল, কোনো session-এর ID দুটো আলাদা network থেকে এসেছে কি না। আর কোনোটা পাওয়া গেল না, কিন্তু "পাওয়া গেল না" মানে "ঘটেনি" নয়। সে শুধু সেই নিঃশব্দ ধরনের আক্রমণগুলোর কথা ভাবল, যেগুলোর কোনো log-ই হয় না।
 
 এবার একে একে হাতলগুলো।
 
@@ -174,9 +174,9 @@ flowchart TD
 
 Anonymous session-এর ঘড়ি session তৈরির সময় থেকে চলে। Authenticated session-এ idle আর absolute, দুটো শর্তই পাস করতে হবে। Expired record আর বৈধ নয়, এবং পরের request-এ গ্রহণ করা যাবে না.
 
-আসল শিক্ষাটা এখন আসে। আরিফ একটা test লিখল, আক্রমণকারীর দৃষ্টিকোণ থেকে: **যদি আক্রমণকারী ২০ মিনিট পরপর একটা করে request পাঠিয়ে session জাগিয়ে রাখে?**
+আসল শিক্ষাটা এখন আসে। আরিফ আক্রমণকারীর দৃষ্টিকোণ থেকে ভাবল: আক্রমণকারীর দৃষ্টিকোণ থেকে: **যদি আক্রমণকারী ২০ মিনিট পরপর একটা করে request পাঠিয়ে session জাগিয়ে রাখে?**
 
-ধরো, আক্রমণকারী চুরি করা cookie দিয়ে প্রতি ২০ মিনিটে একটা request পাঠায়। প্রতিবার server `LastSeen` নতুন করলে idle ঘড়ি আবার শুরু হবে। সে যতক্ষণ absolute সীমার মধ্যে আছে, session সচল থাকতে পারে। Absolute timeout-এ পৌঁছালে activity থাকলেও session শেষ হবে.
+ধরো, আক্রমণকারী চুরি করা cookie দিয়ে প্রতি ২০ মিনিটে একটা request পাঠায়। প্রতিবার server শেষ activity-র সময় নতুন করলে idle ঘড়ি আবার শুরু হবে। সে যতক্ষণ absolute সীমার মধ্যে আছে, session সচল থাকতে পারে। Absolute timeout-এ পৌঁছালে activity থাকলেও session শেষ হবে.
 
 এই পরিস্থিতি একটি অপ্রিয় সত্য দেখায়: **idle timeout চতুর আক্রমণকারীকে থামায় না।** OWASP-ও এটাই বলে: হাইজ্যাক করা session-এ আক্রমণকারী নিজেই activity তৈরি করে ঘড়ি নতুন করে দিতে পারে। Idle timeout কাজের সেই আক্রমণকারীর জন্য, যে দেরিতে আসে। আজকের ঘটনার আক্রমণকারী ৬৬ মিনিট দেরিতে এসেছিল, নতুন নিয়মে সে `/login`-এ ফেরত যেত। কিন্তু সে ১০টা ৪২-এ এলে? তখন idle কিছুই করত না।
 
@@ -185,7 +185,7 @@ Anonymous session-এর ঘড়ি session তৈরির সময় থ�
 ### এই মেয়াদের দাম
 
 - রাফি কাউন্টারে বসে প্যাকেট বাঁধছে, ৩৫ মিনিট অ্যাপ ছোঁয়নি, ফিরে এসে দেখল login পাতা। নীরার প্রথম আপত্তি এটাই আসবে। OWASP আর NIST দুজনেই বলে, মেয়াদ শেষ হওয়ার আগে user-কে সতর্ক করা যায়, আর client-এর countdown শুধু সুবিধা, নিয়ম server-এ।
-- প্রতিটা request-এ `LastSeen` লেখা মানে প্রতিটা read একটা write। বড় হলে প্রতি মিনিটে একবার লেখা (throttle) করতে হয়, তবে তখন idle ঘড়ি মিনিট-খানেক ঢিলা।
+- প্রতিটা request-এ শেষ activity-র সময় লেখা মানে প্রতিটা read একটা write। বড় হলে প্রতি মিনিটে একবার লেখা (throttle) করতে হয়, তবে তখন idle ঘড়ি মিনিট-খানেক ঢিলা।
 - **মেয়াদ cookie-তে নয়, server-এ।** `MaxAge` আমরা এখনো দিচ্ছি না (অধ্যায় ৪)। NIST একটা সূক্ষ্ম কথা বলে: cookie-র expiry শুধু cookie জমা কমানোর জন্য, timeout প্রয়োগের জন্য ভরসা করা চলবে না।
 
 ---
@@ -199,7 +199,7 @@ Session-এর সবচেয়ে বড় সুবিধা অধ্য�
 | User নিজে logout করল | এই session (অধ্যায় ৪) |
 | User বলল "আমার সব device থেকে বের করো" | তার সব session |
 | Password বদলাল | **বাকি** সব session। আর এই session-এর ID নতুন (§১০) |
-| কর্মী ছাড়ানো হলো | তার সব session (অধ্যায় ৪-এর `DeleteAllFor`) |
+| কর্মী ছাড়ানো হলো | তার সব session |
 | সন্দেহজনক ব্যবহার ধরা পড়ল (§৭) | ওই session |
 | মেয়াদ শেষ | ওই session (§৫) |
 
@@ -220,7 +220,7 @@ flowchart TD
 
 এই উদাহরণে password পরিবর্তন সফল হলে বর্তমান session-এর ID নতুন হয় এবং ওই user-এর অন্য session-গুলো বাতিল হয়। আসল implementation-এ password update ও session changes-এর atomicity, failure handling এবং concurrent request-এর আচরণ আলাদাভাবে নির্ধারণ করতে হবে.
 
-(`X-Test-User` শুধু test-এ দেখার জন্য, অধ্যায় ৪-এর middleware-এর সরলীকরণ। আসল অ্যাপে এটা request context থেকে আসে।)
+এই উদাহরণে user identity কেবল সফল authentication-এর পর server-side trusted request context থেকে আসবে; client-এর পাঠানো header বা parameter থেকে নয়. অধ্যায় ৪-এর middleware-এর সরলীকরণ। আসল অ্যাপে এটা request context থেকে আসে।)
 
 আরেকটা জিনিস OWASP আলাদা করে বলে: user যেন নিজের চালু session-এর তালিকা দেখতে পারে (কখন, কোন IP, কোন browser), আর দূর থেকে বন্ধ করতে পারে। এতে শুভ নিজেই দেখত, "এই ৩ নম্বর session আমার নয়।" এর দাম: তালিকা বানাতে আর দেখাতে হয়, আর IP আর User-Agent জমানো privacy-র প্রশ্নও তোলে।
 
@@ -296,7 +296,7 @@ A-তে false positive-এর কারণে বৈধ user বারবার
 
 দুটো ছোট সতর্কতা:
 
-- **Proxy-র পেছনের IP:** `r.RemoteAddr` লোড ব্যালান্সারের IP হতে পারে। `X-Forwarded-For`-এর মতো header শুধু নিজেদের proxy থেকে এলেই বিশ্বাস্য। না হলে আক্রমণকারী নিজেই ওটা লিখে দেবে। আমাদের test সরাসরি `RemoteAddr` ধরে।
+- **Proxy-র পেছনের IP:** request কোন network থেকে এসেছে তা নির্ভরযোগ্যভাবে নির্ণয়ের জন্য trusted proxy configuration দরকার। `X-Forwarded-For`-এর মতো header অন্ধভাবে বিশ্বাস করা যাবে না. লোড ব্যালান্সারের IP হতে পারে। `X-Forwarded-For`-এর মতো header শুধু নিজেদের proxy থেকে এলেই বিশ্বাস্য। না হলে আক্রমণকারী নিজেই ওটা লিখে দেবে। আমাদের test সরাসরি `RemoteAddr` ধরে।
 - **এই সংকেত নিজেই privacy-র বিষয়।** NIST session monitoring-কে অনুমোদন করে, কিন্তু বলে, প্রত্যাশিত বৈশিষ্ট্য জমানো আর প্রক্রিয়া করা privacy risk assessment-এর অংশ হতে হবে। IP আর User-Agent ব্যক্তিগত তথ্যের কাছাকাছি।
 
 ---
@@ -398,7 +398,7 @@ sequenceDiagram
 
 ### Strict mode কেন যথেষ্ট নয়
 
-অধ্যায় ৪-এ আমরা `Lookup`-এ লিখেছিলাম, server যে ID বানায়নি তা চেনে না। OWASP একে *strict mode* বলে (উল্টোটা permissive, যেখানে server ক্লায়েন্টের পাঠানো যেকোনো ID নিয়েই session বানিয়ে ফেলে)। আরিফ ভেবেছিল, এটাই fixation আটকায়।
+অধ্যায় ৪-এ server-এর strict session-management নীতি স্থির করেছি: server যে ID বানায়নি তা চেনে না। OWASP একে *strict mode* বলে (উল্টোটা permissive, যেখানে server ক্লায়েন্টের পাঠানো যেকোনো ID নিয়েই session বানিয়ে ফেলে)। আরিফ ভেবেছিল, এটাই fixation আটকায়।
 
 Strict mode-এ server-তৈরি anonymous ID বৈধ হতে পারে, তাই source validation একা fixation-এর সমাধান করে না. কিন্তু আজকের আক্রমণে `X` **server-ই** বানিয়েছে, তাই strict mode-এর চোখে সেটা পুরোপুরি বৈধ। এই পার্থক্যটা পরের লোকেরা প্রায়ই মিস করে: **strict mode ID-র উৎস দেখে, ID-র ব্যবহার দেখে না।
 
@@ -418,7 +418,7 @@ Login সফল হলে পুরোনো ID নষ্ট করো, এক�
 - Anonymous session-এর `Next` destination কেবল বৈধ, same-site/local destination হলে নতুন session-এ নেওয়া হবে.
 - Rotation ব্যর্থ হলে পুরোনো ID-কে authenticated হিসেবে চালু রাখা যাবে না; failure path-এ session state নিরাপদ থাকতে হবে.
 
-আর handler-এ `upgradeInPlace`-এর জায়গায় এটা। বাকি handler একই। নতুন cookie `Set-Cookie`-তে যায়, আর `Cache-Control: no-store` থাকে (অধ্যায় ৪)।
+Login flow-তে পুরোনো ID-র বদলে নতুন ID পাঠাতে হবে, আর server-side-এ পুরোনো ID অকার্যকর করতে হবে. নতুন cookie `Set-Cookie`-তে যায়, আর `Cache-Control: no-store` থাকে (অধ্যায় ৪)।
 
 ```mermaid
 sequenceDiagram
@@ -442,9 +442,9 @@ sequenceDiagram
 
 **এক: পুরোনো ID নষ্ট করা জরুরি।** আমাদের নকশায় পুরোনো row যেহেতু anonymous, সেটা বাঁচলেও সরাসরি ক্ষতি হতো না। তবু OWASP আর WSTG দুজনেই স্পষ্ট বলে, মুছে ফেলতে। মূল invariant হলো পুরোনো ID আর authenticated session হিসেবে গ্রহণ করা যাবে না. এই conceptual review-তে mutation testing বা automated verification চালানো হয়নি.
 
-**দুই: সব পুরোনো state নতুনে টানা যাবে না।** আমরা শুধু `Next` নিয়েছি, আর সেটাও `safeNext` দিয়ে যাচাই করা (বাইরের URL নয়, শুধু `/manage/`-এর নিচের path)। পুরোনো row থেকে কোন তথ্য নতুন ID-তে যাবে, সেটা নিজের সিদ্ধান্ত। যে তথ্য আক্রমণকারী প্রভাবিত করতে পারত, সেটা বিনা যাচাইয়ে টেনে আনা নতুন সমস্যা। (বাইরের URL-এ redirect-এর আসল গল্প অধ্যায় ১৮-এ।)
+**দুই: সব পুরোনো state নতুনে টানা যাবে না।** আমরা শুধু login-এর পর ফেরত যাওয়ার গন্তব্য রেখেছি, আর সেটি local, অনুমোদিত path কি না যাচাই করেছি (বাইরের URL নয়). আর সেটাও `safeNext` দিয়ে যাচাই করা (বাইরের URL নয়, শুধু `/manage/`-এর নিচের path)। পুরোনো row থেকে কোন তথ্য নতুন ID-তে যাবে, সেটা নিজের সিদ্ধান্ত। যে তথ্য আক্রমণকারী প্রভাবিত করতে পারত, সেটা বিনা যাচাইয়ে টেনে আনা নতুন সমস্যা। (বাইরের URL-এ redirect-এর আসল গল্প অধ্যায় ১৮-এ।)
 
-**তিন: absolute ঘড়ি login থেকে।** `StartedAt` login-এর সময় থেকে গণনা শুরু হবে. যদি anonymous session-এর শুরু থেকেই absolute clock গণনা করা হয়, আক্রমণকারী আগে session বানিয়ে রেখে victim-এর authenticated session-এর কার্যকর সময় কমিয়ে দিতে পারে.
+**তিন: absolute ঘড়ি login থেকে।** Absolute timeout login সফল হওয়ার সময় থেকে গণনা শুরু হবে. যদি anonymous session-এর শুরু থেকেই absolute clock গণনা করা হয়, আক্রমণকারী আগে session বানিয়ে রেখে victim-এর authenticated session-এর কার্যকর সময় কমিয়ে দিতে পারে.
 
 **চার: "login" একটাই ঘটনা নয়।** OWASP বলে, authentication-এর মুহূর্ত সবচেয়ে সাধারণ, কিন্তু যেকোনো privilege বদলের সময় ID নতুন করতে হবে: password বদল, ক্ষমতা বদল, সাধারণ user থেকে admin। KenaKata-য় আজ login-এর পথ একটাই, কিন্তু `changePassword` আগেই `Rotate` ডাকে (§৬)। পরে Google login (অধ্যায় ২১) আসবে, আর সেটাও একটা login, ওখানেও rotate। MFA শেষ হলে (অধ্যায় ২২) session-এর মান বাড়ে, ওখানেও। যেকোনো নতুন পথ যোগ করার সময় প্রশ্ন একটাই: **এখানে কি ID বদলাচ্ছে?**
 
@@ -510,7 +510,7 @@ stateDiagram-v2
 ## ১৩. Trade-off
 
 - **ছোট idle মানে ঘর্ষণ।** রাফিকে ৩০ মিনিট চুপ থাকলেই আবার login। বেশি করলে ঝুঁকি, কম করলে বিরক্তি। OWASP-র নিজের সীমাটাই ২ মিনিট থেকে ৩০ মিনিটের মধ্যে ছড়ানো।
-- **Write-per-read।** `LastSeen` লেখা মানে প্রতিটা request-এ store-এ লেখা। বড় হলে throttle, আর তাতে ঘড়ি ঢিলা।
+- **Write-per-read।** শেষ activity-র সময় লেখা মানে প্রতিটা request-এ store-এ লেখা। বড় হলে throttle, আর তাতে ঘড়ি ঢিলা।
 - **Rotate-এর race।** একই browser থেকে একসঙ্গে অনেক request গেলে কোনটার cookie কোন ID, এটা সামলাতে হয়। আমরা login-এ আর password বদলে rotate করি, প্রতিটা request-এ নয়, তাই ঝুঁকি কম। Renewal timeout (§৫) এই race ডেকে আনে।
 - **Context signal-এর false positive।** মোবাইল ব্যবহারকারী মানে ঘন ঘন network বদল। যত বেশি সন্দেহ, তত বেশি বিরক্ত user, তত বেশি alarm fatigue।
 - **Privacy।** IP আর User-Agent জমানো আর তুলনা করার দায় আছে (NIST)।
