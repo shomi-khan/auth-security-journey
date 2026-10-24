@@ -61,3 +61,12 @@
 - Browser-এর বাইরে থেকেও request পাঠানো যায়, সেটি বোঝাতে runnable command-এর বদলে illustrative HTTP request রাখা হয়েছে।
 - Log sample, HTTP request ও protocol header-এর মতো ছোট illustrative example রাখা যাবে; এগুলো implementation code নয়।
 - এটি প্রথম pilot। Chapter 1-এর technical ও security review এখনও আলাদা করে সম্পন্ন করতে হবে; code test না চালানোকে correctness-এর প্রমাণ ধরা যাবে না।
+
+
+## 2026-10-25 — Chapter 1 final polish after diagram-first pilot
+
+- Chapter 1-এর Basic Authentication trade-off-এ credential কোন component-এ পৌঁছাতে পারে, তা আরও নির্দিষ্টভাবে লেখা হয়েছে; TLS terminate হওয়ার পর সব server-side component স্বয়ংক্রিয়ভাবে password পায়, এমন দাবি করা হয়নি।
+- Basic Authentication-এর limitation-কে session-level revocation-এর অভাব হিসেবে নির্দিষ্ট করা হয়েছে; credential disable/change এবং individual session revocation এক করে দেখানো হয়নি।
+- Authentication সফল হলেও authorization check আলাদা, সেটি Basic Authentication flow-তে দৃশ্যমান করা হয়েছে।
+- পুনরাবৃত্ত Basic Authentication sequence diagram সরিয়ে একটি diagram-এ credential failure, authorization denial ও success-এর পার্থক্য রাখা হয়েছে।
+- Chapter 1-এর Technical Review ও Security Review checkbox এখনো unchecked। এই পরিবর্তনগুলো final polish, formal sign-off নয়।
