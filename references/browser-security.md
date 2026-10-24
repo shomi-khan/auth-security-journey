@@ -46,6 +46,20 @@ Browser কোন পাতা থেকে request গেছে, সেই স�
 - [MDN: Same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy)
 - [HTML Living Standard: Origin](https://html.spec.whatwg.org/multipage/browsers.html#origin)
 
+## Fetch Metadata এবং CSRF
+
+- কোন অধ্যায়: ৬; পরে ১০-এ browser client-এর request context বোঝার সময়।
+- কেন গুরুত্বপূর্ণ: `Sec-Fetch-Site` request initiator ও target-এর site/origin সম্পর্ক জানায়। এটি browser-সৃষ্ট signal, authentication নয়; non-browser client নিজে header লিখতে পারে।
+- [W3C: Fetch Metadata Request Headers](https://www.w3.org/TR/fetch-metadata/): `Sec-Fetch-Site`-এর মান ও security considerations। ২১ সেপ্টেম্বর ২০২৬-এর সংস্করণ Working Draft, Recommendation নয়।
+- [MDN: Fetch metadata](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Fetch_metadata)
+- [WHATWG: Fetch Standard, forbidden request-header names](https://fetch.spec.whatwg.org/): `Sec-` prefix-যুক্ত header browser API থেকে set/modify করা যায় না।
+- [RFC 9110 §9.2.1: Safe Methods](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1): safe method-এর semantics; `GET`-এ state change করা যাবে না।
+- [RFC 7617 §2.2: Reusing Credentials](https://www.rfc-editor.org/rfc/rfc7617.html#section-2.2): HTTP Basic-এর credential reuse ও preemptive sending-এর protocol rule; নির্দিষ্ট browser behavior আলাদাভাবে যাচাই করতে হবে।
+- [Go `net/http` `CrossOriginProtection`](https://pkg.go.dev/net/http@go1.25#CrossOriginProtection): Go 1.25-এর optional implementation reference; default policy-কে application-এর fail-safe policy ধরে নেবে না।
+- [Go vulnerability report GO-2025-3955](https://pkg.go.dev/vuln/GO-2025-3955): `CrossOriginProtection.AddInsecureBypassPattern`-এর নির্দিষ্ট issue, Go 1.25.0-এ প্রভাবিত এবং 1.25.1-এ সংশোধিত।
+
+KenaKata-র Chapter 6 policy হলো: state-changing request-এ `Sec-Fetch-Site` অনুপস্থিত থাকলে configured target origin-এর সঙ্গে `Origin` হুবহু মেলানো হবে; দুটো signal-ই অনুপস্থিত বা `Origin: null` হলে fail-safe reject। `same-site` ও `none`-কেও sensitive state-changing action-এর জন্য নিজে থেকে trust করা হবে না। এটি KenaKata-র threat-model decision, browser standard-এর universal requirement নয়।
+
 ## CORS, যেখানে দরকার
 
 CORS browser-এর নিয়ম: অন্য origin-এর response পড়া যাবে কি না। এটা KenaKata-র API-এর authorization নয়।
