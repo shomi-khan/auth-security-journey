@@ -226,6 +226,6 @@ Trade-off
 | [diagrams/](diagrams/authentication/) | আঁকা ছবির জায়গা। এখন খালি। দরকার হলে chapter-এর সঙ্গে যোগ হবে |
 | [examples/go/](examples/go/authentication/) | ছোট Go উদাহরণের জায়গা। এখন খালি। পুরো backend এখানে বানানো হবে না |
 
-লেখার নিয়ম: [CONTRIBUTING.md](CONTRIBUTING.md)।
+লেখার নিয়ম: [CONTRIBUTING.md](CONTRIBUTING.md)। উদাহরণ ও diagram তৈরির নির্দিষ্ট নীতি: [docs/code-example-policy.md](docs/code-example-policy.md)।
 
 লাইসেন্স MIT। Copyright-এর নাম এখনো বসানো হয়নি, ফাইলে `[COPYRIGHT HOLDER]` লেখা আছে। দেখো [LICENSE](LICENSE)।
