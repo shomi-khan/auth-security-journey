@@ -169,7 +169,7 @@ flowchart TD
     E -->|না| X
     E -->|হ্যাঁ| F{"Login থেকে < ৮ ঘণ্টা?"}
     F -->|না| X
-    F -->|হ্যাঁ| OK["Session গ্রহণ; LastSeen হালনাগাদ"]
+    F -->|হ্যাঁ| OK["Session গ্রহণ; শেষ activity-র সময় হালনাগাদ"]
 ```
 
 Anonymous session-এর ঘড়ি session তৈরির সময় থেকে চলে। Authenticated session-এ idle আর absolute, দুটো শর্তই পাস করতে হবে। Expired record আর বৈধ নয়, এবং পরের request-এ গ্রহণ করা যাবে না.
@@ -220,7 +220,7 @@ flowchart TD
 
 এই উদাহরণে password পরিবর্তন সফল হলে বর্তমান session-এর ID নতুন হয় এবং ওই user-এর অন্য session-গুলো বাতিল হয়। আসল implementation-এ password update ও session changes-এর atomicity, failure handling এবং concurrent request-এর আচরণ আলাদাভাবে নির্ধারণ করতে হবে.
 
-এই উদাহরণে user identity কেবল সফল authentication-এর পর server-side trusted request context থেকে আসবে; client-এর পাঠানো header বা parameter থেকে নয়. অধ্যায় ৪-এর middleware-এর সরলীকরণ। আসল অ্যাপে এটা request context থেকে আসে।)
+এই উদাহরণে user identity কেবল সফল authentication-এর পর server-side trusted request context থেকে আসবে; client-এর পাঠানো header বা parameter থেকে নয়.
 
 আরেকটা জিনিস OWASP আলাদা করে বলে: user যেন নিজের চালু session-এর তালিকা দেখতে পারে (কখন, কোন IP, কোন browser), আর দূর থেকে বন্ধ করতে পারে। এতে শুভ নিজেই দেখত, "এই ৩ নম্বর session আমার নয়।" এর দাম: তালিকা বানাতে আর দেখাতে হয়, আর IP আর User-Agent জমানো privacy-র প্রশ্নও তোলে।
 
@@ -296,7 +296,7 @@ A-তে false positive-এর কারণে বৈধ user বারবার
 
 দুটো ছোট সতর্কতা:
 
-- **Proxy-র পেছনের IP:** request কোন network থেকে এসেছে তা নির্ভরযোগ্যভাবে নির্ণয়ের জন্য trusted proxy configuration দরকার। `X-Forwarded-For`-এর মতো header অন্ধভাবে বিশ্বাস করা যাবে না. লোড ব্যালান্সারের IP হতে পারে। `X-Forwarded-For`-এর মতো header শুধু নিজেদের proxy থেকে এলেই বিশ্বাস্য। না হলে আক্রমণকারী নিজেই ওটা লিখে দেবে। আমাদের test সরাসরি `RemoteAddr` ধরে।
+- **Proxy-র পেছনের IP:** request কোন network থেকে এসেছে তা নির্ভরযোগ্যভাবে নির্ণয়ের জন্য trusted proxy configuration দরকার। `X-Forwarded-For`-এর মতো header শুধু নিজের বিশ্বস্ত proxy থেকে এলে বিশ্বাস করা যায়; নইলে আক্রমণকারী নিজেই সেটি লিখে দিতে পারে.
 - **এই সংকেত নিজেই privacy-র বিষয়।** NIST session monitoring-কে অনুমোদন করে, কিন্তু বলে, প্রত্যাশিত বৈশিষ্ট্য জমানো আর প্রক্রিয়া করা privacy risk assessment-এর অংশ হতে হবে। IP আর User-Agent ব্যক্তিগত তথ্যের কাছাকাছি।
 
 ---
@@ -442,13 +442,13 @@ sequenceDiagram
 
 **এক: পুরোনো ID নষ্ট করা জরুরি।** আমাদের নকশায় পুরোনো row যেহেতু anonymous, সেটা বাঁচলেও সরাসরি ক্ষতি হতো না। তবু OWASP আর WSTG দুজনেই স্পষ্ট বলে, মুছে ফেলতে। মূল invariant হলো পুরোনো ID আর authenticated session হিসেবে গ্রহণ করা যাবে না. এই conceptual review-তে mutation testing বা automated verification চালানো হয়নি.
 
-**দুই: সব পুরোনো state নতুনে টানা যাবে না।** আমরা শুধু login-এর পর ফেরত যাওয়ার গন্তব্য রেখেছি, আর সেটি local, অনুমোদিত path কি না যাচাই করেছি (বাইরের URL নয়). আর সেটাও `safeNext` দিয়ে যাচাই করা (বাইরের URL নয়, শুধু `/manage/`-এর নিচের path)। পুরোনো row থেকে কোন তথ্য নতুন ID-তে যাবে, সেটা নিজের সিদ্ধান্ত। যে তথ্য আক্রমণকারী প্রভাবিত করতে পারত, সেটা বিনা যাচাইয়ে টেনে আনা নতুন সমস্যা। (বাইরের URL-এ redirect-এর আসল গল্প অধ্যায় ১৮-এ।)
+**দুই: সব পুরোনো state নতুনে টানা যাবে না।** Login-এর পরে ফেরত যাওয়ার গন্তব্য রাখতে হলে সেটি local ও অনুমোদিত path কি না যাচাই করতে হবে, বাইরের URL-এ redirect করা যাবে না. পুরোনো anonymous state থেকে কোন তথ্য নতুন ID-তে যাবে, সেটা সচেতনভাবে বেছে নিতে হবে.
 
 **তিন: absolute ঘড়ি login থেকে।** Absolute timeout login সফল হওয়ার সময় থেকে গণনা শুরু হবে. যদি anonymous session-এর শুরু থেকেই absolute clock গণনা করা হয়, আক্রমণকারী আগে session বানিয়ে রেখে victim-এর authenticated session-এর কার্যকর সময় কমিয়ে দিতে পারে.
 
-**চার: "login" একটাই ঘটনা নয়।** OWASP বলে, authentication-এর মুহূর্ত সবচেয়ে সাধারণ, কিন্তু যেকোনো privilege বদলের সময় ID নতুন করতে হবে: password বদল, ক্ষমতা বদল, সাধারণ user থেকে admin। KenaKata-য় আজ login-এর পথ একটাই, কিন্তু `changePassword` আগেই `Rotate` ডাকে (§৬)। পরে Google login (অধ্যায় ২১) আসবে, আর সেটাও একটা login, ওখানেও rotate। MFA শেষ হলে (অধ্যায় ২২) session-এর মান বাড়ে, ওখানেও। যেকোনো নতুন পথ যোগ করার সময় প্রশ্ন একটাই: **এখানে কি ID বদলাচ্ছে?**
+**চার: "login" একটাই ঘটনা নয়।** OWASP বলে, authentication-এর মুহূর্ত সবচেয়ে সাধারণ, কিন্তু যেকোনো privilege বদলের সময় ID নতুন করতে হবে: password বদল, ক্ষমতা বদল, সাধারণ user থেকে admin। KenaKata-য় password বদল, ভবিষ্যতের Google login (অধ্যায় ২১) এবং MFA completion (অধ্যায় ২২)-এর মতো প্রতিটি authentication বা privilege-change flow-তে ID rotation দরকার. যেকোনো নতুন পথ যোগ করার সময় প্রশ্ন একটাই: **এখানে কি ID বদলাচ্ছে?**
 
-OWASP একটা সম্পূরক বুদ্ধিও দেয়: login-এর আগে আর পরে আলাদা নামের cookie ব্যবহার করা, যাতে anonymous আর authenticated অবস্থা কখনো গুলিয়ে না যায়। আমরা এটা নিইনি, কারণ rotate-ই যথেষ্ট আর কম জটিল। দাম: প্রতিটা handler-কে মনে রাখতে হয় anonymous session-কে authenticated ধরা যাবে না। আমাদের middleware-এ `!rec.Authenticated()` ঠিক সেই কাজ করে।
+OWASP একটা সম্পূরক বুদ্ধিও দেয়: login-এর আগে আর পরে আলাদা নামের cookie ব্যবহার করা, যাতে anonymous আর authenticated অবস্থা কখনো গুলিয়ে না যায়। আলাদা cookie name না নিলে প্রতিটি protected request-এ server-কে যাচাই করতে হবে যে session authenticated; anonymous session-কে authenticated হিসেবে গ্রহণ করা যাবে না.
 
 ### আর যদি রাস্তা বন্ধ করা যায়?
 
