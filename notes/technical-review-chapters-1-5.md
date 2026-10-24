@@ -45,3 +45,10 @@ Pull request: [#1](https://github.com/shomi-khan/auth-security-journey/pull/1)
 - Chapter 1–5-এর code snippet-গুলোকে “compile করা যায়” বলে দাবি করার আগে প্রতিটি snippet-এর scope স্পষ্ট করা এবং সম্ভব হলে runnable companion test রাখা।
 - Chapter 4-এর 401/API response design নিয়ে সিদ্ধান্ত নথিভুক্ত করা।
 - বাকি যাচাই শেষ না হওয়া পর্যন্ত chapter status checkbox unchecked রাখা।
+
+
+## 2026-10-25 — Chapter 3 diagram-first migration note
+
+The Chapter 3 bullets above that mention Go, `norm.NFC`, `checkPolicy`, parser tests, and prior compile/test history describe an earlier implementation-code revision. The current Chapter 3 teaching draft has been converted to Mermaid diagrams and language-neutral examples; those implementation-specific findings are historical and should not be read as claims about the current chapter content.
+
+The current draft has not been granted Technical Review or Security Review sign-off. Future review should focus on password-storage concepts, Argon2id parameter claims, PHC string validation invariants, Unicode normalization consistency, account-enumeration mitigations, online/offline threat boundaries, and the accuracy of diagrams and source references. No code tests were run for this diagram-first update.
