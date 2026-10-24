@@ -44,14 +44,15 @@ status: draft
 ```mermaid
 flowchart TD
     R["Request আসে"] --> M{"কোন route?"}
-    M -->|"GET /manage/orders"| O["অর্ডার দেখার handler"]
-    M -->|"POST /manage/orders/1042/refund"| F["Refund handler"]
-    O --> G["/manage-এর authentication guard"]
-    F --> G
-    G --> A{"Credential বৈধ?"}
-    A -->|"না"| X["Request থামে"]
-    A -->|"হ্যাঁ"| H["Protected handler চলে"]
-    H --> N["Refund-এর আলাদা permission check নেই"]
+    M -->|"GET /manage/orders"| G1["Authentication guard"]
+    M -->|"POST /manage/orders/1042/refund"| G2["Authentication guard"]
+    G1 --> A1{"Credential বৈধ?"}
+    A1 -->|"না"| X1["Request থামে"]
+    A1 -->|"হ্যাঁ"| O["অর্ডারের তালিকা দেখাও"]
+    G2 --> A2{"Credential বৈধ?"}
+    A2 -->|"না"| X2["Request থামে"]
+    A2 -->|"হ্যাঁ"| F["Refund handler"]
+    F --> N["Refund-এর permission check নেই"]
     N --> BAD["কর্মীও refund করতে পারে"]
 ```
 
