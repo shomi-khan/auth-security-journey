@@ -35,9 +35,9 @@
 ৩. **আগের chapter পড়া।** নতুন অধ্যায় আগের সমস্যার পরের ধাপ। Product আবার শূন্য থেকে শুরু হয় না।
 ৪. **Problem আর narrative ঠিক করা।** নিচের ছক অনুসরণ করো। কোন threat, কোন সীমা, কোন trade-off — এগুলো না ভেবে লেখা শুরু করবে না।
 ৫. **Chapter লেখা।** ওই অধ্যায়ের `README.md`-এ placeholder সরাও। ভাষা বাংলা। Technical term ইংরেজিতে থাকবে।
-৬. **Technical accuracy।** নাম, প্রবাহ, আর “এটা কী করে” — [`references/`](references/README.md)-এর সোর্স খুলে মিলাও। ব্লগের কথাকে spec-এর উপরে বসাবে না।
-৭. **Security accuracy।** একই সোর্স। “JWT secure” এই ধরনের কথা লিখবে না, যদি না সঙ্গে থাকে কোন threat, কোন property, কোথায় সীমা, কী trade-off। নতুন ভুল ধারণা ধরা পড়লে ছোট করে [misconceptions](notes/misconceptions.md)-এ যোগ করো। ব্যাখ্যা অধ্যায়েই থাকবে।
-৮. **Diagram বা illustrative example।** [উদাহরণ ও Diagram লেখার নীতি](docs/code-example-policy.md) মেনে চলো। Mermaid flowchart ও sequence diagram হবে প্রধান মাধ্যম; pseudocode কেবল প্রয়োজন হলে। Go code বা অন্য language-specific implementation code থাকবে না। Diagram অধ্যায়ের ভিতরে রাখো, যদি না সেটি একাধিক অধ্যায়ে পুনর্ব্যবহারের প্রয়োজন হয়।
+৬. **Technical accuracy।** মূল concept, protocol flow এবং “এটা কী করে” — [`references/`](references/README.md)-এর authoritative source খুলে মিলাও। ব্লগের কথাকে spec-এর উপরে বসাবে না। কোনো নির্দিষ্ট tool-এর প্রতিটি parameter বা internal implementation বুঝে ফেলা এই ধাপের লক্ষ্য নয়।
+৭. **Security accuracy।** Threat model, মূল security property, control-এর সীমা ও trade-off যাচাই করো। “JWT secure” এই ধরনের কথা লিখবে না, যদি না সঙ্গে থাকে কোন threat, কোন property, কোথায় সীমা, কী trade-off। নতুন ভুল ধারণা ধরা পড়লে ছোট করে [misconceptions](notes/misconceptions.md)-এ যোগ করো। ব্যাখ্যা অধ্যায়েই থাকবে।
+৮. **Diagram বা illustrative example।** [উদাহরণ ও Diagram লেখার নীতি](docs/code-example-policy.md) মেনে চলো। Mermaid flowchart ও sequence diagram হবে প্রধান মাধ্যম; pseudocode default নয়। Go code বা অন্য language-specific implementation code থাকবে না। Tool/library-এর গভীর implementation detail-এ যেও না, যদি না তা core security concept বোঝাতে অপরিহার্য হয়। Diagram অধ্যায়ের ভিতরে রাখো, যদি না সেটি একাধিক অধ্যায়ে পুনর্ব্যবহারের প্রয়োজন হয়।
 ৯. **Chapter status।** নিচের বাক্সে টিক তখনই, যখন সেই ধাপ সত্যি শেষ। `Published`-এ টিক মানে অধ্যায় প্রকাশিত।
 ১০. **Season README আর root README।** অধ্যায় প্রকাশিত না হওয়া পর্যন্ত সূচিপত্রে `[ ] লেখা হয়নি` থাকবে। প্রকাশিত হলে `[x]` করো, আর “লেখা হয়নি” সরিয়ে দাও।
 
@@ -71,7 +71,7 @@ Technical term-এর জোর করা বাংলা বসাবে না
 
 ## একটা বড় বিষয় এলে
 
-অধ্যায় যখন কোনো বড় জিনিস শেখায়, এই প্রশ্নগুলো ছুঁয়ে যাও:
+অধ্যায় যখন কোনো বড় security concept শেখায়, এই প্রশ্নগুলো ছুঁয়ে যাও:
 
 - এটা কী
 - কেন এসেছে
@@ -85,7 +85,7 @@ Technical term-এর জোর করা বাংলা বসাবে না
 - বিকল্প কী
 - production-এ কী ছাড় দিতে হয়
 
-এখনই এই প্রশ্নগুলোর উত্তর এই ফাইলে লিখে রেখো না। উত্তর অধ্যায়ে, সোর্স দেখে।
+সব প্রশ্নের উত্তর সমান গভীরতায় দিতে হবে না। অধ্যায়ের মূল উদ্দেশ্যের সঙ্গে সম্পর্কিত বিষয়গুলো বেছে নাও। Tool-specific implementation-এর বিবরণ প্রয়োজন হলে reference-এ পাঠাও, chapter-কে manual বানিও না। উত্তর অধ্যায়ে, authoritative source দেখে লিখো।
 
 ## পাঠককে সক্রিয়ভাবে যুক্ত রাখা
 
@@ -151,6 +151,14 @@ Chapter 1-এ যে পদ্ধতিগুলো পাঠককে সক্
 - বড় ধারণাকে ছোট section-এ ভাগ করো। একটানা দীর্ঘ ব্যাখ্যার বদলে গল্প, diagram, প্রশ্ন এবং ব্যাখ্যার মধ্যে স্বাভাবিক বিরতি রাখো।
 - প্রতিটি diagram বা illustrative example-এর সঙ্গে কী লক্ষ্য করতে হবে, তা ব্যাখ্যা করো। শুধু দেখতে সুন্দর বলে visual যোগ করো না।
 - অপ্রয়োজনীয় meme, বাহুল্যপূর্ণ decoration বা জোর করে humour যোগ করবে না। হালকা, স্বাভাবিক ভাষা ভালো; technical accuracy ও পাঠকের মনোযোগই অগ্রাধিকার।
+
+### Chapter review: শেখার গভীরতা যাচাই
+
+- পাঠক কি মূল security concept ব্যাখ্যা করতে পারবে, নাকি শুধু algorithm/tool-এর নাম মনে রাখবে?
+- উদাহরণটি কি সমস্যা, mechanism, limitation এবং trade-off বোঝায়?
+- Tool-specific detail বাদ দিলেও কি পাঠকের mental model অক্ষত থাকে?
+- কোনো parameter, implementation choice বা configuration-কে কি সর্বজনীন security rule হিসেবে দেখানো হয়েছে?
+- Technical Review ও Security Review কি conceptual correctness, source-backed claims, threat model এবং গুরুত্বপূর্ণ limitation-এ মনোযোগ দিচ্ছে, অপ্রয়োজনীয় implementation-level deep dive-এ নয়?
 
 ### Chapter review-এর সময় engagement যাচাই
 
