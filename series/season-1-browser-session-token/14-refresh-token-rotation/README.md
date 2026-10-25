@@ -1,5 +1,5 @@
 ---
-chapter: 13
+chapter: 14
 season: 1
 title: "Refresh Token Rotation এবং Reuse Detection"
 status: draft
@@ -148,9 +148,9 @@ RFC 9700 হলো OAuth 2.0 Security Best Current Practice। এর OAuth-spec
 
 ## ধারাবাহিকতা
 
-আগে: [অধ্যায় ১২: Refresh Token কেন?](../12-refresh-token/README.md)
+আগে: [অধ্যায় ১২: Refresh Token কেন?](../13-refresh-token/README.md)
 
-পরে: [অধ্যায় ১৪: Logout, Revocation এবং Session Recovery](../14-logout-revocation/README.md)
+পরে: [অধ্যায় ১৪: Logout, Revocation এবং Session Recovery](../15-logout-revocation/README.md)
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী mobile app-এ access token ও refresh token অধ্যায় ১০-এর SPA আসার আগেই আছে। এই অধ্যায় সেই first-party lifecycle-এর rotation ও reuse-detection ঝুঁকি ব্যাখ্যা করে।
 
