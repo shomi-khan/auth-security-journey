@@ -1,5 +1,5 @@
 ---
-chapter: 17
+chapter: 18
 season: 2
 title: "Authorization Code Flow এবং state"
 status: planned
@@ -37,8 +37,8 @@ OAuth-এর actor-দের চেনার পর authorization request থে
 - User identity-এর OIDC claims; অধ্যায় ২০
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৬: OAuth 2.0 কেন?](../16-oauth/README.md)
-পরে: [অধ্যায় ১৮: Redirect URI এবং Authorization Code Theft](../18-redirect-uri-code-theft/README.md)
+আগে: [অধ্যায় ১৬: OAuth 2.0 কেন?](../17-oauth/README.md)
+পরে: [অধ্যায় ১৮: Redirect URI এবং Authorization Code Theft](../19-redirect-uri-code-theft/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
