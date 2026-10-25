@@ -12,7 +12,7 @@ Chapter 12-এর source-based conceptual Technical Review ও Security Review�
 
 ## Continuity ও repository conventions
 
-1. **Chapter path:** Root README এবং Season 1 index-এর canonical path হলো 11-token-expiration-replay/README.md; article ভুল করে 11-token-expiration-replay-window/README.md-এ ছিল। Article canonical path-এ সরানো হয়েছে, যাতে বিদ্যমান সূচির links কাজ করে।
+1. **Chapter path:** Root README এবং Season 1 index-এর canonical path হলো 12-token-expiration-replay/README.md; article ভুল করে 12-token-expiration-replay-window/README.md-এ ছিল। Article canonical path-এ সরানো হয়েছে, যাতে বিদ্যমান সূচির links কাজ করে।
 2. **Chapter 11 continuity:** Chapter 11 browser storage এবং XSS/CSRF boundary নিয়ে; Chapter 12 token-এর lifetime, replay এবং revocation নিয়ে। Chapter 12 OAuth refresh-token flow-কে current KenaKata implementation বলে না এবং refresh-token lifecycle পরের নির্ধারিত chapter-এ রাখে।
 3. **Product continuity:** Mobile/API access-token story বজায় আছে। OAuth-specific RFC-গুলো conceptual reference হিসেবে চিহ্নিত, KenaKata-র first-party flow-কে OAuth implementation বলা হয়নি।
 4. **Learning format:** KenaKata scenario, Mermaid sequence diagram, Decision Game, reasoning, edge case, self-check এবং concise key takeaway রাখা হয়েছে।
