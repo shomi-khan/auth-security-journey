@@ -2,7 +2,7 @@
 
 **তারিখ:** 2026-10-25  
 **Branch:** `improvements/chapters-engagement`  
-**Reviewed file:** `series/season-1-browser-session-token/07-xss-and-httponly/README.md`  
+**Reviewed file:** `series/season-1-browser-session-token/08-xss-and-httponly/README.md`  
 **Review type:** Source-based conceptual review of the chapter, its claims, diagrams, and cited guidance.
 
 ## সারাংশ
