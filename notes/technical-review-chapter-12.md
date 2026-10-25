@@ -1,4 +1,4 @@
-# Chapter 11: Technical ও Security Review
+# Chapter 12: Technical ও Security Review
 
 Date: 2026-10-25  
 Branch: improvements/chapters-engagement  
@@ -6,14 +6,14 @@ Pull request: https://github.com/shomi-khan/auth-security-journey/pull/1
 
 ## Review scope
 
-Chapter 11-এর source-based conceptual Technical Review ও Security Review। Chapter 10-এর SPA/browser token-storage narrative, KenaKata-র product timeline, chapter naming/link conventions, token expiry semantics, bearer-token replay, revocation, JWT validation এবং RFC references যাচাই করা হয়েছে।
+Chapter 12-এর source-based conceptual Technical Review ও Security Review। Chapter 11-এর SPA/browser token-storage narrative, KenaKata-র product timeline, chapter naming/link conventions, token expiry semantics, bearer-token replay, revocation, JWT validation এবং RFC references যাচাই করা হয়েছে।
 
 এটি application implementation audit, automated test run, Mermaid renderer test বা production security certification নয়।
 
 ## Continuity ও repository conventions
 
 1. **Chapter path:** Root README এবং Season 1 index-এর canonical path হলো 11-token-expiration-replay/README.md; article ভুল করে 11-token-expiration-replay-window/README.md-এ ছিল। Article canonical path-এ সরানো হয়েছে, যাতে বিদ্যমান সূচির links কাজ করে।
-2. **Chapter 10 continuity:** Chapter 10 browser storage এবং XSS/CSRF boundary নিয়ে; Chapter 11 token-এর lifetime, replay এবং revocation নিয়ে। Chapter 11 OAuth refresh-token flow-কে current KenaKata implementation বলে না এবং refresh-token lifecycle পরের নির্ধারিত chapter-এ রাখে।
+2. **Chapter 11 continuity:** Chapter 11 browser storage এবং XSS/CSRF boundary নিয়ে; Chapter 12 token-এর lifetime, replay এবং revocation নিয়ে। Chapter 12 OAuth refresh-token flow-কে current KenaKata implementation বলে না এবং refresh-token lifecycle পরের নির্ধারিত chapter-এ রাখে।
 3. **Product continuity:** Mobile/API access-token story বজায় আছে। OAuth-specific RFC-গুলো conceptual reference হিসেবে চিহ্নিত, KenaKata-র first-party flow-কে OAuth implementation বলা হয়নি।
 4. **Learning format:** KenaKata scenario, Mermaid sequence diagram, Decision Game, reasoning, edge case, self-check এবং concise key takeaway রাখা হয়েছে।
 5. **Status:** Draft ও source-based Technical/Security Review complete; Published unchecked। এটি published chapter বা production audit নয়।
@@ -48,18 +48,18 @@ Chapter 11-এর source-based conceptual Technical Review ও Security Review�
 - This record is not a production security audit or certification.
 
 
-## Follow-up review: Chapter 11 in PR #2
+## Follow-up review: Chapter 12 in PR #2
 
 Date: 2026-10-25  
 Branch: `docs/chapters-11-25-blueprints`  
 Pull request: https://github.com/shomi-khan/auth-security-journey/pull/2
 
-Chapter 11-এর existing draft, Chapter 11 brief, Chapter 10 continuity, Chapter 12 boundary এবং product timeline আবার মিলিয়ে দেখা হয়েছে। এই follow-up-এ একটি narrative ambiguity ঠিক করা হয়েছে: password বদলানোর পর পুরোনো access token দিয়ে request সফল হওয়ার ঘটনাটি দেখে যেন পাঠক ধরে না নেয় যে password change সব architecture-এ access token স্বয়ংক্রিয়ভাবে invalidate করে। এখন opening-এ স্পষ্ট বলা আছে, এটি architecture ও revocation policy-র ওপর নির্ভর করে; password change নিজে থেকে সব already-issued access token বাতিল করে না।
+Chapter 12-এর existing draft, Chapter 12 brief, Chapter 11 continuity, Chapter 13 boundary এবং product timeline আবার মিলিয়ে দেখা হয়েছে। এই follow-up-এ একটি narrative ambiguity ঠিক করা হয়েছে: password বদলানোর পর পুরোনো access token দিয়ে request সফল হওয়ার ঘটনাটি দেখে যেন পাঠক ধরে না নেয় যে password change সব architecture-এ access token স্বয়ংক্রিয়ভাবে invalidate করে। এখন opening-এ স্পষ্ট বলা আছে, এটি architecture ও revocation policy-র ওপর নির্ভর করে; password change নিজে থেকে সব already-issued access token বাতিল করে না।
 
 এই পরিবর্তনটি আলাদা commit-এ রাখা হয়েছে। মূল article-এর বাকি scope, learning sequence ও security claims-এ অপ্রয়োজনীয় rewrite করা হয়নি। এটি source-based conceptual follow-up; implementation test, link checker, Mermaid renderer বা production audit চালানো হয়নি।
 
 
-## Final Technical Review ও Security Review: Chapter 11 in PR #2
+## Final Technical Review ও Security Review: Chapter 12 in PR #2
 
 Date: 2026-10-25  
 Branch: `docs/chapters-11-25-blueprints`  
@@ -67,7 +67,7 @@ Pull request: https://github.com/shomi-khan/auth-security-journey/pull/2
 
 ### Review coverage
 
-এই pass-এ Chapter 11-এর সম্পূর্ণ article ও chapter brief, Chapter 10-এর SPA token-storage context, Chapter 12-এর refresh-token scope এবং `product/timeline.md` মিলিয়ে দেখা হয়েছে। মূল security claims-গুলো authoritative RFC guidance-এর সঙ্গে পুনরায় cross-check করা হয়েছে।
+এই pass-এ Chapter 12-এর সম্পূর্ণ article ও chapter brief, Chapter 11-এর SPA token-storage context, Chapter 13-এর refresh-token scope এবং `product/timeline.md` মিলিয়ে দেখা হয়েছে। মূল security claims-গুলো authoritative RFC guidance-এর সঙ্গে পুনরায় cross-check করা হয়েছে।
 
 ### Technical findings
 
@@ -85,7 +85,7 @@ Pull request: https://github.com/shomi-khan/auth-security-journey/pull/2
 2. **Layered controls:** Short lifetime-কে একমাত্র solution বলা হয়নি; least privilege, audience restriction, exposure reduction, revocation এবং প্রয়োজনমতো sender-constraining-এর ভূমিকা আলাদা করা হয়েছে.
 3. **Password change/logout narrative:** Password change বা client-side logout যে সব architecture-এ already-issued token স্বয়ংক্রিয়ভাবে invalidate করে না, opening ও পরের আলোচনা তা স্পষ্ট করে.
 4. **Incident attribution:** IP, timestamp এবং `sub` claim-কে একা মানুষের পরিচয়ের প্রমাণ ধরা হয়নি.
-5. **Scope control:** Chapter 11 refresh-token rotation/reuse detection, logout recovery এবং OAuth normative flow নিজের মধ্যে টেনে নেয়নি। Chapter 12 ও timeline-এর সঙ্গে scope সামঞ্জস্যপূর্ণ.
+5. **Scope control:** Chapter 12 refresh-token rotation/reuse detection, logout recovery এবং OAuth normative flow নিজের মধ্যে টেনে নেয়নি। Chapter 13 ও timeline-এর সঙ্গে scope সামঞ্জস্যপূর্ণ.
 
 ### Outcome
 
