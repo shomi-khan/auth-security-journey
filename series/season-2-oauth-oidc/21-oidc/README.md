@@ -1,5 +1,5 @@
 ---
-chapter: 20
+chapter: 21
 season: 2
 title: "OIDC: OAuth-এর ওপর Identity Layer"
 status: planned
@@ -38,8 +38,8 @@ OAuth access delegation ব্যাখ্যা করে, কিন্তু �
 - নির্দিষ্ট OIDC library-র implementation
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৯: PKCE](../19-pkce/README.md)
-পরে: [অধ্যায় ২১: Google Login এবং Token Validation](../21-google-login/README.md)
+আগে: [অধ্যায় ১৯: PKCE](../20-pkce/README.md)
+পরে: [অধ্যায় ২১: Google Login এবং Token Validation](../22-google-login/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
