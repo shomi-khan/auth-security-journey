@@ -32,13 +32,13 @@ OAuth-এর actor-দের চেনার পর authorization request থে
 - Callback handler-এর জন্য গুরুত্বপূর্ণ validation checklist তৈরি করতে
 
 ## এই অধ্যায়ে থাকবে না
-- Redirect URI-র নির্ভুল matching ও code interception-এর পূর্ণ বিশ্লেষণ; অধ্যায় ১৮
-- PKCE-এর বিস্তারিত; অধ্যায় ১৯
-- User identity-এর OIDC claims; অধ্যায় ২০
+- Redirect URI-র নির্ভুল matching ও code interception-এর পূর্ণ বিশ্লেষণ; অধ্যায় ১৯
+- PKCE-এর বিস্তারিত; অধ্যায় ২০
+- User identity-এর OIDC claims; অধ্যায় ২১
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৬: OAuth 2.0 কেন?](../17-oauth/README.md)
-পরে: [অধ্যায় ১৮: Redirect URI এবং Authorization Code Theft](../19-redirect-uri-code-theft/README.md)
+আগে: [অধ্যায় ১৭: OAuth 2.0 কেন?](../17-oauth/README.md)
+পরে: [অধ্যায় ১৯: Redirect URI এবং Authorization Code Theft](../19-redirect-uri-code-theft/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
