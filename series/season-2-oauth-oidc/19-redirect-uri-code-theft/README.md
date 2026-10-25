@@ -1,5 +1,5 @@
 ---
-chapter: 18
+chapter: 19
 season: 2
 title: "Redirect URI এবং Authorization Code Theft"
 status: planned
@@ -37,8 +37,8 @@ Authorization Code Flow-এ browser-কে কোথায় ফেরানো �
 - Provider-specific console configuration walkthrough
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৭: Authorization Code Flow এবং state](../17-authorization-code-state/README.md)
-পরে: [অধ্যায় ১৯: PKCE](../19-pkce/README.md)
+আগে: [অধ্যায় ১৭: Authorization Code Flow এবং state](../18-authorization-code-state/README.md)
+পরে: [অধ্যায় ১৯: PKCE](../20-pkce/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
