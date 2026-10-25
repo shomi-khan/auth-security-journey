@@ -143,8 +143,8 @@ Trade-off
 
 #### [অধ্যায় ৭ — CORS: Browser কোন Response পড়তে পারবে?](series/season-1-browser-session-token/07-cors/README.md)
 
-- [ ] Technical Review বাকি
-- [ ] Security Review বাকি
+- [x] Technical Review সম্পন্ন
+- [x] Security Review সম্পন্ন
 
 #### [অধ্যায় ৮ — XSS এবং HttpOnly-এর সীমাবদ্ধতা](series/season-1-browser-session-token/08-xss-and-httponly/README.md)
 
