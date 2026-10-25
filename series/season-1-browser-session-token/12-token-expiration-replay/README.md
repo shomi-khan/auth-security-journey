@@ -233,7 +233,7 @@ Protocol বা security claim নিয়ে পরিবর্তন করা�
 - [x] Security Review (source-based threat-model review; not a production audit)
 - [ ] Published
 
-Review record: [Chapter 11 Technical ও Security Review](../../../notes/technical-review-chapter-11.md).
+Review record: [Chapter 12 Technical ও Security Review](../../../notes/technical-review-chapter-11.md).
 
 
 ## Chapter Brief: এই অধ্যায়ের ভূমিকা ও সীমা
