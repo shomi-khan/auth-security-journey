@@ -153,4 +153,4 @@ Token B-কে বিশ্বাস করা যাবে না। Payload de
 - [x] Security Review (source-based threat-model review; not a production audit)
 - [ ] Published
 
-Review record: [Chapter 9 Technical ও Security Review](../../../notes/technical-review-chapter-9.md).
+Review record: [Chapter 11 Technical ও Security Review](../../../notes/technical-review-chapter-9.md).
