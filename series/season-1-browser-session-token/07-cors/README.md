@@ -180,3 +180,5 @@ CORS browser-এর cross-origin response sharing নিয়ে। এবার �
 - [x] Technical Review
 - [x] Security Review
 - [ ] Published
+
+Review record: [Chapter 7 Technical ও Security Review](../../../notes/technical-review-chapter-7.md).
