@@ -119,7 +119,7 @@ Refresh token-এর lifetime নির্ধারণে “সবার জন
 
 ### Revocation
 
-Server-side policy অনুযায়ী refresh token বাতিল বা revoke করা যেতে পারে। উদাহরণস্বরূপ, কোনো credential compromise ধরা পড়লে বা সংশ্লিষ্ট authorization আর গ্রহণযোগ্য না হলে সেটি বন্ধ করার প্রয়োজন হতে পারে। কিন্তু refresh token revoke করলেই আগে issue করা প্রতিটি access token সব architecture-এ সঙ্গে সঙ্গে invalid হবে, এমন নিশ্চয়তা নেই। Access token-এর lifecycle ও revocation আলাদা করে নকশা করতে হয়। এর পূর্ণ আলোচনা অধ্যায় ১৪-তে হবে।
+Server-side policy অনুযায়ী refresh token বাতিল বা revoke করা যেতে পারে। উদাহরণস্বরূপ, কোনো credential compromise ধরা পড়লে বা সংশ্লিষ্ট authorization আর গ্রহণযোগ্য না হলে সেটি বন্ধ করার প্রয়োজন হতে পারে। কিন্তু refresh token revoke করলেই আগে issue করা প্রতিটি access token সব architecture-এ সঙ্গে সঙ্গে invalid হবে, এমন নিশ্চয়তা নেই। Access token-এর lifecycle ও revocation আলাদা করে নকশা করতে হয়। এর পূর্ণ আলোচনা অধ্যায় ১৫-তে হবে।
 
 ### Refresh token না দিলে?
 
@@ -144,7 +144,7 @@ flowchart TD
     N -- Refresh token invalid বা expired --> L[Refresh বন্ধ; প্রয়োজন হলে পুনরায় authenticate]
 ```
 
-Diagram-টি failure handling-এর উচ্চস্তরের মডেল। Refresh token rotation, concurrent refresh request, reuse detection এবং ambiguous timeout-এর পূর্ণ recovery policy এখানে আলোচনা করা হচ্ছে না। সেগুলো পরের অধ্যায় ১৩-এর বিষয়।
+Diagram-টি failure handling-এর উচ্চস্তরের মডেল। Refresh token rotation, concurrent refresh request, reuse detection এবং ambiguous timeout-এর পূর্ণ recovery policy এখানে আলোচনা করা হচ্ছে না। সেগুলো পরের অধ্যায় ১৪-এর বিষয়।
 
 ## ৭. KenaKata-র সিদ্ধান্ত
 
@@ -179,9 +179,9 @@ Diagram-টি failure handling-এর উচ্চস্তরের মডে�
 
 ## ধারাবাহিকতা
 
-আগে: [অধ্যায় ১১: Token Expiration এবং Replay Window](../12-token-expiration-replay/README.md)
+আগে: [অধ্যায় ১২: Token Expiration এবং Replay Window](../12-token-expiration-replay/README.md)
 
-পরে: [অধ্যায় ১৩: Refresh Token Rotation এবং Reuse Detection](../14-refresh-token-rotation/README.md)
+পরে: [অধ্যায় ১৪: Refresh Token Rotation এবং Reuse Detection](../14-refresh-token-rotation/README.md)
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী KenaKata-র mobile app-এ refresh token আগে থেকেই আছে। এই অধ্যায় সেই first-party lifecycle-এর ধারণা শেখায়, OAuth flow নয়।
 
