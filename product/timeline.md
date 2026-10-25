@@ -6,8 +6,8 @@ KenaKata কীভাবে এগোয়, এই ফাইল সেটা। �
 
 দুটো জায়গায় শেখানোর ক্রম আর product-এর ক্রম এক নয়। Product-এর ক্রম বদলায় না।
 
-- Refresh token product-এ mobile app-এর সঙ্গে আসে। বিস্তারিত ব্যাখ্যা অধ্যায় ১২–১৪-এ, SPA-র অধ্যায়ের পরে। SPA আসার সময় refresh token আগে থেকেই আছে। অধ্যায় ১০ বলতে পারে mobile client-এর কাছে এটা আছে। Rotation আর revocation সেখানে ব্যাখ্যা করবে না।
-- অধ্যায় ১৬–২০ OAuth, PKCE, আর OIDC শেখায়। তখন Google login আর বাইরের app-এর connection এখনো দাবি, চালু feature নয়। Google login চালু হয় অধ্যায় ২১-এ। বাইরের application যুক্ত হয় তার পরে, Season 2-এর শেষে।
+- Refresh token product-এ mobile app-এর সঙ্গে আসে। বিস্তারিত ব্যাখ্যা অধ্যায় ১৩–১৫-এ, SPA-র অধ্যায়ের পরে। SPA আসার সময় refresh token আগে থেকেই আছে। অধ্যায় ১১ বলতে পারে mobile client-এর কাছে এটা আছে। Rotation আর revocation সেখানে ব্যাখ্যা করবে না।
+- অধ্যায় ১৭–২১ OAuth, PKCE, আর OIDC শেখায়। তখন Google login আর বাইরের app-এর connection এখনো দাবি, চালু feature নয়। Google login চালু হয় অধ্যায় ২২-এ। বাইরের application যুক্ত হয় তার পরে, Season 2-এর শেষে।
 
 ```text
 Simple E-commerce
@@ -99,14 +99,43 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 | ২ | সেই শুরুর দোকান। Authorization আলাদা প্রশ্ন। Organization এখনো নেই |
 | ৩ | Email আর password আছে |
 | ৪ | Session আর cookie আছে |
-| ৫–৭ | Cookie session আক্রান্ত। Token তখনকার ডিজাইন নয় |
-| ৮–৯ | Mobile app আছে। Access token আলোচনায়। JWT format হিসেবে আসতে পারে |
-| ১০ | SPA আছে। Mobile-এর refresh token আগে থেকে থাকতে পারে |
-| ১১–১৪ | মেয়াদ, refresh, rotation, logout, revocation |
-| ১৫ | Organization, membership, role, আর resource কার সেটা |
-| ১৬–২০ | Delegation শেখা হচ্ছে। Google login চালু নয়। বাইরের app-এর integration শেষ নয় |
-| ২১ | Google login চালু |
-| Season 2-এর শেষ | অধ্যায় ২১-এর পরে third-party integration চালু |
-| ২২ | MFA আর step-up চালু |
-| ২৩ | Microservice আর machine-to-machine authentication চালু |
-| ২৪–২৫ | শেষ architecture বর্তমান ছবি হিসেবে আলোচনা করা যায় |
+| ৫–৬ | Cookie session আক্রান্ত। Session hijacking/fixation ও CSRF |
+| ৭ | CORS-এর generic browser/API scenario; KenaKata-র architecture এখনো single web application |
+| ৮ | XSS ও HttpOnly-এর সীমা; cookie session এখনও আছে |
+| ৯–১০ | Mobile app আছে। Access token এবং JWT format নিয়ে আলোচনা |
+| ১১ | SPA আছে। Mobile-এর refresh token আগে থেকে থাকতে পারে; cross-origin API call-এর CORS প্রসঙ্গ এখানে product-এ আসে |
+| ১২–১৫ | Token expiry, refresh, rotation, logout ও revocation |
+| ১৬ | Organization, membership, role, আর resource কার সেটা |
+| ১৭–২১ | Delegation শেখা হচ্ছে। Google login চালু নয়। বাইরের app-এর integration শেষ নয় |
+| ২২ | Google login চালু |
+| Season 2-এর শেষ | অধ্যায় ২২-এর পরে third-party integration চালু |
+| ২৩ | MFA আর step-up চালু |
+| ২৪ | Microservice আর machine-to-machine authentication চালু |
+| ২৫–২৬ | শেষ architecture বর্তমান ছবি হিসেবে আলোচনা করা যায় |
+
+
+
+## Chapter plan status (২০২৬-১০-২৫)
+
+অধ্যায় ১–৬-এর content এই পরিবর্তনে rewrite করা হয়নি। CORS-এর নতুন অধ্যায় ৭ যোগ হওয়ায় পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়েছে। পুরোনো অধ্যায় ১১-এর draft এখন অধ্যায় ১২; অধ্যায় ১৩–২৬-এর README-তে পূর্ণাঙ্গ content লেখার আগে ব্যবহারযোগ্য brief থাকবে।
+
+| অধ্যায় | পরিকল্পিত শিরোনাম | Brief-এর মূল ফোকাস |
+| --- | --- | --- |
+| ৭ | CORS: Browser কোন Response পড়তে পারবে? | Origin, same-origin policy, preflight, credentials এবং CORS-এর সীমা |
+| ১২ | Token Expiration এবং Replay Window | Token lifetime, replay window ও layered control |
+| ১৩ | Refresh Token কেন? | Refresh lifecycle ও credential-এর গুরুত্ব |
+| ১৪ | Refresh Token Rotation এবং Reuse Detection | Rotation, reuse signal, race ও timeout recovery |
+| ১৫ | Logout, Revocation এবং Session Recovery | Local logout, server revocation ও incident recovery |
+| ১৬ | IDOR/BOLA এবং Authorization Design | Object-level ও tenant-level authorization |
+| ১৭ | OAuth 2.0 কেন? | Delegated authorization ও OAuth-এর সীমানা |
+| ১৮ | Authorization Code Flow এবং state | Flow sequence ও request/response correlation |
+| ১৯ | Redirect URI এবং Authorization Code Theft | Redirect validation ও code interception |
+| ২০ | PKCE | Code verifier/challenge ও public client |
+| ২১ | OIDC: OAuth-এর ওপর Identity Layer | ID Token, claims ও validation |
+| ২২ | Google Login এবং Token Validation | Google OIDC, token validation ও account linking |
+| ২৩ | MFA এবং Step-up Authentication | Sensitive action ও assurance |
+| ২৪ | Machine-to-Machine Authentication | Workload identity ও service credential |
+| ২৫ | Context বদলালে Architecture কেন বদলায়? | Threat model ও architecture trade-off synthesis |
+| ২৬ | Capstone: পুরো KenaKata Security Architecture | End-to-end architecture, abuse case ও residual risk |
+
+এগুলো planning brief, পূর্ণাঙ্গ article নয়। OAuth-specific normative guidance অধ্যায় ১৭–২১-এ থাকবে। অধ্যায় ১৩–১৫-তে KenaKata-র first-party mobile refresh-token lifecycle শেখানো হবে; সেটিকে OAuth flow হিসেবে বর্ণনা করা হবে না।

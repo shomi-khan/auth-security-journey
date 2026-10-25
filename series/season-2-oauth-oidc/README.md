@@ -1,6 +1,6 @@
 # Season 2 — OAuth, OIDC এবং Delegated Identity
 
-অধ্যায় ১৬–২১। একটাও এখনো লেখা হয়নি।
+অধ্যায় ১৭–২২। অধ্যায় ১৭–২২-এর brief প্রস্তুত; পূর্ণাঙ্গ article লেখা বাকি।
 
 Product-এর তথ্য [product/](../../product/README.md)-এ। Google login আর বাইরের application কখন চালু হয়, সেটা [timeline](../../product/timeline.md)-এ। এই season-এর শুরুতে দুটোই এখনো দাবি, চালু feature নয়।
 
@@ -15,7 +15,7 @@ OAuth 2.0 আর OIDC এই দুই দাবির ভাষা। Google lo
 - Password না দিয়ে অন্য app-কে access দেওয়া
 - মাঝপথে code চুরি হওয়া, আর redirect ঠিকানা ভুল হওয়া
 - Mobile বা SPA-র মতো client, যে নিজে secret লুকিয়ে রাখতে পারে না
-- Access পাওয়া আর user কে সেটা জানা — দুটোকে এক করে ফেলা
+- Access পাওয়া আর user কে সেটা জানা, দুটোকে এক করে ফেলা
 
 ## কোন concepts শিখব?
 
@@ -23,12 +23,12 @@ OAuth, Authorization Code, `state`, redirect URI, PKCE, OIDC, ID Token, Access T
 
 ## Chapter list
 
-16. [OAuth 2.0 কেন?](16-oauth/README.md)
-17. [Authorization Code Flow এবং `state`](17-authorization-code-state/README.md)
-18. [Redirect URI এবং Authorization Code Theft](18-redirect-uri-code-theft/README.md)
-19. [PKCE](19-pkce/README.md)
-20. [OIDC](20-oidc/README.md)
-21. [Google Login এবং ID Token বনাম Access Token](21-google-login/README.md)
+17. [OAuth 2.0 কেন?](17-oauth/README.md)
+18. [Authorization Code Flow এবং `state`](18-authorization-code-state/README.md)
+19. [Redirect URI এবং Authorization Code Theft](19-redirect-uri-code-theft/README.md)
+20. [PKCE](20-pkce/README.md)
+21. [OIDC: OAuth-এর ওপর Identity Layer](21-oidc/README.md)
+22. [Google Login এবং Token Validation](22-google-login/README.md)
 
 ## Season শেষে reader কী বুঝতে পারবে?
 

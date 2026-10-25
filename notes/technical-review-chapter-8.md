@@ -1,47 +1,105 @@
-# Chapter 8: Technical and Security Review
+# Chapter 8: Technical ও Security Review
 
-Date: 2026-10-25
-Branch: `improvements/chapters-engagement`
-Pull request: https://github.com/shomi-khan/auth-security-journey/pull/1
+**তারিখ:** 2026-10-25  
+**Branch:** `improvements/chapters-engagement`  
+**Reviewed file:** `series/season-1-browser-session-token/08-xss-and-httponly/README.md`  
+**Review type:** Source-based conceptual review of the chapter, its claims, diagrams, and cited guidance.
 
-## Review scope
+## সারাংশ
 
-Source-based conceptual review of Chapter 8. Reviewed the product timeline, chapter boundaries, terminology, illustrative HTTP request, Mermaid diagrams, failure paths, and relevant IETF source text. This is not an implementation audit, browser/mobile test, or production security certification.
+Chapter 8-এর প্রথম Draft-এর Technical ও Security Review করা হয়েছে। Review-এ একটি গুরুত্বপূর্ণ taxonomy issue পাওয়া গিয়েছিল: Stored, Reflected এবং DOM-based XSS-কে এমনভাবে উপস্থাপন করা হয়েছিল, যাতে পাঠক এগুলোকে পরস্পর-বিচ্ছিন্ন তিনটি category ভাবতে পারত। এটি সংশোধন করা হয়েছে। আরও দুটি clarification যোগ হয়েছে: safe DOM text sink-এর উদাহরণ এবং server-side authorization-এর অব্যাহত ভূমিকা।
 
-## Findings and changes
+এই review নথি chapter-এর source-based conceptual accuracy নিয়ে। এটি implementation audit, browser compatibility test বা production security certification নয়।
 
-### 1. Password transport wording
+## Technical Review
 
-The initial draft could imply that sending a password on every HTTPS request means the password is exposed in clear text on the network. Updated the paragraph to distinguish the design concern from transport confidentiality: HTTPS encrypts the transport, while repeatedly using a password still expands where it is sent and handled. The chapter now frames an access token as a common credential model, not as proof that tokens are automatically safer.
+### ১. XSS classification
 
-### 2. Token-validation and authorization failure paths
+**আগের gap:** Stored/reflected input delivery এবং server-side/DOM-based unsafe processing-এর পার্থক্য যথেষ্ট স্পষ্ট ছিল না।
 
-The first sequence diagram showed a combined success/permission-denied branch after token validation. Updated it to show missing or invalid token -> 401, then valid token -> authorization check, then allowed -> resource response or denied -> 403. The separate flowchart remains an educational simplification; exact API error behavior belongs to the API contract.
+**সংশোধন:** Chapter এখন আলাদা করে ব্যাখ্যা করে:
+- Stored/reflected হলো attacker-controlled input victim-এর কাছে পৌঁছানোর delivery path।
+- Server-side/DOM-based হলো unsafe processing কোথায় ঘটে।
+- Stored/reflected input browser-side code-এ unsafeভাবে handle হলে DOM-based XSS-ও হতে পারে।
 
-### 3. Intended resource / audience boundary
+**Source:** OWASP DOM-based XSS Prevention Cheat Sheet  
+https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html
 
-Added an explicit sentence that the server must check whether the token is intended for this API, as well as whether the user may access the requested resource and perform the action. This keeps token acceptance, token target, and resource authorization distinct without prematurely teaching JWT claim mechanics.
+### ২. Safe DOM sink
 
-### 4. OAuth boundary
+Chapter-এ plain text দেখানোর জন্য `textContent`-এর উদাহরণ যোগ করা হয়েছে এবং unsafe HTML/code-interpreting sink-এর বিপরীতে সেটি ব্যাখ্যা করা হয়েছে। এটিকে সর্বক্ষেত্রের encoding strategy হিসেবে দেখানো হয়নি: attribute, URL, CSS, script এবং rich HTML-এর জন্য আলাদা context-aware handling দরকার।
 
-Chapter 8 explicitly says the KenaKata first-party mobile login illustration is not an OAuth authorization-code flow. RFC 6750 is used narrowly to explain bearer-token request semantics, not to imply that the whole KenaKata login flow is OAuth.
+**Sources:**
+- https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html
+- https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
 
-## Sources checked
+### ৩. Context-specific output encoding ও sanitization
 
-- RFC 6750, especially Sections 1, 2.1, 3.1 and 5: bearer-token possession, the Authorization header, invalid-token / insufficient-scope responses, token disclosure, TLS and URL-token risks. https://www.rfc-editor.org/rfc/rfc6750.html
-- RFC 6749: OAuth-context definition and framework context for access tokens. https://www.rfc-editor.org/rfc/rfc6749.html
-- Project source map: `references/rfc.md`, including the explicit note that RFC 6750 is being used for bearer-token concepts and not as a claim that KenaKata's first-party login is OAuth.
-- Project teaching policy: `docs/code-example-policy.md`, checked against the chapter's Mermaid diagrams, illustrative HTTP request, failure paths, and language-neutral approach.
+Chapter সঠিকভাবে আলাদা করেছে:
+- Plain text render করার জন্য destination context অনুযায়ী output encoding / framework escaping।
+- User-authored rich HTML-এর জন্য maintained HTML sanitizer।
+- Sanitization-এর পরে unsafe modification করলে সুরক্ষা নষ্ট হতে পারে।
+- Input validation একা output encoding বা sanitization-এর বিকল্প নয়।
 
-## Review outcome
+### ৪. CSP-এর ভূমিকা ও সীমা
 
-- No language-specific implementation code or runnable commands were added.
-- The chapter preserves the product timeline: the existing server-rendered web app keeps its cookie session while the new mobile client uses the access-token model.
-- The chapter avoids claiming that mobile clients cannot use cookies or that tokens are inherently safer than cookie sessions.
-- The chapter keeps JWT internals, SPA token storage, expiry/replay details, refresh-token lifecycle, and OAuth/PKCE/OIDC flows in their planned later chapters.
-- Mermaid source was inspected and the nested token-validation/authorization failure path was clarified. The diagram was not rendered in a Mermaid renderer.
-- No application code, browser, or mobile-client tests were run. Review is conceptual and source-based only.
+Chapter CSP-কে defense-in-depth হিসেবে উপস্থাপন করে, root-cause fix-এর বিকল্প হিসেবে নয়। Nonce/hash policy এবং Report-Only mode-এর সীমা ব্যাখ্যা করা হয়েছে। Report-Only violation report করতে পারে, কিন্তু নিজে execution block করে না।
+
+**Source:** OWASP Content Security Policy Cheat Sheet  
+https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html
+
+### ৫. HttpOnly ও browser request
+
+Chapter সঠিকভাবে আলাদা করেছে:
+- HttpOnly cookie value-কে JavaScript cookie API থেকে আড়াল করে।
+- একই origin-এর vulnerable page-এ চলা script user-এর browser দিয়ে request শুরু করতে পারে।
+- Cookie value না পড়তে পারা মানেই authenticated request করতে না পারা নয়।
+
+Chapter-এ এই দাবিকে সীমাবদ্ধ করা হয়েছে: request সফল হবে কি না, তা cookie scope/policy, browser behavior, CSP/network restrictions, এবং server-side controls-এর ওপরও নির্ভর করে।
+
+### ৬. Server-side authorization boundary
+
+**সংশোধন:** Diagram ও ব্যাখ্যায় যোগ করা হয়েছে যে server-side authorization ও business-rule checks এখনও প্রযোজ্য। XSS মানেই attacker সব operation করতে পারবে, এমন নয়। তবে script user-এর বৈধ ক্ষমতা অপব্যবহারের চেষ্টা করতে পারে।
+
+### ৭. Diagrams ও learning flow
+
+- চারটি Mermaid diagram আছে।
+- XSS delivery/processing taxonomy-র diagram সংশোধন করা হয়েছে।
+- HttpOnly flow-তে cookie-read failure এবং server authorization outcome-এর পার্থক্য দেখানো হয়েছে।
+- Chapter-এ threat model, limitation table, misconceptions, exercises এবং future manual-review checklist আছে।
+
+**বাকি সীমা:** Mermaid source-এর structure পরিদর্শন করা হয়েছে, কিন্তু GitHub renderer বা কোনো browser-এ render করে দেখা হয়নি।
+
+## Security Review
+
+### Claims যাচাই
+
+| Claim | Review outcome |
+|---|---|
+| HttpOnly JavaScript থেকে cookie value পড়া আটকায় | গ্রহণযোগ্য, cookie attribute-এর নির্দিষ্ট scope হিসেবে ব্যাখ্যা করা হয়েছে |
+| HttpOnly একা XSS বন্ধ করে না | গ্রহণযোগ্য; OWASP guidance-এর সঙ্গে সামঞ্জস্যপূর্ণ |
+| XSS script authenticated request শুরু করতে পারে | গ্রহণযোগ্য, তবে server authorization ও browser policy-র সীমা যোগ করা হয়েছে |
+| অন্য origin-এর private data পড়া সাধারণত same-origin policy দ্বারা সীমিত | গ্রহণযোগ্য, নির্বিচার cross-origin access দাবি করা হয়নি |
+| Output encoding destination context অনুযায়ী হওয়া দরকার | গ্রহণযোগ্য |
+| Rich HTML-এর জন্য sanitization আলাদা control | গ্রহণযোগ্য |
+| CSP defense-in-depth, একমাত্র প্রতিরক্ষা নয় | গ্রহণযোগ্য |
+| Report-Only policy execution block করে না | গ্রহণযোগ্য |
+
+### Threat-model scope
+
+Chapter ধরে নিয়েছে attacker-controlled content page-এ পৌঁছাতে পারে এবং vulnerable rendering/browser-side processing-এর কারণে script চালু হতে পারে। Chapter ধরে নেয়নি যে attacker সব cookie, সব origin-এর data, operating system বা server database স্বয়ংক্রিয়ভাবে দখল করেছে।
+
+### Review-এর সীমা
+
+এই review-তে:
+- Application source code পরীক্ষা করা হয়নি।
+- Browser বা browser compatibility matrix চালানো হয়নি।
+- Automated test, exploit reproduction বা dynamic security test চালানো হয়নি।
+- CSP বা cookie configuration বাস্তবে deploy/test করা হয়নি।
+- Reverse proxy, production deployment বা network egress policy পরীক্ষা করা হয়নি।
+
+অতএব, এই review-কে source-based conceptual review হিসেবে গণ্য করতে হবে, implementation-level security audit বা production approval হিসেবে নয়।
 
 ## Status
 
-Chapter 8 is marked Draft, Technical Review (source-based), and Security Review (source-based threat-model review). Published remains unchecked. This record does not claim implementation testing or production security certification.
+Chapter-এ `Draft`, `Technical Review` এবং `Security Review` checked আছে। এটি Chapter 4 ও 5-এর status convention-এর সঙ্গে সামঞ্জস্যপূর্ণ: source-based conceptual review সম্পন্ন, threat model ও control boundaries পর্যালোচিত। Review checkboxes **implementation audit, browser/rendering test বা production security certification বোঝায় না**; সেই সীমাগুলো উপরের অংশে স্পষ্টভাবে লেখা আছে। `Published` unchecked আছে.

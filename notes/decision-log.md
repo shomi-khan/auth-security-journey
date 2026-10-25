@@ -150,61 +150,68 @@
 
 
 
-## 2026-10-25 — Chapter 8: token অধ্যায়ের scope
+## 2026-10-25 — Chapter 9: token অধ্যায়ের scope
 
-- Chapter 8-এর কেন্দ্রীয় সমস্যা: KenaKata-র first-party mobile app API request-এ credential কীভাবে বহন করবে। পুরোনো server-rendered web app-এর cookie session থাকবে; mobile আসার কারণে সেটি সরানো হবে না।
-- Chapter 8-এ access-token ও cookie-session model তুলনা করা হবে, কিন্তু mobile app cookie ব্যবহার করতে পারে না বা token নিজে থেকেই বেশি নিরাপদ — এমন absolute claim করা হবে না।
+- Chapter 9-এর কেন্দ্রীয় সমস্যা: KenaKata-র first-party mobile app API request-এ credential কীভাবে বহন করবে। পুরোনো server-rendered web app-এর cookie session থাকবে; mobile আসার কারণে সেটি সরানো হবে না।
+- Chapter 9-এ access-token ও cookie-session model তুলনা করা হবে, কিন্তু mobile app cookie ব্যবহার করতে পারে না বা token নিজে থেকেই বেশি নিরাপদ — এমন absolute claim করা হবে না।
 - Bearer-token example-এ Authorization header, HTTPS, token disclosure/replay risk এবং token validation বনাম resource authorization-এর পার্থক্য থাকবে। Token URL/query string-এ দেখানো হবে না।
-- KenaKata-র first-party mobile login-কে OAuth flow বলা হবে না। OAuth/PKCE/OIDC অধ্যায় ১৬–২১-এ থাকবে; JWT অধ্যায় ৯, SPA token storage অধ্যায় ১০, expiry/replay অধ্যায় ১১, refresh-token lifecycle অধ্যায় ১২–১৪-এ থাকবে।
-- RFC 6750 Chapter 8-এ bearer-token model বোঝাতে ব্যবহার হবে, তবে OAuth-specific semantics-কে KenaKata-র বর্তমান architecture-এর সত্য হিসেবে আগেভাগে প্রয়োগ করা হবে না।
-- Chapter 8-এর scope ও source plan series/season-1-browser-session-token/08-tokens/08-repo-notes.md-এ আছে। এই এন্ট্রি সিদ্ধান্তের রেকর্ড; chapter draft বা review সম্পন্ন হওয়ার দাবি নয়.
+- KenaKata-র first-party mobile login-কে OAuth flow বলা হবে না। OAuth/PKCE/OIDC অধ্যায় ১৭–২২-এ থাকবে; JWT অধ্যায় ১০, SPA token storage অধ্যায় ১১, expiry/replay অধ্যায় ১২, refresh-token lifecycle অধ্যায় ১৩–১৫-এ থাকবে।
+- RFC 6750 Chapter 9-এ bearer-token model বোঝাতে ব্যবহার হবে, তবে OAuth-specific semantics-কে KenaKata-র বর্তমান architecture-এর সত্য হিসেবে আগেভাগে প্রয়োগ করা হবে না।
+- Chapter 9-এর scope ও source plan series/season-1-browser-session-token/09-tokens/README.md-এ আছে। এই এন্ট্রি সিদ্ধান্তের রেকর্ড; chapter draft বা review সম্পন্ন হওয়ার দাবি নয়.
 
-## 2026-10-25 — Chapter 8-এর প্রথম Draft
+## 2026-10-25 — Chapter 9-এর প্রথম Draft
 
-- Chapter 8-এর first-party mobile access-token story, cookie-session comparison, illustrative Authorization: Bearer request, token validation বনাম authorization, bearer-token disclosure/replay risk, failure paths, exercises এবং RFC references যোগ করা হয়েছে।
-- Chapter 8-এর Draft OAuth authorization-code flow, JWT internals, SPA token storage, expiry/replay timeline এবং refresh-token lifecycle আগেভাগে শেখায় না; এগুলো timeline অনুযায়ী পরের অধ্যায়ে থাকবে।
-- Chapter 8 এখন Draft। Technical Review ও Security Review এখনও করা হয়নি। Mermaid source-এর basic fence/section check হয়েছে, কিন্তু Mermaid renderer বা browser-এ diagram render করে দেখা হয়নি।
+- Chapter 9-এর first-party mobile access-token story, cookie-session comparison, illustrative Authorization: Bearer request, token validation বনাম authorization, bearer-token disclosure/replay risk, failure paths, exercises এবং RFC references যোগ করা হয়েছে।
+- Chapter 9-এর Draft OAuth authorization-code flow, JWT internals, SPA token storage, expiry/replay timeline এবং refresh-token lifecycle আগেভাগে শেখায় না; এগুলো timeline অনুযায়ী পরের অধ্যায়ে থাকবে।
+- Chapter 9 এখন Draft। Technical Review ও Security Review এখনও করা হয়নি। Mermaid source-এর basic fence/section check হয়েছে, কিন্তু Mermaid renderer বা browser-এ diagram render করে দেখা হয়নি।
 - Source basis: RFC 6750-এর bearer-token definition, Authorization header, transport ও disclosure guidance; RFC 6749 শুধু OAuth-context access-token reference হিসেবে রাখা হয়েছে। RFC 6750-এর OAuth scope এবং KenaKata-র first-party login-এর মধ্যে পার্থক্য স্পষ্ট করা হয়েছে.
 
-## 2026-10-25 — Chapter 8 Technical ও Security Review
+## 2026-10-25 — Chapter 9 Technical ও Security Review
 
-- Chapter 8-এর source-based conceptual review করা হয়েছে। Password প্রতিটি request-এ পাঠানোর আলোচনায় HTTPS transport encryption-এর পার্থক্য স্পষ্ট করা হয়েছে; bearer token ব্যবহার করলেই নিরাপত্তা স্বয়ংক্রিয়ভাবে বাড়ে এমন দাবি রাখা হয়নি।
+- Chapter 9-এর source-based conceptual review করা হয়েছে। Password প্রতিটি request-এ পাঠানোর আলোচনায় HTTPS transport encryption-এর পার্থক্য স্পষ্ট করা হয়েছে; bearer token ব্যবহার করলেই নিরাপত্তা স্বয়ংক্রিয়ভাবে বাড়ে এমন দাবি রাখা হয়নি।
 - Mermaid sequence diagram-এ missing/invalid token-এর 401 path এবং valid token-এর পরে authorization decision, permission না থাকলে 403 path আলাদা করা হয়েছে। Intended API/audience যাচাইয়ের কথাও স্পষ্ট করা হয়েছে।
 - RFC 6750-এর bearer-token semantics, Authorization header, invalid-token/insufficient-scope behavior এবং token disclosure/TLS/URL risks source হিসেবে দেখা হয়েছে। KenaKata-র first-party login-কে OAuth flow বলা হয়নি।
-- Review record: `notes/technical-review-chapter-8.md`। Chapter 8 Draft, source-based Technical Review ও Security Review হিসেবে চিহ্নিত; Published নয়। Mermaid renderer, browser বা mobile implementation test চালানো হয়নি.
+- Review record: `notes/technical-review-chapter-9.md`। Chapter 9 Draft, source-based Technical Review ও Security Review হিসেবে চিহ্নিত; Published নয়। Mermaid renderer, browser বা mobile implementation test চালানো হয়নি.
 
-## 2026-10-25 — Chapter 9-এর scope ও প্রথম Draft
+## 2026-10-25 — Chapter 10-এর scope ও প্রথম Draft
 
-- Chapter 9 JWT-কে token format হিসেবে শেখাবে, access token-এর সমার্থক হিসেবে নয়। Signed JWT/JWS-এর পরিচিত তিন অংশ, Base64URL encoding বনাম encryption, claims-এর সীমা, signature/integrity, এবং validation ও authorization-এর পার্থক্য ব্যাখ্যা করা হবে।
+- Chapter 10 JWT-কে token format হিসেবে শেখাবে, access token-এর সমার্থক হিসেবে নয়। Signed JWT/JWS-এর পরিচিত তিন অংশ, Base64URL encoding বনাম encryption, claims-এর সীমা, signature/integrity, এবং validation ও authorization-এর পার্থক্য ব্যাখ্যা করা হবে।
 - তিন-part structure-কে সব JWT-এর সার্বজনীন গঠন বলা হবে না; JWE Compact Serialization-এ পাঁচটি অংশ থাকতে পারে। JWS signature payload গোপন করে না।
 - Validation guidance-এ server-defined algorithm policy, trusted key, issuer, intended audience এবং প্রযোজ্য time claims থাকবে। এটি conceptual guidance, কোনো universal copy-paste validation recipe নয়।
 - OAuth access-token profile, SPA storage, expiry/replay timeline ও refresh-token lifecycle পরের অধ্যায়ের scope-এই থাকবে।
 - Source basis: RFC 7519 (JWT), RFC 7515 (JWS), RFC 8725 (JWT Best Current Practices)। Draft লেখার পর source-based Technical ও Security Review আলাদা করে করতে হবে; browser/app test বা production certification দাবি করা যাবে না।
 
 
-## 2026-10-25 — Chapter 9 Technical ও Security Review
+## 2026-10-25 — Chapter 10 Technical ও Security Review
 
-- Chapter 9-এর source-based conceptual review-এ JWT বনাম access token, JWS-এর signing input ও integrity protection, Base64URL encoding বনাম encryption, JWS/JWE serialization-এর পার্থক্য, trusted key/algorithm policy, issuer/audience/time claims এবং authorization boundary যাচাই করা হয়েছে।
+- Chapter 10-এর source-based conceptual review-এ JWT বনাম access token, JWS-এর signing input ও integrity protection, Base64URL encoding বনাম encryption, JWS/JWE serialization-এর পার্থক্য, trusted key/algorithm policy, issuer/audience/time claims এবং authorization boundary যাচাই করা হয়েছে।
 - Mermaid signing-input diagram সংশোধন করা হয়েছে। JWT-সম্পর্কিত ভুল ধারণাগুলো `notes/misconceptions.md`-এ যোগ করা হয়েছে।
-- Review record: `notes/technical-review-chapter-9.md`। Chapter 9-এর Technical Review ও Security Review source-based review হিসেবে checked; Published নয়।
+- Review record: `notes/technical-review-chapter-10.md`। Chapter 10-এর Technical Review ও Security Review source-based review হিসেবে checked; Published নয়।
 - Mermaid renderer, browser, mobile বা application implementation test চালানো হয়নি। এটি production security audit বা certification নয়।
 
 
-## 2026-10-25 — Chapter 10: SPA token storage
+## 2026-10-25 — Chapter 11: SPA token storage
 
-- Chapter 10-এ localStorage, sessionStorage, in-memory storage, HttpOnly cookie এবং Backend for Frontend (BFF) তুলনা করা হয়েছে; কোনো storage-কে সব threat-এর সর্বজনীন সমাধান বলা হয়নি।
+- Chapter 11-এ localStorage, sessionStorage, in-memory storage, HttpOnly cookie এবং Backend for Frontend (BFF) তুলনা করা হয়েছে; কোনো storage-কে সব threat-এর সর্বজনীন সমাধান বলা হয়নি।
 - KenaKata-র product timeline অক্ষুণ্ণ: SPA browser client, mobile-এর access/refresh token আগে থেকেই আছে; এই অধ্যায়ে OAuth flow চালু করা হয়নি।
 - Cookie-ভিত্তিক authentication-এ Chapter 6-এর KenaKata-specific CSRF policy বহাল। BFF token browser থেকে আড়াল করলেও XSS-এর মাধ্যমে authenticated action-এর ঝুঁকি রয়ে যায়।
 - Source basis: RFC 10017 (August 2026 Internet Best Current Practice), OWASP HTML5 Security / Session Management / CSRF cheat sheets এবং MDN cookie/Web Storage documentation.
-- Chapter 10-এর Technical ও Security Review source-based conceptual review; browser test, Mermaid renderer test বা production audit নয়। Review record: notes/technical-review-chapter-10.md.
+- Chapter 11-এর Technical ও Security Review source-based conceptual review; browser test, Mermaid renderer test বা production audit নয়। Review record: notes/technical-review-chapter-11.md.
 
 
-- Chapter 10 follow-up review (2026-10-25): clarified that the illustrative cookie lacks Max-Age/Expires and therefore does not promise persistence across browser restarts; persistent login depends on cookie lifetime plus server-side session lifetime and server-side invalidation on logout. Clarified RFC 10017 §6.1 (OAuth BFF) vs §7.1 (single-domain non-OAuth context) so KenaKata is not implied to implement OAuth.
+- Chapter 11 follow-up review (2026-10-25): clarified that the illustrative cookie lacks Max-Age/Expires and therefore does not promise persistence across browser restarts; persistent login depends on cookie lifetime plus server-side session lifetime and server-side invalidation on logout. Clarified RFC 10017 §6.1 (OAuth BFF) vs §7.1 (single-domain non-OAuth context) so KenaKata is not implied to implement OAuth.
 
-## 2026-10-25 — Chapter 11–14 এবং OAuth scope continuity
+## 2026-10-25 — Chapter 13–15 এবং OAuth scope continuity
 
-- Chapter 11-এর wording সংশোধন করা হয়েছে: refresh-token-এর generic lifecycle অধ্যায় ১২–১৪-তে; OAuth authorization flow ও protocol-specific নিয়ম অধ্যায় ১৬–২০-তে থাকবে।
-- Chapter 12-এর scope হবে refresh token কেন দরকার, access token-এর সঙ্গে পার্থক্য, token renewal-এর conceptual flow, দীর্ঘমেয়াদি credential-এর ঝুঁকি, storage/binding/lifetime-এর baseline, এবং design trade-off।
-- Chapter 13-তে rotation, token-family/reuse detection, race condition ও breach response-এর গভীর আলোচনা থাকবে। Chapter 14-তে logout, revocation এবং ইতিমধ্যে issue হওয়া access token-এর আচরণ থাকবে।
+- Chapter 12-এর wording সংশোধন করা হয়েছে: refresh-token-এর generic lifecycle অধ্যায় ১৩–১৫-তে; OAuth authorization flow ও protocol-specific নিয়ম অধ্যায় ১৭–২১-তে থাকবে।
+- Chapter 13-এর scope হবে refresh token কেন দরকার, access token-এর সঙ্গে পার্থক্য, token renewal-এর conceptual flow, দীর্ঘমেয়াদি credential-এর ঝুঁকি, storage/binding/lifetime-এর baseline, এবং design trade-off।
+- Chapter 14-তে rotation, token-family/reuse detection, race condition ও breach response-এর গভীর আলোচনা থাকবে। Chapter 15-তে logout, revocation এবং ইতিমধ্যে issue হওয়া access token-এর আচরণ থাকবে।
 - OAuth-নির্দিষ্ট normative requirements শেখানোর সময় RFC 6749-এর পাশাপাশি RFC 9700-এর বর্তমান OAuth Security BCP ব্যবহার করতে হবে; generic first-party mobile flow-কে OAuth implementation বলা যাবে না।
-- এই scope note Chapter 12-এর draft নয়; লেখার আগে product documents, আগের chapter, authoritative references এবং `CONTRIBUTING.md` আবার মিলিয়ে নিতে হবে।
+- এই scope note Chapter 13-এর draft নয়; লেখার আগে product documents, আগের chapter, authoritative references এবং `CONTRIBUTING.md` আবার মিলিয়ে নিতে হবে।
+
+
+## 2026-10-25 — Season 1-এ CORS অধ্যায় যোগ
+
+- CSRF (অধ্যায় ৬)-এর পরে এবং XSS (নতুন অধ্যায় ৮)-এর আগে CORS-কে অধ্যায় ৭ হিসেবে যুক্ত করা হয়েছে।
+- CORS browser-এর cross-origin response sharing নিয়ন্ত্রণ করে; এটি authentication, authorization বা CSRF defense-এর বিকল্প নয়।
+- পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়ে ৮–২৬ হয়েছে। Season 1 এখন অধ্যায় ১–১৬, Season 2 অধ্যায় ১৭–২২ এবং Season 3 অধ্যায় ২৩–২৬।

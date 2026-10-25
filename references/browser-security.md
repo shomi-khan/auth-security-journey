@@ -6,7 +6,7 @@ Browser-এর আচরণ আর cookie-র স্পেসিফিকেশ�
 
 Browser ছোট ডেটা জমিয়ে রাখে, আর পরের request-এর সঙ্গে পাঠাতে পারে। KenaKata-র প্রথম login এই জিনিসটার উপর দাঁড়ায়।
 
-- কোন অধ্যায়: ৪, ৫, ৬, ৭। SPA-তে token রাখার অধ্যায় ১০-এও browser কী পাঠায় সেটা কাজে লাগে।
+- কোন অধ্যায়: ৪, ৫, ৬, ৮। SPA-তে token রাখার অধ্যায় ১১-এও browser কী পাঠায় সেটা কাজে লাগে।
 - কেন গুরুত্বপূর্ণ: Session cookie না বুঝলে পরের আক্রমণগুলোর ছবি আলাদা হয় না।
 - [MDN: HTTP cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
 - [MDN: Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
@@ -24,9 +24,9 @@ RFC 10025 জুলাই ২০২৬-এ প্রকাশিত হয়ে
 
 ## HttpOnly
 
-`HttpOnly` একটা `Set-Cookie` অ্যাট্রিবিউট। অধ্যায় ৭ এটা নিয়ে। Flag কী সরিয়ে দেয় আর কোন আক্রমণ থামিয়ে দেয় না, সেটা অধ্যায়ে সোর্স দেখে লিখতে হবে। “HttpOnly থাকলে XSS সমস্যা নেই” এই ধারণা [ভুল ধারণার তালিকায়](../notes/misconceptions.md) আছে। এখানে সেটার রায় দেওয়া হয়নি।
+`HttpOnly` একটা `Set-Cookie` অ্যাট্রিবিউট। অধ্যায় ৮ এটা নিয়ে। Flag কী সরিয়ে দেয় আর কোন আক্রমণ থামিয়ে দেয় না, সেটা অধ্যায়ে সোর্স দেখে লিখতে হবে। “HttpOnly থাকলে XSS সমস্যা নেই” এই ধারণা [ভুল ধারণার তালিকায়](../notes/misconceptions.md) আছে। এখানে সেটার রায় দেওয়া হয়নি।
 
-- কোন অধ্যায়: ৭।
+- কোন অধ্যায়: ৮।
 - কেন গুরুত্বপূর্ণ: XSS আর cookie একসঙ্গে পড়ার সময় এই flag না দেখলে ছবি আধা হয়।
 
 ## SameSite
@@ -40,7 +40,7 @@ RFC 10025 জুলাই ২০২৬-এ প্রকাশিত হয়ে
 
 Browser কোন পাতা থেকে request গেছে, সেই সীমানা CSRF, XSS, আর CORS-এর আলোচনায় লাগে।
 
-- কোন অধ্যায়: ৬ আর ৭।
+- কোন অধ্যায়: ৬, ৭ ও ৮।
 - কেন গুরুত্বপূর্ণ: “একই সাইট” আর “অন্য সাইট” না আলাদা করলে cookie কখন যায় সেটা বোঝা যায় না।
 - [MDN: Origin header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin)
 - [MDN: Same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy)
@@ -48,7 +48,7 @@ Browser কোন পাতা থেকে request গেছে, সেই স�
 
 ## Fetch Metadata এবং CSRF
 
-- কোন অধ্যায়: ৬; পরে ১০-এ browser client-এর request context বোঝার সময়।
+- কোন অধ্যায়: ৬; পরে ১১-এ browser client-এর request context বোঝার সময়।
 - কেন গুরুত্বপূর্ণ: `Sec-Fetch-Site` request initiator ও target-এর site/origin সম্পর্ক জানায়। এটি browser-সৃষ্ট signal, authentication নয়; non-browser client নিজে header লিখতে পারে।
 - [W3C: Fetch Metadata Request Headers](https://www.w3.org/TR/fetch-metadata/): `Sec-Fetch-Site`-এর মান ও security considerations। ২১ সেপ্টেম্বর ২০২৬-এর সংস্করণ Working Draft, Recommendation নয়।
 - [MDN: Fetch metadata](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Fetch_metadata)
@@ -64,16 +64,16 @@ KenaKata-র Chapter 6 policy হলো: state-changing request-এ `Sec-Fetch-S
 
 CORS browser-এর নিয়ম: অন্য origin-এর response পড়া যাবে কি না। এটা KenaKata-র API-এর authorization নয়।
 
-- কোন অধ্যায়: ১০, যখন SPA আলাদা origin থেকে API ডাকতে পারে। পরে API-র অধ্যায়েও।
+- কোন অধ্যায়: ৭-এ CORS-এর মূল ধারণা; অধ্যায় ১১-এ SPA-র cross-origin API request-এর প্রেক্ষাপট। পরে API-র অধ্যায়েও।
 - কেন গুরুত্বপূর্ণ: CORS header বসালেই কে কোন resource দেখতে পাবে, সেই প্রশ্ন শেষ হয় না। দুটোকে এক করে লিখবে না।
-- [MDN: CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+- [MDN: CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS)
 - [Fetch Living Standard](https://fetch.spec.whatwg.org/)
 
 ## Browser credential behavior
 
 Cookie কখন request-এর সঙ্গে যায়, আর `fetch` বা navigation credential পাঠায় কি না, সেটা browser ঠিক করে। `SameSite`, `Secure`, origin, আর request কীভাবে পাঠানো হয়েছে — এগুলো একসঙ্গে দেখতে হয়।
 
-- কোন অধ্যায়: ৪, ৬, আর ১০।
+- কোন অধ্যায়: ৪, ৬, আর ১১।
 - কেন গুরুত্বপূর্ণ: “Cookie থাকলেই পরের request-এ যাবে” — এই কথাটা ডিফল্ট হিসেবে লিখে রেখো না। লেখার সময় MDN আর cookie ড্রাফট দেখে নাও।
 - [MDN: HTTP cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
 
@@ -97,7 +97,7 @@ DBSC-র specification ও browser support পরিবর্তনশীল। 
 
 ## SPA token storage এবং BFF
 
-- কোন অধ্যায়: ১০।
+- কোন অধ্যায়: ১১।
 - কেন গুরুত্বপূর্ণ: Browser storage API-তে থাকা token-এ একই origin-এর JavaScript access পেতে পারে; cookie browser নিজে request-এ যোগ করতে পারে; BFF token server-side-এ রাখতে পারে, কিন্তু XSS/CSRF threat পুরোপুরি সরায় না।
 - [RFC 10017 — OAuth 2.0 for Browser-Based Applications](https://www.rfc-editor.org/rfc/rfc10017.html): browser-based OAuth architecture ও token-storage threat model। এটি Internet Best Current Practice, আগস্ট ২০২৬।
 - [MDN: Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): localStorage ও sessionStorage-এর lifetime ও scope।

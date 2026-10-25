@@ -1,38 +1,47 @@
-# Chapter 9: Technical ও Security Review
+# Chapter 9: Technical and Security Review
 
-Date: 2026-10-25  
-Branch: `improvements/chapters-engagement`  
+Date: 2026-10-25
+Branch: `improvements/chapters-engagement`
 Pull request: https://github.com/shomi-khan/auth-security-journey/pull/1
 
 ## Review scope
 
-Chapter 9-এর source-based conceptual Technical Review ও Security Review। Chapter-এর core claims-কে RFC 7519, RFC 7515 এবং RFC 8725-এর সঙ্গে মিলিয়ে দেখা হয়েছে; chapter scope, diagrams, examples, validation guidance এবং threat-model boundaries যাচাই করা হয়েছে।
+Source-based conceptual review of Chapter 9. Reviewed the product timeline, chapter boundaries, terminology, illustrative HTTP request, Mermaid diagrams, failure paths, and relevant IETF source text. This is not an implementation audit, browser/mobile test, or production security certification.
 
-এই review কোনো application implementation audit, browser/mobile test, Mermaid renderer test, বা production security certification নয়।
+## Findings and changes
 
-## Findings and corrections
+### 1. Password transport wording
 
-1. **JWT বনাম access token:** JWT-কে format হিসেবে এবং access token-কে usage/purpose হিসেবে আলাদা করা হয়েছে। সব JWT access token নয়, আর access token opaque হতে পারে।
-2. **JWS structure:** তিন-part compact representation-কে common JWS Compact Serialization হিসেবে চিহ্নিত করা হয়েছে, সব JWT-এর universal structure হিসেবে নয়। JWE Compact Serialization-এ পাঁচটি অংশ থাকতে পারে।
-3. **Encoding বনাম encryption:** Base64URL encoding payload-কে গোপন করে না, তা স্পষ্ট। Signed JWS-এর payload decode করা যায়; signature/MAC confidentiality দেয় না।
-4. **Signing input diagram:** Mermaid diagram সংশোধন করে encoded header ও encoded payload-কে signing input হিসেবে দেখানো হয়েছে; signature/MAC-এর ভূমিকা আলাদা করা হয়েছে।
-5. **Signature বনাম trust:** Valid signature একাই issuer trust, intended audience, expiry বা authorization নিশ্চিত করে না। Trusted key, server-defined algorithm policy, issuer/audience এবং প্রযোজ্য time claims-এর conceptual checks রাখা হয়েছে।
-6. **Algorithm ও key selection:** Token-এর untrusted header-কে একা accepted algorithm বা trust source নির্ধারণ করতে দেওয়া যাবে না, এমন সতর্কতা যোগ করা হয়েছে।
-7. **Authorization boundary:** Token-এর `role` claim resource/action permission-এর বিকল্প নয়। Decision Game-এ এই পার্থক্য অনুশীলন করানো হয়েছে।
-8. **Scope control:** OAuth access-token profile, SPA token storage, expiry/replay timeline এবং refresh-token lifecycle নিজ নিজ পরের অধ্যায়ের জন্য রাখা হয়েছে।
+The initial draft could imply that sending a password on every HTTPS request means the password is exposed in clear text on the network. Updated the paragraph to distinguish the design concern from transport confidentiality: HTTPS encrypts the transport, while repeatedly using a password still expands where it is sent and handled. The chapter now frames an access token as a common credential model, not as proof that tokens are automatically safer.
+
+### 2. Token-validation and authorization failure paths
+
+The first sequence diagram showed a combined success/permission-denied branch after token validation. Updated it to show missing or invalid token -> 401, then valid token -> authorization check, then allowed -> resource response or denied -> 403. The separate flowchart remains an educational simplification; exact API error behavior belongs to the API contract.
+
+### 3. Intended resource / audience boundary
+
+Added an explicit sentence that the server must check whether the token is intended for this API, as well as whether the user may access the requested resource and perform the action. This keeps token acceptance, token target, and resource authorization distinct without prematurely teaching JWT claim mechanics.
+
+### 4. OAuth boundary
+
+Chapter 9 explicitly says the KenaKata first-party mobile login illustration is not an OAuth authorization-code flow. RFC 6750 is used narrowly to explain bearer-token request semantics, not to imply that the whole KenaKata login flow is OAuth.
 
 ## Sources checked
 
-- RFC 7519, *JSON Web Token*: JWT claims and serialization definitions. https://www.rfc-editor.org/rfc/rfc7519.html
-- RFC 7515, *JSON Web Signature (JWS)*: JWS signing input, compact serialization, signature/MAC integrity protection. https://www.rfc-editor.org/rfc/rfc7515.html
-- RFC 8725, *JSON Web Token Best Current Practices*: security guidance for JWT deployments. https://www.rfc-editor.org/rfc/rfc8725.html
-- Project source map: `references/rfc.md`.
+- RFC 6750, especially Sections 1, 2.1, 3.1 and 5: bearer-token possession, the Authorization header, invalid-token / insufficient-scope responses, token disclosure, TLS and URL-token risks. https://www.rfc-editor.org/rfc/rfc6750.html
+- RFC 6749: OAuth-context definition and framework context for access tokens. https://www.rfc-editor.org/rfc/rfc6749.html
+- Project source map: `references/rfc.md`, including the explicit note that RFC 6750 is being used for bearer-token concepts and not as a claim that KenaKata's first-party login is OAuth.
+- Project teaching policy: `docs/code-example-policy.md`, checked against the chapter's Mermaid diagrams, illustrative HTTP request, failure paths, and language-neutral approach.
 
-## Review outcome and limitations
+## Review outcome
 
-- Technical Review: complete, source-based conceptual review.
-- Security Review: complete, source-based threat-model review.
-- Mermaid diagrams were reviewed as source text only; they were not rendered in a Mermaid renderer.
-- No application code, browser, or mobile tests were run.
-- This record is not a production security audit or certification.
-- Chapter status remains Draft; Published remains unchecked.
+- No language-specific implementation code or runnable commands were added.
+- The chapter preserves the product timeline: the existing server-rendered web app keeps its cookie session while the new mobile client uses the access-token model.
+- The chapter avoids claiming that mobile clients cannot use cookies or that tokens are inherently safer than cookie sessions.
+- The chapter keeps JWT internals, SPA token storage, expiry/replay details, refresh-token lifecycle, and OAuth/PKCE/OIDC flows in their planned later chapters.
+- Mermaid source was inspected and the nested token-validation/authorization failure path was clarified. The diagram was not rendered in a Mermaid renderer.
+- No application code, browser, or mobile-client tests were run. Review is conceptual and source-based only.
+
+## Status
+
+Chapter 9 is marked Draft, Technical Review (source-based), and Security Review (source-based threat-model review). Published remains unchecked. This record does not claim implementation testing or production security certification.

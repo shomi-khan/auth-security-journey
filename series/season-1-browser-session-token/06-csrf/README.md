@@ -284,7 +284,7 @@ MDN একটা সূক্ষ্ম কৌশল দেয়: পাতা �
 
 ### ৪.৫ স্তর ৪: ভয়ংকর কাজে user-কে আবার জড়ানো
 
-OWASP বলে, অতি সংবেদনশীল কাজে re-authentication বা one-time token ধরনের user-নির্ভর প্রতিরক্ষা ভাবো। আর **CAPTCHA নয়**: ওটা বট ঠেকানোর জন্য বানানো, আর মানুষের উপস্থিতির প্রমাণ অন্য session থেকে জোগাড় করা যায়। অর্ডার বাতিল সাধারণ কাজ, এখানে এটা অতিরিক্ত। কিন্তু টাকা বা ক্ষমতা বদলের কাজে লাগবে, অধ্যায় ২২।
+OWASP বলে, অতি সংবেদনশীল কাজে re-authentication বা one-time token ধরনের user-নির্ভর প্রতিরক্ষা ভাবো। আর **CAPTCHA নয়**: ওটা বট ঠেকানোর জন্য বানানো, আর মানুষের উপস্থিতির প্রমাণ অন্য session থেকে জোগাড় করা যায়। অর্ডার বাতিল সাধারণ কাজ, এখানে এটা অতিরিক্ত। কিন্তু টাকা বা ক্ষমতা বদলের কাজে লাগবে, অধ্যায় ২৩।
 
 ### ৪.৬ সব মিলিয়ে
 
@@ -321,7 +321,7 @@ Origin/Fetch Metadata policy state-changing request-এ প্রথম দি�
 
 অনেকে ভাবে, login পাতায় CSRF অর্থহীন, কারণ user তখনো authenticated নয়। OWASP বলে, এই ধারণা সবসময় ঠিক নয়। *Login CSRF*-এ আক্রমণকারী victim-কে **নিজের account-এ** login করিয়ে দেয়। victim তখন অজান্তে আক্রমণকারীর account-এ তথ্য লিখে ফেলতে পারে। OWASP-র উদাহরণ: shopping সাইটে victim নিজের কার্ডের তথ্য ওই account-এ রাখল, আর আক্রমণকারী পরে সেটা ব্যবহার করল।
 
-KenaKata-র এখনকার একটাই দোকান, তাই ঝুঁকিটা কল্পনার। কিন্তু যেদিন একাধিক দোকান আসবে (অধ্যায় ১৫), রাফি অজান্তে অন্য কারও account-এ ক্রেতার তালিকা তুলে দিলে সেটা সত্যিকারের তথ্য ফাঁস।
+KenaKata-র এখনকার একটাই দোকান, তাই ঝুঁকিটা কল্পনার। কিন্তু যেদিন একাধিক দোকান আসবে (অধ্যায় ১৬), রাফি অজান্তে অন্য কারও account-এ ক্রেতার তালিকা তুলে দিলে সেটা সত্যিকারের তথ্য ফাঁস।
 
 OWASP-র সুপারিশ: login-এর আগে একটা *pre-session* বানিয়ে তাতে token বসাও, আর login-এর পর সেটা **ধ্বংস করে নতুন session** দাও (নইলে fixation)। এখানে অধ্যায় ৫-এর নকশা আমাদের সোজা সুবিধা দেয়। নীরার "login-এর পর ঠিক ওই পাতায় ফেরো" দাবির জন্য আরিফ anonymous session তৈরি করেছিল, আর login-এর মুহূর্তে পুরোনো session বাতিল করে নতুন session ID দিয়েছিল। pre-session আমাদের আগেই আছে। সেই session-এর record-এ (§৪.৩) একটা token-ও আছে। login পাতা সেটা form-এ বসায়, login handler সেটা মেলায়:
 
@@ -371,13 +371,13 @@ Login flow-তে origin policy আর pre-session token দুটোই প্�
 
 **যা আসে।** তিনটা নতুন প্রশ্ন।
 
-এক, মানটা এখন JavaScript-এর নাগালে থাকতে হয়। কোথায় রাখবে? সেখানে XSS ঢুকলে কী হবে? অধ্যায় ৭ আর ১০।
+এক, মানটা এখন JavaScript-এর নাগালে থাকতে হয়। কোথায় রাখবে? সেখানে XSS ঢুকলে কী হবে? অধ্যায় ৮ আর ১১।
 
 দুই, CORS ভুল সাজালে দরজা আবার খোলে। MDN বলে, কোনো origin থেকে CSRF সম্ভব হবে যদি server সেই origin-কে `Access-Control-Allow-Origin` আর `Access-Control-Allow-Credentials` দুটোতেই অনুমতি দেয়।
 
 তিন, `Authorization` header সবসময় non-ambient নয়। RFC 7617 §2.2 অনুযায়ী HTTP Basic client একই protection space-এর পরের request-এ challenge ছাড়াই credential আগেভাগে পাঠাতে পারে। Browser-এর নির্দিষ্ট credential-storage behavior implementation-ভেদে যাচাই করতে হয়, তাই সব browser-এর আচরণ একই বলে দাবি করা হচ্ছে না। মূল শিক্ষা: header-এর নাম নয়, credential কে ও কখন স্বয়ংক্রিয়ভাবে request-এ যোগ করছে সেটাই CSRF model-এর জন্য গুরুত্বপূর্ণ.
 
-KenaKata-র এখনকার নকশায় header-ভিত্তিক credential নেই। token আসে মোবাইল app-এর সঙ্গে (অধ্যায় ৮)। তাই এই অংশ একটা আগাম নোট, সিদ্ধান্ত নয়।
+KenaKata-র এখনকার নকশায় header-ভিত্তিক credential নেই। token আসে মোবাইল app-এর সঙ্গে (অধ্যায় ৯)। তাই এই অংশ একটা আগাম নোট, সিদ্ধান্ত নয়।
 
 ---
 
@@ -396,7 +396,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 | কতক্ষণ access? | একটা request। কিন্তু victim-এর session যতক্ষণ বৈধ আর সে ওই পাতা খোলে, ততক্ষণ প্রতিবার আবার। অধ্যায় ৫-এর নিয়মে সেটা idle ৩০ মিনিট (কাজের মাঝে ঘড়ি নতুন হয়) আর absolute ৮ ঘণ্টা। রাফি ৩০ মিনিট চুপ থাকলে session মরে, হামলা ব্যর্থ। session hijack-এর মতো টানা দখল নয় |
 | server কি ধরতে পারবে? | সাধারণ log-এ প্রায় না (শুরুর log দেখো)। অধ্যায় ৫-এর context signal (network, User-Agent) চুপ থাকে, কারণ request victim-এর নিজের browser থেকেই আসে। Fetch Metadata আর token থাকলে হ্যাঁ: cross-site `POST` আর token mismatch গোনা যায়। OWASP বলে এমন ঘটনা log করতে, কিন্তু token-এর মান log-এ নয় |
 | server কি revoke করতে পারবে? | CSRF নিজে credential চুরি করে না, তাই revocation মূল প্রতিরক্ষা নয়। Credential compromise-এর আলাদা প্রমাণ থাকলে session revoke করো; নইলে audit, ক্ষতি ফেরানো ও business recovery জরুরি |
-| ক্ষতি কীভাবে সীমিত হয়? | স্তর (§৪), ছোট ভূমিকা (অধ্যায় ২, ১৫), ফেরানো-যায় এমন কাজ (soft cancel), সংবেদনশীল কাজে আবার প্রমাণ (অধ্যায় ২২) |
+| ক্ষতি কীভাবে সীমিত হয়? | স্তর (§৪), ছোট ভূমিকা (অধ্যায় ২, ১৬), ফেরানো-যায় এমন কাজ (soft cancel), সংবেদনশীল কাজে আবার প্রমাণ (অধ্যায় ২৩) |
 
 ---
 
@@ -415,12 +415,12 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 
 ## ৯. এই সমাধান কী সমাধান করে না
 
-- **XSS।** OWASP-র সবচেয়ে বড় সতর্কতা: XSS সব CSRF প্রতিরক্ষা ভেঙে দিতে পারে। আক্রমণকারীর script আমাদের নিজের পাতায় চললে request আসবে `same-origin` থেকে, `Origin` ঠিক থাকবে, পাতা থেকে token-ও পড়া যাবে। প্রতিটা স্তর পাস করবে। অধ্যায় ৭।
+- **XSS।** OWASP-র সবচেয়ে বড় সতর্কতা: XSS সব CSRF প্রতিরক্ষা ভেঙে দিতে পারে। আক্রমণকারীর script আমাদের নিজের পাতায় চললে request আসবে `same-origin` থেকে, `Origin` ঠিক থাকবে, পাতা থেকে token-ও পড়া যাবে। প্রতিটা স্তর পাস করবে। অধ্যায় ৮।
 - **`GET`-এ state বদল।** guard safe method-কে CSRF check থেকে ছাড় দেয়, আর synchronizer token-ও safe request-এ সাধারণত যাচাই হয় না। `GET /…/cancel` থাকলে স্তরগুলো পাশ কাটানো যেতে পারে। তাই safe method-এ state change না হওয়াটাই মৌলিক invariant.
-- **client-side CSRF।** OWASP-র আলাদা একটা শ্রেণি: আমাদের নিজের JavaScript যদি URL-এর অংশ ধরে request বানায়, আক্রমণকারী সেই ইনপুট নিয়ন্ত্রণ করে নিজের পছন্দের request করিয়ে নিতে পারে। request তখন same-origin, token সহ, cookie সহ। `SameSite` আর token কিছুই ধরে না। এখন আমাদের JavaScript কম, কিন্তু SPA এলে (অধ্যায় ১০) এটা জীবন্ত হবে।
+- **client-side CSRF।** OWASP-র আলাদা একটা শ্রেণি: আমাদের নিজের JavaScript যদি URL-এর অংশ ধরে request বানায়, আক্রমণকারী সেই ইনপুট নিয়ন্ত্রণ করে নিজের পছন্দের request করিয়ে নিতে পারে। request তখন same-origin, token সহ, cookie সহ। `SameSite` আর token কিছুই ধরে না। এখন আমাদের JavaScript কম, কিন্তু SPA এলে (অধ্যায় ১১) এটা জীবন্ত হবে।
 - **session চুরি (অধ্যায় ৫)।** আক্রমণকারীর হাতে cookie থাকলে সে পাতা চেয়ে নিয়ে token-ও পায়। এই স্তরগুলো **browser-কে অপব্যবহার** থেকে বাঁচায়, credential-ধারী আক্রমণকারী থেকে নয়। `curl`-এ `Sec-Fetch-Site` লিখে দেওয়া যায়।
 - **অধ্যায় ৫-এর যন্ত্র।** মেয়াদ, rotate, revoke আর context signal, কোনোটাই CSRF ধরে না, কারণ কিছু চুরি বা বসানো হয়নি, request আসে victim-এর নিজের browser থেকে। শুধু idle timeout জানালা ছোট করে: রাফি ৩০ মিনিট চুপ থাকলে session মরে, তখন আসা জাল request ব্যর্থ। কিন্তু রাফি কাজের মাঝে থাকলে নয়।
-- **authorization (অধ্যায় ২, ১৫)।** CSRF victim-এর ক্ষমতা ধার করে। অধ্যায় ৫-এর শুভ (`user-4`) Owner নয়, তাই তার browser দিয়ে পাঠানো refund `403` পেত। কিন্তু রাফি (`user-1`) Owner। ক্ষমতা যার যত বেশি, তাকে ধরে CSRF-এর ক্ষতিও তত বেশি। কারও ক্ষমতা কতটুকু, সেটা CSRF-এর প্রতিরক্ষা ঠিক করে না, ঠিক করে অধ্যায় ২ আর ১৫-এর নকশা।
+- **authorization (অধ্যায় ২, ১৫)।** CSRF victim-এর ক্ষমতা ধার করে। অধ্যায় ৫-এর শুভ (`user-4`) Owner নয়, তাই তার browser দিয়ে পাঠানো refund `403` পেত। কিন্তু রাফি (`user-1`) Owner। ক্ষমতা যার যত বেশি, তাকে ধরে CSRF-এর ক্ষতিও তত বেশি। কারও ক্ষমতা কতটুকু, সেটা CSRF-এর প্রতিরক্ষা ঠিক করে না, ঠিক করে অধ্যায় ২ আর ১৬-এর নকশা।
 - **clickjacking।** একটা আলাদা সমস্যা: আসল user আসল পাতায় আসল ক্লিক করে, কিন্তু পাতাটা অদৃশ্যভাবে অন্য ছবির নিচে। তখন request সত্যিই same-origin, token সহ। এর প্রতিরক্ষা আলাদা (OWASP-র Clickjacking Defense cheat sheet)। এখানে আলোচনা হয়নি।
 - **প্রতারণা।** রাফিকে কেউ বুঝিয়ে নিজেই বাটন টেপাতে পারে। সেটা ঠিক এই ধরনের জাল-request নয়।
 
@@ -531,7 +531,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 
 ## পরের অধ্যায়
 
-[অধ্যায় ৭: XSS এবং HttpOnly-এর সীমাবদ্ধতা](../07-xss-and-httponly/README.md)। একটা input ঘরে script ঢোকে। Stored, Reflected আর DOM XSS, `HttpOnly` কী ঠেকায় আর কী ঠেকায় না, আর CSP।
+[অধ্যায় ৭: CORS: Browser কোন Response পড়তে পারবে?](../07-cors/README.md)। Browser অন্য origin-এর response কখন JavaScript-কে পড়তে দেয়, আর CORS কেন authentication, authorization বা CSRF defense নয়, সেটা দেখব।
 
 ---
 

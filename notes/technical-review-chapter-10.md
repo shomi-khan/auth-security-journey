@@ -6,59 +6,33 @@ Pull request: https://github.com/shomi-khan/auth-security-journey/pull/1
 
 ## Review scope
 
-Chapter 10-এর source-based conceptual Technical Review ও Security Review। Browser token storage-এর threat model, storage options, cookie behavior, BFF architecture, XSS/CSRF boundaries এবং product timeline-এর সঙ্গে chapter continuity যাচাই করা হয়েছে।
+Chapter 10-এর source-based conceptual Technical Review ও Security Review। Chapter-এর core claims-কে RFC 7519, RFC 7515 এবং RFC 8725-এর সঙ্গে মিলিয়ে দেখা হয়েছে; chapter scope, diagrams, examples, validation guidance এবং threat-model boundaries যাচাই করা হয়েছে।
 
-এটি application implementation audit, browser compatibility test, Mermaid renderer test বা production security certification নয়।
+এই review কোনো application implementation audit, browser/mobile test, Mermaid renderer test, বা production security certification নয়।
 
-## Technical Review
+## Findings and corrections
 
-1. **Product continuity:** KenaKata-তে SPA mobile app-এর পরে আসে। Mobile-এর access token ও refresh token আগে থেকেই আছে; chapter সেটিকে নতুন করে পরিচয় করায়নি। Server-rendered web app-এর cookie session মুছে ফেলা হয়নি।
-2. **OAuth scope:** Chapter 10-এ OAuth flow চালু করা হয়নি। RFC 10017 browser-based OAuth applications নিয়ে হলেও এখানে storage threat model ও BFF pattern-এর authoritative reference হিসেবে চিহ্নিত।
-3. **Storage semantics:** localStorage persistent ও same-origin script-accessible; sessionStorage tab/page-session-scoped হলেও JavaScript-accessible; in-memory storage reload-এর পর টিকে থাকে না, তবে active execution context-এর malicious script থেকে নিরাপদ নয়।
-4. **Cookie semantics:** HttpOnly JavaScript-কে cookie value পড়া থেকে আটকায়; Secure HTTPS transmission সীমিত করে; SameSite cross-site cookie sending সীমিত করতে পারে, কিন্তু CSRF-এর সম্পূর্ণ universal fix হিসেবে দেখানো হয়নি।
-5. **BFF definition:** BFF browser থেকে token সরিয়ে server-side-এ রাখতে পারে এবং API request-এ token যোগ করে forward করে। Chapter এটিকে generic architectural pattern হিসেবে ব্যাখ্যা করেছে; OAuth flow-এর বাস্তব implementation দাবি করেনি।
-6. **Failure paths:** Diagram-এ invalid/expired session, API rejection এবং successful request path দেখানো হয়েছে।
-7. **Scope control:** Refresh token rotation/reuse detection, expiry/revocation এবং OAuth authorization flow পরের নির্ধারিত chapter-গুলোর জন্য রাখা হয়েছে।
-
-## Security Review
-
-1. **XSS বনাম CSRF:** দুই threat আলাদা করা হয়েছে। JavaScript-readable storage token exfiltration-এর ঝুঁকি বাড়ায়; cookie auto-attachment CSRF threat model তৈরি করে; একই origin-এ চলা malicious JavaScript HttpOnly cookie না পড়েও authenticated request করতে পারে।
-2. **No universal winner:** কোনো storage option-কে সব attack-এর সমাধান বলা হয়নি। Trade-off-গুলো table ও narrative-এ স্পষ্ট করা হয়েছে।
-3. **Persistent token storage:** OWASP Session Management guidance অনুযায়ী sensitive authentication token, refresh token ও session identifier local/session storage-এ রাখার ঝুঁকি তুলে ধরা হয়েছে। এটি guidance হিসেবে উপস্থাপিত, browser standard-এর mandate হিসেবে নয়।
-4. **Cookie example:** __Host- prefix-এর শর্ত, HTTPS-এর জন্য Secure, JavaScript থেকে আড়াল রাখার জন্য HttpOnly এবং SameSite-এর সীমা উল্লেখ করা হয়েছে। উদাহরণটিকে production-ready configuration বলা হয়নি।
-5. **BFF limitation:** Browser-এ token না থাকলেও XSS-এর মাধ্যমে BFF-এ authenticated action নেওয়ার ঝুঁকি রয়ে যায়; cookie-based session-এর জন্য CSRF defenses প্রয়োজন।
-6. **Authorization boundary:** Token/storage decision server-side authentication validation ও resource/action authorization-এর বিকল্প নয়।
+1. **JWT বনাম access token:** JWT-কে format হিসেবে এবং access token-কে usage/purpose হিসেবে আলাদা করা হয়েছে। সব JWT access token নয়, আর access token opaque হতে পারে।
+2. **JWS structure:** তিন-part compact representation-কে common JWS Compact Serialization হিসেবে চিহ্নিত করা হয়েছে, সব JWT-এর universal structure হিসেবে নয়। JWE Compact Serialization-এ পাঁচটি অংশ থাকতে পারে।
+3. **Encoding বনাম encryption:** Base64URL encoding payload-কে গোপন করে না, তা স্পষ্ট। Signed JWS-এর payload decode করা যায়; signature/MAC confidentiality দেয় না।
+4. **Signing input diagram:** Mermaid diagram সংশোধন করে encoded header ও encoded payload-কে signing input হিসেবে দেখানো হয়েছে; signature/MAC-এর ভূমিকা আলাদা করা হয়েছে।
+5. **Signature বনাম trust:** Valid signature একাই issuer trust, intended audience, expiry বা authorization নিশ্চিত করে না। Trusted key, server-defined algorithm policy, issuer/audience এবং প্রযোজ্য time claims-এর conceptual checks রাখা হয়েছে।
+6. **Algorithm ও key selection:** Token-এর untrusted header-কে একা accepted algorithm বা trust source নির্ধারণ করতে দেওয়া যাবে না, এমন সতর্কতা যোগ করা হয়েছে।
+7. **Authorization boundary:** Token-এর `role` claim resource/action permission-এর বিকল্প নয়। Decision Game-এ এই পার্থক্য অনুশীলন করানো হয়েছে।
+8. **Scope control:** OAuth access-token profile, SPA token storage, expiry/replay timeline এবং refresh-token lifecycle নিজ নিজ পরের অধ্যায়ের জন্য রাখা হয়েছে।
 
 ## Sources checked
 
-- RFC 10017, *OAuth 2.0 for Browser-Based Applications*, published August 2026 as an Internet Best Current Practice. Sections 5, 6 and 8 cover malicious JavaScript, BFF architecture and browser token storage: https://www.rfc-editor.org/rfc/rfc10017.html
-- OWASP HTML5 Security Cheat Sheet, Storage APIs: https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html
-- OWASP Session Management Cheat Sheet, HTML5 Web Storage API: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
-- OWASP CSRF Prevention Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
-- MDN, Secure cookie configuration: https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies
-- MDN, Web Storage API: https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
+- RFC 7519, *JSON Web Token*: JWT claims and serialization definitions. https://www.rfc-editor.org/rfc/rfc7519.html
+- RFC 7515, *JSON Web Signature (JWS)*: JWS signing input, compact serialization, signature/MAC integrity protection. https://www.rfc-editor.org/rfc/rfc7515.html
+- RFC 8725, *JSON Web Token Best Current Practices*: security guidance for JWT deployments. https://www.rfc-editor.org/rfc/rfc8725.html
+- Project source map: `references/rfc.md`.
 
-## Outcome and limitations
+## Review outcome and limitations
 
 - Technical Review: complete, source-based conceptual review.
 - Security Review: complete, source-based threat-model review.
-- Chapter status: Draft; Published remains unchecked.
-- Mermaid diagrams were reviewed as source text only; no Mermaid renderer was run.
-- No browser, mobile, application or automated tests were run.
+- Mermaid diagrams were reviewed as source text only; they were not rendered in a Mermaid renderer.
+- No application code, browser, or mobile tests were run.
 - This record is not a production security audit or certification.
-
-
-## Follow-up review findings (2026-10-25)
-
-GitHub PR #1-এ Chapter 10-সংক্রান্ত submitted review, inline thread বা issue comment পাওয়া যায়নি। নিচের দুটি gap স্বাধীনভাবে chapter review-তে শনাক্ত করে এই follow-up commit-এ সংশোধন করা হয়েছে:
-
-1. **Persistent-login ambiguity:** Decision Game-এ browser restart-এর পর login টিকে থাকার requirement ছিল, কিন্তু BFF-এর session cookie/session lifetime সেটি কীভাবে প্রভাবিত করে তা বলা হয়নি। Cookie example-এ Max-Age/Expires না থাকার অর্থও স্পষ্ট ছিল না। Chapter এখন session cookie-এর সীমা, persistent cookie-এর Max-Age/Expires, server-side session lifetime-এর সামঞ্জস্য এবং logout-এ server-side invalidation-এর প্রয়োজন ব্যাখ্যা করে।
-2. **OAuth scope boundary:** RFC 10017-এর BFF pattern OAuth-specific। Chapter এখন §6.1-কে তুলনামূলক architecture reference এবং §7.1-কে single-domain non-OAuth context-এর reference হিসেবে আলাদা করে; KenaKata-র বর্তমান flow-কে OAuth BFF implementation বা RFC compliance হিসেবে উপস্থাপন করে না।
-3. **Terminology:** Comparison table-এ “OAuth/access token browser-এ নেই” বদলে “API access token browser-এ নেই (এই BFF variant-এ)” লেখা হয়েছে, যাতে বর্তমান non-OAuth product story-র সঙ্গে অসঙ্গতি না থাকে।
-
-## Follow-up verification
-
-- Confirmed PR #1 remains open and unmerged before update.
-- Confirmed all targeted text anchors existed before editing.
-- After commit, re-fetch the changed files and PR head to verify branch update and review-status checkboxes.
-- No browser/session persistence test, automated test suite, or Mermaid renderer was run.
+- Chapter status remains Draft; Published remains unchecked.
