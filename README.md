@@ -146,83 +146,83 @@ Trade-off
 - [ ] Technical Review বাকি
 - [ ] Security Review বাকি
 
-#### [অধ্যায় ৮ — XSS এবং HttpOnly-এর সীমাবদ্ধতা](series/season-1-browser-session-token/07-xss-and-httponly/README.md)
+#### [অধ্যায় ৮ — XSS এবং HttpOnly-এর সীমাবদ্ধতা](series/season-1-browser-session-token/08-xss-and-httponly/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ৯ — Token কেন দরকার?](series/season-1-browser-session-token/08-tokens/README.md)
+#### [অধ্যায় ৯ — Token কেন দরকার?](series/season-1-browser-session-token/09-tokens/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১০ — JWT আসলে কী?](series/season-1-browser-session-token/09-jwt/README.md)
+#### [অধ্যায় ১০ — JWT আসলে কী?](series/season-1-browser-session-token/10-jwt/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১১ — SPA-তে Token কোথায় রাখব?](series/season-1-browser-session-token/10-spa-token-storage/README.md)
+#### [অধ্যায় ১১ — SPA-তে Token কোথায় রাখব?](series/season-1-browser-session-token/11-spa-token-storage/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১২ — Token Expiration এবং Replay Window](series/season-1-browser-session-token/11-token-expiration-replay/README.md)
+#### [অধ্যায় ১২ — Token Expiration এবং Replay Window](series/season-1-browser-session-token/12-token-expiration-replay/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৩ — Refresh Token কেন?](series/season-1-browser-session-token/12-refresh-token/README.md)
+#### [অধ্যায় ১৩ — Refresh Token কেন?](series/season-1-browser-session-token/13-refresh-token/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৪ — Refresh Token Rotation এবং Reuse Detection](series/season-1-browser-session-token/13-refresh-token-rotation/README.md)
+#### [অধ্যায় ১৪ — Refresh Token Rotation এবং Reuse Detection](series/season-1-browser-session-token/14-refresh-token-rotation/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৫ — Logout, Revocation এবং Session Recovery](series/season-1-browser-session-token/14-logout-revocation/README.md)
+#### [অধ্যায় ১৫ — Logout, Revocation এবং Session Recovery](series/season-1-browser-session-token/15-logout-revocation/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৬ — IDOR/BOLA এবং Authorization Design](series/season-1-browser-session-token/15-idor-bola-authorization/README.md)
+#### [অধ্যায় ১৬ — IDOR/BOLA এবং Authorization Design](series/season-1-browser-session-token/16-idor-bola-authorization/README.md)
 
 - [ ] লেখা হয়নি
 
 ### Season 2 — OAuth, OIDC এবং Delegated Identity
 
-#### [অধ্যায় ১৭ — OAuth 2.0 কেন?](series/season-2-oauth-oidc/16-oauth/README.md)
+#### [অধ্যায় ১৭ — OAuth 2.0 কেন?](series/season-2-oauth-oidc/17-oauth/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৮ — Authorization Code Flow এবং `state`](series/season-2-oauth-oidc/17-authorization-code-state/README.md)
+#### [অধ্যায় ১৮ — Authorization Code Flow এবং `state`](series/season-2-oauth-oidc/18-authorization-code-state/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৯ — Redirect URI এবং Authorization Code Theft](series/season-2-oauth-oidc/18-redirect-uri-code-theft/README.md)
+#### [অধ্যায় ১৯ — Redirect URI এবং Authorization Code Theft](series/season-2-oauth-oidc/19-redirect-uri-code-theft/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২০ — PKCE](series/season-2-oauth-oidc/19-pkce/README.md)
+#### [অধ্যায় ২০ — PKCE](series/season-2-oauth-oidc/20-pkce/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২১ — OIDC: OAuth-এর ওপর Identity Layer](series/season-2-oauth-oidc/20-oidc/README.md)
+#### [অধ্যায় ২১ — OIDC: OAuth-এর ওপর Identity Layer](series/season-2-oauth-oidc/21-oidc/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২২ — Google Login এবং Token Validation](series/season-2-oauth-oidc/21-google-login/README.md)
+#### [অধ্যায় ২২ — Google Login এবং Token Validation](series/season-2-oauth-oidc/22-google-login/README.md)
 
 - [ ] লেখা হয়নি
 
 ### Season 3 — Production Security
 
-#### [অধ্যায় ২৩ — MFA এবং Step-up Authentication](series/season-3-production-security/22-mfa-step-up/README.md)
+#### [অধ্যায় ২৩ — MFA এবং Step-up Authentication](series/season-3-production-security/23-mfa-step-up/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২৪ — Machine-to-Machine Authentication](series/season-3-production-security/23-machine-to-machine/README.md)
+#### [অধ্যায় ২৪ — Machine-to-Machine Authentication](series/season-3-production-security/24-machine-to-machine/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২৫ — Context বদলালে Architecture কেন বদলায়?](series/season-3-production-security/24-context-and-architecture/README.md)
+#### [অধ্যায় ২৫ — Context বদলালে Architecture কেন বদলায়?](series/season-3-production-security/25-context-and-architecture/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২৬ — Capstone: পুরো KenaKata Security Architecture](series/season-3-production-security/25-capstone/README.md)
+#### [অধ্যায় ২৬ — Capstone: পুরো KenaKata Security Architecture](series/season-3-production-security/26-capstone/README.md)
 
 - [ ] লেখা হয়নি
 
