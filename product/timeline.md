@@ -6,7 +6,7 @@ KenaKata কীভাবে এগোয়, এই ফাইল সেটা। �
 
 দুটো জায়গায় শেখানোর ক্রম আর product-এর ক্রম এক নয়। Product-এর ক্রম বদলায় না।
 
-- Refresh token product-এ mobile app-এর সঙ্গে আসে। বিস্তারিত ব্যাখ্যা অধ্যায় ১২–১৪-এ, SPA-র অধ্যায়ের পরে। SPA আসার সময় refresh token আগে থেকেই আছে। অধ্যায় ১০ বলতে পারে mobile client-এর কাছে এটা আছে। Rotation আর revocation সেখানে ব্যাখ্যা করবে না।
+- Refresh token product-এ mobile app-এর সঙ্গে আসে। বিস্তারিত ব্যাখ্যা অধ্যায় ১৩–১৫-এ, SPA-র অধ্যায়ের পরে। SPA আসার সময় refresh token আগে থেকেই আছে। অধ্যায় ১১ বলতে পারে mobile client-এর কাছে এটা আছে। Rotation আর revocation সেখানে ব্যাখ্যা করবে না।
 - অধ্যায় ১৬–২০ OAuth, PKCE, আর OIDC শেখায়। তখন Google login আর বাইরের app-এর connection এখনো দাবি, চালু feature নয়। Google login চালু হয় অধ্যায় ২১-এ। বাইরের application যুক্ত হয় তার পরে, Season 2-এর শেষে।
 
 ```text
@@ -114,24 +114,25 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 
 ## Chapter plan status (২০২৬-১০-২৫)
 
-অধ্যায় ১–১০-এর content এই পরিকল্পনার অংশ হিসেবে rewrite করা হবে না। অধ্যায় ১১-এর বিদ্যমান draft অক্ষত রেখে তার scope brief যোগ করা হয়েছে। অধ্যায় ১২–২৫-এর README-তে পূর্ণাঙ্গ content লেখার আগে ব্যবহারযোগ্য brief থাকবে।
+অধ্যায় ১–৬-এর content এই পরিবর্তনে rewrite করা হয়নি। CORS-এর নতুন অধ্যায় ৭ যোগ হওয়ায় পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়েছে। পুরোনো অধ্যায় ১১-এর draft এখন অধ্যায় ১২; অধ্যায় ১৩–২৬-এর README-তে পূর্ণাঙ্গ content লেখার আগে ব্যবহারযোগ্য brief থাকবে।
 
 | অধ্যায় | পরিকল্পিত শিরোনাম | Brief-এর মূল ফোকাস |
 | --- | --- | --- |
-| ১১ | Token Expiration এবং Replay Window | Token lifetime, replay window ও layered control |
-| ১২ | Refresh Token কেন? | Refresh lifecycle ও credential-এর গুরুত্ব |
-| ১৩ | Refresh Token Rotation এবং Reuse Detection | Rotation, reuse signal, race ও timeout recovery |
-| ১৪ | Logout, Revocation এবং Session Recovery | Local logout, server revocation ও incident recovery |
-| ১৫ | IDOR/BOLA এবং Authorization Design | Object-level ও tenant-level authorization |
-| ১৬ | OAuth 2.0 কেন? | Delegated authorization ও OAuth-এর সীমানা |
-| ১৭ | Authorization Code Flow এবং state | Flow sequence ও request/response correlation |
-| ১৮ | Redirect URI এবং Authorization Code Theft | Redirect validation ও code interception |
-| ১৯ | PKCE | Code verifier/challenge ও public client |
-| ২০ | OIDC: OAuth-এর ওপর Identity Layer | ID Token, claims ও validation |
-| ২১ | Google Login এবং Token Validation | Google OIDC, token validation ও account linking |
-| ২২ | MFA এবং Step-up Authentication | Sensitive action ও assurance |
-| ২৩ | Machine-to-Machine Authentication | Workload identity ও service credential |
-| ২৪ | Context বদলালে Architecture কেন বদলায়? | Threat model ও architecture trade-off synthesis |
-| ২৫ | Capstone: পুরো KenaKata Security Architecture | End-to-end architecture, abuse case ও residual risk |
+| ৭ | CORS: Browser কোন Response পড়তে পারবে? | Origin, same-origin policy, preflight, credentials এবং CORS-এর সীমা |
+| ১২ | Token Expiration এবং Replay Window | Token lifetime, replay window ও layered control |
+| ১৩ | Refresh Token কেন? | Refresh lifecycle ও credential-এর গুরুত্ব |
+| ১৪ | Refresh Token Rotation এবং Reuse Detection | Rotation, reuse signal, race ও timeout recovery |
+| ১৫ | Logout, Revocation এবং Session Recovery | Local logout, server revocation ও incident recovery |
+| ১৬ | IDOR/BOLA এবং Authorization Design | Object-level ও tenant-level authorization |
+| ১৭ | OAuth 2.0 কেন? | Delegated authorization ও OAuth-এর সীমানা |
+| ১৮ | Authorization Code Flow এবং state | Flow sequence ও request/response correlation |
+| ১৯ | Redirect URI এবং Authorization Code Theft | Redirect validation ও code interception |
+| ২০ | PKCE | Code verifier/challenge ও public client |
+| ২১ | OIDC: OAuth-এর ওপর Identity Layer | ID Token, claims ও validation |
+| ২২ | Google Login এবং Token Validation | Google OIDC, token validation ও account linking |
+| ২৩ | MFA এবং Step-up Authentication | Sensitive action ও assurance |
+| ২৪ | Machine-to-Machine Authentication | Workload identity ও service credential |
+| ২৫ | Context বদলালে Architecture কেন বদলায়? | Threat model ও architecture trade-off synthesis |
+| ২৬ | Capstone: পুরো KenaKata Security Architecture | End-to-end architecture, abuse case ও residual risk |
 
-এগুলো planning brief, পূর্ণাঙ্গ article নয়। OAuth-specific normative guidance অধ্যায় ১৬–২০-এ থাকবে। অধ্যায় ১২–১৪-তে KenaKata-র first-party mobile refresh-token lifecycle শেখানো হবে; সেটিকে OAuth flow হিসেবে বর্ণনা করা হবে না।
+এগুলো planning brief, পূর্ণাঙ্গ article নয়। OAuth-specific normative guidance অধ্যায় ১৭–২১-এ থাকবে। অধ্যায় ১৩–১৫-তে KenaKata-র first-party mobile refresh-token lifecycle শেখানো হবে; সেটিকে OAuth flow হিসেবে বর্ণনা করা হবে না।
