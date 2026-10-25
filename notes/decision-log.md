@@ -200,3 +200,11 @@
 
 
 - Chapter 10 follow-up review (2026-10-25): clarified that the illustrative cookie lacks Max-Age/Expires and therefore does not promise persistence across browser restarts; persistent login depends on cookie lifetime plus server-side session lifetime and server-side invalidation on logout. Clarified RFC 10017 §6.1 (OAuth BFF) vs §7.1 (single-domain non-OAuth context) so KenaKata is not implied to implement OAuth.
+
+## 2026-10-25 — Chapter 11–14 এবং OAuth scope continuity
+
+- Chapter 11-এর wording সংশোধন করা হয়েছে: refresh-token-এর generic lifecycle অধ্যায় ১২–১৪-তে; OAuth authorization flow ও protocol-specific নিয়ম অধ্যায় ১৬–২০-তে থাকবে।
+- Chapter 12-এর scope হবে refresh token কেন দরকার, access token-এর সঙ্গে পার্থক্য, token renewal-এর conceptual flow, দীর্ঘমেয়াদি credential-এর ঝুঁকি, storage/binding/lifetime-এর baseline, এবং design trade-off।
+- Chapter 13-তে rotation, token-family/reuse detection, race condition ও breach response-এর গভীর আলোচনা থাকবে। Chapter 14-তে logout, revocation এবং ইতিমধ্যে issue হওয়া access token-এর আচরণ থাকবে।
+- OAuth-নির্দিষ্ট normative requirements শেখানোর সময় RFC 6749-এর পাশাপাশি RFC 9700-এর বর্তমান OAuth Security BCP ব্যবহার করতে হবে; generic first-party mobile flow-কে OAuth implementation বলা যাবে না।
+- এই scope note Chapter 12-এর draft নয়; লেখার আগে product documents, আগের chapter, authoritative references এবং `CONTRIBUTING.md` আবার মিলিয়ে নিতে হবে।
