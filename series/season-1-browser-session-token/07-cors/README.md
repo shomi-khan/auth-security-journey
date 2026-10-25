@@ -31,7 +31,7 @@ CORS মানে server-এর API-তে কে ঢুকতে পারব�
 
 ## ২. CORS আসলে কী নিয়ন্ত্রণ করে?
 
-ধরা যাক, KenaKata-র browser frontend API-তে order চায়। Browser request পাঠাতে পারে, কিন্তু API-র response JavaScript-কে দেখানোর আগে browser CORS policy যাচাই করে।
+ধরা যাক, একটি browser frontend API-তে order চায়। Browser request পাঠাতে পারে, কিন্তু API-র response JavaScript-কে দেখানোর আগে browser CORS policy যাচাই করে।
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant B as Browser
-    participant A as KenaKata API
+    participant A as Example API
     B->>A: OPTIONS preflight: Origin, requested method/header
     A-->>B: CORS policy: allowed origin, method, header
     alt Preflight অনুমোদিত
@@ -86,7 +86,7 @@ CORS-এ কয়েকটি response header বিশেষভাবে গু�
 
 এগুলো browser-এর CORS decision-এ অংশ নেয়। এগুলো API-র business permission বা role check-এর বিকল্প নয়।
 
-KenaKata-র API যদি শুধু নির্দিষ্ট frontend-কে response পড়তে দিতে চায়, তবে scheme, host এবং port-সহ নির্দিষ্ট origin allowlist-এ মিলিয়ে দেখতে হবে। যেকোনো `Origin` header-কে যাচাই ছাড়া response-এ ফেরত দেওয়া বিপজ্জনক হতে পারে। Origin-এ path থাকে না, আর `https://app.kenakata.example` ও `http://app.kenakata.example` এক origin নয়।
+কোনো API যদি শুধু নির্দিষ্ট frontend-কে response পড়তে দিতে চায়, তবে scheme, host এবং port-সহ নির্দিষ্ট origin allowlist-এ মিলিয়ে দেখতে হবে। যেকোনো `Origin` header-কে যাচাই ছাড়া response-এ ফেরত দেওয়া বিপজ্জনক হতে পারে। Origin-এ path থাকে না, আর `https://app.kenakata.example` ও `http://app.kenakata.example` এক origin নয়।
 
 ## ৫. Credential-সহ CORS
 
@@ -135,7 +135,7 @@ Browser-এর বাইরে থাকা client-এর request-এ `Origin` h
 
 আরিফের প্রথম প্রতিক্রিয়া ছিল সব origin অনুমোদন করে দেওয়া, যাতে frontend-এর CORS error চলে যায়। নীরা থামাল। Development-এর সুবিধার জন্য production-এ অনির্দিষ্ট origin trust করা ঠিক নয়।
 
-KenaKata-র design decision:
+এই illustrative scenario-র design decision:
 
 1. যে frontend origin সত্যিই API ব্যবহার করবে, কেবল সেটি allowlist-এ থাকবে।
 2. Credential দরকার না হলে credentialed CORS চালু করা হবে না।
