@@ -188,6 +188,8 @@ Diagram-টি failure handling-এর উচ্চস্তরের মডে�
 ## লেখার অবস্থা
 
 - [x] পূর্ণাঙ্গ Draft
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (source-based conceptual review)
+- [x] Security Review (source-based threat-model review)
 - [ ] Published
+
+রিভিউয়ের সীমা: মূল security claim ও scope authoritative source-এর সঙ্গে মিলিয়ে দেখা হয়েছে। এটি production implementation audit নয়; কোনো application test suite চালানো হয়নি।
