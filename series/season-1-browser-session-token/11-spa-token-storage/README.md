@@ -238,4 +238,4 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 - [x] Security Review (source-based threat-model review; not a production audit)
 - [ ] Published
 
-Review record: [Chapter 11 Technical ও Security Review](../../../notes/technical-review-chapter-10.md).
+Review record: [Chapter 11 Technical ও Security Review](../../../notes/technical-review-chapter-11.md).
