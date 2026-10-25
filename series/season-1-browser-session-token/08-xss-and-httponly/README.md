@@ -1,5 +1,5 @@
 ---
-chapter: 7
+chapter: 8
 season: 1
 title: "XSS এবং HttpOnly-এর সীমাবদ্ধতা"
 status: draft
@@ -310,7 +310,7 @@ Input validation business rule যাচাই করে। নিরাপদ o
 
 ## পরের অধ্যায়
 
-[অধ্যায় ৮: Token কেন দরকার?](../08-tokens/README.md)। Mobile app-ও যখন KenaKata-র resource চাইবে, তখন browser-এর cookie-session model-এর বাইরে পরিচয় request-এর সঙ্গে কীভাবে যাবে, সেই প্রশ্নে যাব। Token-কে cookie-এর চেয়ে স্বয়ংক্রিয়ভাবে নিরাপদ বিকল্প ধরে নেব না; কোন client-এ কোন credential model মানায়, আর তার নতুন ঝুঁকি কী, তা আলাদা করে দেখব।
+[অধ্যায় ৮: Token কেন দরকার?](../09-tokens/README.md)। Mobile app-ও যখন KenaKata-র resource চাইবে, তখন browser-এর cookie-session model-এর বাইরে পরিচয় request-এর সঙ্গে কীভাবে যাবে, সেই প্রশ্নে যাব। Token-কে cookie-এর চেয়ে স্বয়ংক্রিয়ভাবে নিরাপদ বিকল্প ধরে নেব না; কোন client-এ কোন credential model মানায়, আর তার নতুন ঝুঁকি কী, তা আলাদা করে দেখব।
 
 ## তথ্যসূত্র
 
