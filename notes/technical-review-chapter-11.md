@@ -57,3 +57,44 @@ Pull request: https://github.com/shomi-khan/auth-security-journey/pull/2
 Chapter 11-এর existing draft, Chapter 11 brief, Chapter 10 continuity, Chapter 12 boundary এবং product timeline আবার মিলিয়ে দেখা হয়েছে। এই follow-up-এ একটি narrative ambiguity ঠিক করা হয়েছে: password বদলানোর পর পুরোনো access token দিয়ে request সফল হওয়ার ঘটনাটি দেখে যেন পাঠক ধরে না নেয় যে password change সব architecture-এ access token স্বয়ংক্রিয়ভাবে invalidate করে। এখন opening-এ স্পষ্ট বলা আছে, এটি architecture ও revocation policy-র ওপর নির্ভর করে; password change নিজে থেকে সব already-issued access token বাতিল করে না।
 
 এই পরিবর্তনটি আলাদা commit-এ রাখা হয়েছে। মূল article-এর বাকি scope, learning sequence ও security claims-এ অপ্রয়োজনীয় rewrite করা হয়নি। এটি source-based conceptual follow-up; implementation test, link checker, Mermaid renderer বা production audit চালানো হয়নি।
+
+
+## Final Technical Review ও Security Review: Chapter 11 in PR #2
+
+Date: 2026-10-25  
+Branch: `docs/chapters-11-25-blueprints`  
+Pull request: https://github.com/shomi-khan/auth-security-journey/pull/2
+
+### Review coverage
+
+এই pass-এ Chapter 11-এর সম্পূর্ণ article ও chapter brief, Chapter 10-এর SPA token-storage context, Chapter 12-এর refresh-token scope এবং `product/timeline.md` মিলিয়ে দেখা হয়েছে। মূল security claims-গুলো authoritative RFC guidance-এর সঙ্গে পুনরায় cross-check করা হয়েছে।
+
+### Technical findings
+
+1. **JWT expiration semantics:** `exp` claim উপস্থিত থাকলে exp time-এর সমান বা পরে token গ্রহণ না করার বর্ণনা RFC 7519-এর সঙ্গে সামঞ্জস্যপূর্ণ। `exp` optional claim, bounded clock-skew allowance এবং application/profile-এ missing-exp policy নির্ধারণের কথাও সঠিকভাবে আলাদা করা হয়েছে.
+2. **JWT validation:** Signature verification-কে একা যথেষ্ট বলা হয়নি। Trusted key, allowed algorithm, issuer, audience এবং application/profile-এর প্রয়োজনীয় claims যাচাইয়ের কথা আছে। JWT decode করা আর validate করার পার্থক্যও স্পষ্ট.
+3. **Bearer replay:** Token চুরি হলে তা এখনও গ্রহণযোগ্য থাকা অবস্থায় পুনরায় উপস্থাপনের ঝুঁকি বোঝানো হয়েছে; resource/action authorization-কে token validity থেকে আলাদা রাখা হয়েছে.
+4. **Expiry, session এবং revocation:** এগুলোকে পৃথক concern হিসেবে উপস্থাপন করা হয়েছে। Stateless local validation-এ revocation state না দেখলে token expiry পর্যন্ত accepted থাকতে পারে, এই caveat-টি যথাযথ.
+5. **Clock skew ও time claims:** Clock-skew tolerance সীমিত রাখার কথা বলা হয়েছে; `iat`-কে universal expiry mechanism হিসেবে দেখানো হয়নি.
+6. **Sender-constrained tokens:** DPoP ও mTLS-কে OAuth-context example হিসেবে সীমাবদ্ধ রাখা হয়েছে। DPoP-কে blanket replay immunity বলা হয়নি; proof validity window এবং `jti` replay tracking-এর ভূমিকা উল্লেখ আছে.
+7. **Illustrative payload:** JWT payload-টি বাস্তব credential নয়, উদাহরণ হিসেবে চিহ্নিত; timestamp-গুলো 15-minute example-এর সঙ্গে সামঞ্জস্যপূর্ণ.
+
+### Security findings
+
+1. **Token leakage:** Log, compromised device/endpoint এবং অন্য exposure path উল্লেখ আছে। HTTPS transit protection-কে endpoint/log exposure-এর সমাধান হিসেবে অতিরঞ্জিত করা হয়নি.
+2. **Layered controls:** Short lifetime-কে একমাত্র solution বলা হয়নি; least privilege, audience restriction, exposure reduction, revocation এবং প্রয়োজনমতো sender-constraining-এর ভূমিকা আলাদা করা হয়েছে.
+3. **Password change/logout narrative:** Password change বা client-side logout যে সব architecture-এ already-issued token স্বয়ংক্রিয়ভাবে invalidate করে না, opening ও পরের আলোচনা তা স্পষ্ট করে.
+4. **Incident attribution:** IP, timestamp এবং `sub` claim-কে একা মানুষের পরিচয়ের প্রমাণ ধরা হয়নি.
+5. **Scope control:** Chapter 11 refresh-token rotation/reuse detection, logout recovery এবং OAuth normative flow নিজের মধ্যে টেনে নেয়নি। Chapter 12 ও timeline-এর সঙ্গে scope সামঞ্জস্যপূর্ণ.
+
+### Outcome
+
+- Technical Review: **Complete**, source-based conceptual review.
+- Security Review: **Complete**, threat-model-oriented conceptual review.
+- Blocking technical/security defect found in this pass: **None**.
+- Article rewrite: **Not needed**; বর্তমান wording-এর জন্য অপ্রয়োজনীয় rewrite এড়ানো হয়েছে.
+- Authoritative sources rechecked: [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519.html), [RFC 8725](https://www.rfc-editor.org/rfc/rfc8725.html), [RFC 9449](https://www.rfc-editor.org/rfc/rfc9449.html), [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html). Existing references to RFC 6750, RFC 7009 and the OWASP OAuth 2.0 Cheat Sheet were also reviewed in context.
+
+### Limitations
+
+এটি article-এর source-based conceptual review, production implementation audit নয়। কোনো application/mobile/browser test suite, automated link checker বা Mermaid renderer চালানো হয়নি। তাই relative links ও Mermaid diagram-এর rendered output-কে automatedভাবে verify করা হয়েছে বলে দাবি করা হচ্ছে না.
