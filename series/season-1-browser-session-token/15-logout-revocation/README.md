@@ -149,9 +149,9 @@ OAuth standards-এ থাকা protocol-specific নিয়মকে KenaKata-�
 
 ## ধারাবাহিকতা
 
-আগে: [অধ্যায় ১৩: Refresh Token Rotation এবং Reuse Detection](../14-refresh-token-rotation/README.md)
+আগে: [অধ্যায় ১৪: Refresh Token Rotation এবং Reuse Detection](../14-refresh-token-rotation/README.md)
 
-পরে: [অধ্যায় ১৫: IDOR/BOLA এবং Authorization Design](../16-idor-bola-authorization/README.md)
+পরে: [অধ্যায় ১৬: IDOR/BOLA এবং Authorization Design](../16-idor-bola-authorization/README.md)
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী mobile app-এ access token ও refresh token আগে থেকেই আছে। এই অধ্যায় first-party mobile flow-তে logout, revocation ও recovery-র ধারণা ব্যাখ্যা করে, OAuth token revocation endpoint-এর tutorial নয়।
 
