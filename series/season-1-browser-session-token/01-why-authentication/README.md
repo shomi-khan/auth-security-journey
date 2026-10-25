@@ -34,52 +34,28 @@ KenaKata তখনো খুব ছোট। একটা server-rendered web ap
 | `GET /manage/orders` | সব অর্ডার, সঙ্গে নাম-ফোন-ঠিকানা | শুধু রাফি আর তার লোক |
 | `POST /manage/products/{id}/price` | পণ্যের দাম বদলায় | শুধু রাফি আর তার লোক |
 
-কোডটা ছিল এরকম:
+প্রথম সংস্করণে server-এর route map-টা এমন:
 
-```go
-package main
-
-import (
-	"log"
-	"net/http"
-)
-
-func main() {
-	mux := http.NewServeMux()
-
-	// দোকানের সামনের দিক: সবার জন্য খোলা, এটাই চাই
-	mux.HandleFunc("GET /products", listProducts)
-	mux.HandleFunc("POST /orders", placeOrder)
-
-	// ভেতরের দিক: "শুধু রাফির লোক ব্যবহার করবে" (এটা আরিফের আশা)
-	mux.HandleFunc("GET /manage/orders", listAllOrders)
-	mux.HandleFunc("POST /manage/products/{id}/price", updatePrice)
-
-	log.Fatal(http.ListenAndServe(":8080", mux))
-}
-
-// Go 1.22+ লাগবে: method সহ route pattern আর r.PathValue-এর জন্য।
-// listProducts, placeOrder, listAllOrders এখানে দেখানো হয়নি।
-func updatePrice(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	price := r.FormValue("price")
-
-	// ... database-এ দাম বদলে দেওয়া হলো ...
-
-	log.Printf("price updated: product=%s price=%s", id, price)
-	w.WriteHeader(http.StatusNoContent)
-}
+```mermaid
+flowchart TD
+    A["HTTP request আসে"] --> B{"কোন route?"}
+    B -->|"GET /products"| C["পণ্যের তালিকা"]
+    B -->|"POST /orders"| D["নতুন অর্ডার"]
+    B -->|"GET /manage/orders"| E["সব অর্ডার ও customer তথ্য"]
+    B -->|"POST /manage/products/{id}/price"| F["পণ্যের দাম বদলানো"]
+    E -. "Authentication check নেই" .-> G["যে কেউ request পাঠাতে পারে"]
+    F -. "Authentication check নেই" .-> G
 ```
 
-এবার কোডটা আরেকবার পড়ো, একটা প্রশ্ন নিয়ে: **কোথায় বলা আছে যে `updatePrice` শুধু রাফির লোকেরা চালাতে পারবে?**
+এবার route map-টা আরেকবার দেখো, একটা প্রশ্ন নিয়ে: **কোথায় বলা আছে যে `updatePrice` শুধু রাফির লোকেরা চালাতে পারবে?**
 
 কোথাও নেই। "শুধু ওরাই ব্যবহার করবে" একটা আশা, system-এর নিয়ম নয়। Path-এর নামে `manage` লেখা থাকলে সেটা private হয়ে যায় না। ওটা শুধু একটা নাম।
 
-আরও একটা কথা। HTTP server-এর চোখে `POST /manage/products/17/price` আর `POST /orders` একই ধরনের জিনিস: একটা method, একটা path, কিছু byte। "ভেতরের" আর "বাইরের" বলে কোনো ভাগ প্রোটোকলে নেই। ওই ভাগ আরিফ মাথায় এঁকেছিল, কোডে আঁকেনি।
+আরও একটা কথা। HTTP server-এর চোখে `POST /manage/products/17/price` আর `POST /orders` একই ধরনের জিনিস: একটা method, একটা path, কিছু byte। "ভেতরের" আর "বাইরের" বলে কোনো ভাগ প্রোটোকলে নেই। ওই ভাগ আরিফ মাথায় এঁকেছিল, server-এর নিয়মে বসায়নি।
 
 ---
 
-## ২. ঘটনার পর: log কী বলল
+## 🔍 ২. ঘটনার পর: log কী বলল
 
 রাফির ফোন রাখার পর আরিফ server-এর log খুলল। যা পেল:
 
@@ -96,6 +72,8 @@ func updatePrice(w http.ResponseWriter, r *http.Request) {
 3. **ইচ্ছা করে** করেছে, নাকি ভুল করে? সম্ভাবনা অন্তত তিনটা: কর্মচারীর হাত ফসকে যাওয়া, system-এর bug, বা বাইরের কেউ।
 
 লক্ষ্য করো, তিনটা সম্ভাবনার একটাকেও আরিফ অন্যগুলো থেকে আলাদা করতে পারছে না। এটা শুধু "বাইরের শত্রু ঠেকানোর" সমস্যা নয়। এটা আরও গভীর: **system জানে না কে কী করছে।**
+
+> **Log ≠ পরিচয়ের প্রমাণ।** Audit log তদন্তে কাজে লাগে, কিন্তু IP address ও timestamp একা প্রমাণ করে না কোন মানুষটি কাজটি করেছে। Authentication চালু করার পর log-এ authenticated user ID, কী action হয়েছে, কোন resource বদলেছে এবং কখন হয়েছে, সেগুলো রাখা অনেক বেশি কার্যকর। তবুও log-কে চূড়ান্ত সত্য ধরে নেওয়া যাবে না: application বা account compromise হলে log-ও অসম্পূর্ণ বা বিভ্রান্তিকর হতে পারে।
 
 ---
 
@@ -129,7 +107,7 @@ URL এমন জিনিস, যেটা বহু জায়গা দি�
 
 ---
 
-## ৪. কাদের থেকে, কী বাঁচাতে চাই? (Threat model)
+## 🧠 ৪. কাদের থেকে, কী বাঁচাতে চাই? (Threat model)
 
 "নিরাপত্তা চাই" একটা ঝাপসা কথা। Threat model হলো সেই ঝাপসা কথাকে স্পষ্ট প্রশ্নে বদলানো: **কারা কী করতে পারে, আর কোনটা আমরা ঠেকাতে চাই?**
 
@@ -180,12 +158,18 @@ URL এমন জিনিস, যেটা বহু জায়গা দি�
 
 "আস্থা" শব্দটা ইচ্ছা করে বেছেছি। Authentication নিশ্চয়তা দেয় না। প্রমাণ চুরি হতে পারে, নকল হতে পারে। তাই প্রতিটা প্রমাণ-পদ্ধতির সীমা জানা ততটাই জরুরি, যতটা পদ্ধতিটা জানা।
 
-### পাহারা কোথায় বসবে?
+### 🛡️ পাহারা কোথায় বসবে?
 
 আরিফের এক সহকর্মী বলতে পারত, "Browser-এ ওই button-টা লুকিয়ে ফেলি, কিংবা JavaScript দিয়ে check করি।" এতে কাজ হবে না। আক্রমণকারী browser ব্যবহারই করে না:
 
-```bash
-curl -X POST https://kenakata.example/manage/products/17/price -d "price=120"
+একই অনুরোধ browser ছাড়াও পাঠানো যায়। যেমন, একজন আক্রমণকারী সরাসরি এমন HTTP request পাঠাতে পারে:
+
+```http
+POST /manage/products/17/price HTTP/1.1
+Host: kenakata.example
+Content-Type: application/x-www-form-urlencoded
+
+price=120
 ```
 
 কেন কাজ হবে না, সেটা ছবিতে দেখা যাক। প্রশ্নটা হলো: server কি বুঝতে পারে অনুরোধটা রাফির browser থেকে এসেছে, নাকি `curl` থেকে?
@@ -208,59 +192,33 @@ flowchart LR
 
 দুটো তীর হুবহু এক। Server-এর কাছে পৌঁছনো byte-এ কোনো দাগ নেই যে একটা "ভদ্র" browser থেকে এসেছে আর আরেকটা `curl` থেকে। Browser-এর ভেতরে যা ঘটে, তা আক্রমণকারী পাশ কাটিয়ে যেতে পারে। তাই **Authentication-এর পাহারা বসাতে হয় server-এ, প্রতিটা সুরক্ষিত অনুরোধের ঠিক সামনে।** UI-তে button লুকানো একটা সুবিধা, নিয়ম নয়।
 
-আরিফের নতুন কাঠামোটা এরকম হতে পারে। এখনো আমরা জানি না প্রমাণটা আসলে কী হবে, তাই ভেতরটা ফাঁকা:
+আরিফের নতুন কাঠামোয় প্রতিটি protected request আগে server-side পাহারাদারের কাছে যাবে। এখনো আমরা জানি না পরিচয়ের প্রমাণটা কী হবে, তাই flow-তে সেই যাচাইকে আলাদা ধাপ হিসেবে দেখানো হয়েছে:
 
-```go
-package main
-
-import (
-	"context"
-	"net/http"
-)
-
-type identityKey struct{}
-
-// Identity হলো authentication-এর ফল: "এই অনুরোধ কার পক্ষ থেকে এসেছে"
-type Identity struct {
-	UserID string
-}
-
-// requireAuthentication হলো ভেতরের route-গুলোর সামনে বসানো পাহারাদার
-func requireAuthentication(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, ok := authenticate(r)
-		if !ok {
-			http.Error(w, "authentication required", http.StatusUnauthorized)
-			return
-		}
-		ctx := context.WithValue(r.Context(), identityKey{}, id)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
-// authenticate-এর ভেতরে কী হবে, সেটা এখনো ঠিক হয়নি।
-// সেটা এই season-এর পরের অধ্যায়গুলোর কাজ।
-func authenticate(r *http.Request) (Identity, bool) {
-	return Identity{}, false // আপাতত কাউকেই বিশ্বাস করি না
-}
+```mermaid
+flowchart TD
+    A["/manage-এর কোনো request"] --> B{"Server-এ credential / পরিচয়ের প্রমাণ বৈধ?"}
+    B -->|"না"| C["Request থামাও<br/>401 + উপযুক্ত WWW-Authenticate challenge"]
+    B -->|"হ্যাঁ"| D["যাচাই-করা identity request-এর সঙ্গে যুক্ত করো"]
+    D --> E["নির্দিষ্ট protected handler চালাও"]
 ```
 
-পাহারাদারকে route-এর সঙ্গে আলাদা আলাদা জুড়লে একটা নতুন ঝুঁকি আসে: কাল কেউ নতুন একটা `/manage/...` route যোগ করল, কিন্তু পাহারাদার জুড়তে ভুলে গেল। তখন ঠিক সেই route-ই খোলা। তাই `/manage`-এর পুরো subtree-টাকেই একসঙ্গে মুড়ে দেওয়া ভালো:
+প্রতিটি route-এ আলাদা করে পাহারা বসালে একটা নতুন ঝুঁকি আসে: কাল কেউ নতুন একটা `/manage/...` route যোগ করল, কিন্তু পাহারাদার জুড়তে ভুলে গেল। তখন ঠিক সেই route-ই খোলা। তাই `/manage`-এর পুরো subtree-টাকেই একসঙ্গে মুড়ে দেওয়া ভালো:
 
-```go
-manage := http.NewServeMux()
-manage.HandleFunc("GET /orders", listAllOrders)
-manage.HandleFunc("POST /products/{id}/price", updatePrice)
-
-// /manage/-এর নিচে যা-ই যোগ হোক, পাহারাদার পেরিয়েই যেতে হবে
-mux.Handle("/manage/", http.StripPrefix("/manage", requireAuthentication(manage)))
+```mermaid
+flowchart TD
+    A["GET /manage/orders"] --> G["একই /manage পাহারাদার"]
+    B["POST /manage/products/{id}/price"] --> G
+    C["ভবিষ্যতে যোগ হওয়া অন্য /manage route"] --> G
+    G --> D{"Authentication সফল?"}
+    D -->|"না"| E["Request প্রত্যাখ্যান"]
+    D -->|"হ্যাঁ"| F["সংশ্লিষ্ট handler"]
 ```
 
 দুটো জিনিস লক্ষ্য করার মতো।
 
-**প্রথমত,** `authenticate` আপাতত সবাইকে ফিরিয়ে দেয়। শুরুটা খোলা দরজা থেকে বন্ধ দরজায়। "ডিফল্টভাবে অস্বীকার করো, প্রমাণ পেলে অনুমতি দাও।" নিরাপদ নকশা সাধারণত এই দিক থেকেই শুরু হয়।
+**প্রথমত,** এই flow-তে authentication সফল না হলে protected handler পর্যন্ত request পৌঁছায় না। তবে পরিচয় যাচাই মানেই কাজের অনুমতি নয়: handler চালানোর আগে প্রাসঙ্গিক authorization check-ও লাগতে পারে, যেমন এই কর্মী দাম বদলাতে পারবেন কি না। নিরাপদ নকশার শুরু হলো: "ডিফল্টভাবে অস্বীকার করো, বৈধ প্রমাণ পেলে তবেই এগোও।" বাস্তবে কোন credential কীভাবে যাচাই হবে, সেটা পরের অধ্যায়গুলোতে আসবে।
 
-**দ্বিতীয়ত,** `Identity` এখন প্রতিটা অনুরোধের সঙ্গে চলতে পারে। যে log আগে ছিল:
+**দ্বিতীয়ত,** authentication সফল হলে যাচাই-করা identity-কে request-এর সঙ্গে যুক্ত করে পরের ধাপে নেওয়া যায়। যে log আগে ছিল:
 
 ```
 price updated: product=17 price=120 ip=203.0.113.58
@@ -274,11 +232,11 @@ price updated: product=17 price=120 by=user-4 ip=203.0.113.58
 
 এবার "কে করল?" প্রশ্নের একটা উত্তর পাওয়া সম্ভব। তবে একটা শর্ত আছে। এই উত্তর ততটাই নির্ভরযোগ্য, যতটা নির্ভরযোগ্য আমাদের authentication। দোকানের সবাই একটাই login ভাগ করে ব্যবহার করলে accountability আবার ধসে পড়ে।
 
-> **নামকরণের একটা ফাঁদ।** HTTP-তে `401` status-এর নাম "Unauthorized", কিন্তু মানে হলো "তোমার authentication নেই বা বৈধ নয়"। অনুমতির ব্যর্থতার জন্য আলাদা `403`, সেটা অধ্যায় ২-এ। উপরের কোডটা সরল করা হয়েছে: RFC 9110 অনুযায়ী `401` response-এ `WWW-Authenticate` header থাকতেই হবে, আর server-rendered web app সাধারণত সরাসরি login পেজে redirect করে। ওসব পরে, যখন আমরা ঠিক করব প্রমাণটা আসলে কী।
+> **নামকরণের একটা ফাঁদ।** HTTP-তে `401` status-এর নাম "Unauthorized", কিন্তু মানে হলো "তোমার authentication নেই বা বৈধ নয়"। অনুমতির ব্যর্থতার জন্য আলাদা `403`, সেটা অধ্যায় ২-এ। এই flow-টি ধারণা বোঝানোর জন্য সরল করা হয়েছে: RFC 9110 অনুযায়ী `401` response-এ `WWW-Authenticate` header থাকতেই হবে, আর server-rendered web app সাধারণত সরাসরি login পেজে redirect করে। ওসব পরে, যখন আমরা ঠিক করব প্রমাণটা আসলে কী।
 
 ---
 
-## ৬. কঠিন অর্ধেক: প্রমাণ দেওয়া আর প্রমাণ ধরে রাখা এক জিনিস নয়
+## ⚠️ ৬. কঠিন অর্ধেক: প্রমাণ দেওয়া আর প্রমাণ ধরে রাখা এক জিনিস নয়
 
 আরিফ ভাবল, এবার সোজা। `authenticate` ভরাট করব: request এলে password দেখব, মিলিয়ে নেব।
 
@@ -290,46 +248,38 @@ Christopher Nolan-এর *Memento* সিনেমার নায়কের �
 
 ### সবচেয়ে সোজা সমাধান: প্রতিবার password
 
-আরিফ whiteboard-এ সবচেয়ে সোজা ছবিটা আঁকল। প্রতিটা request-এই password পাঠাও। Server প্রতিবার যাচাই করবে, কিছু মনে রাখতে হবে না, stateless স্বভাবের সঙ্গেও খাপ খায়।
+আরিফ whiteboard-এ সবচেয়ে সোজা flow-টা আঁকল। প্রতিটা request-এই password পাঠাও। Server প্রতিবার যাচাই করবে, কিছু মনে রাখতে হবে না, stateless স্বভাবের সঙ্গেও খাপ খায়।
 
 এটা কল্পনার সমাধান নয়। HTTP-তে এর একটা প্রমিত রূপ আছে: Basic authentication scheme (RFC 7617)। এখানে প্রতিটা request-এর `Authorization` header-এ `user:password` Base64 করে পাঠানো হয়। Base64 একটা encoding, encryption নয়। RFC নিজেই বলছে, TLS-এর মতো আলাদা সুরক্ষা ছাড়া এটা নিরাপদ নয়।
-
-```go
-func authenticate(r *http.Request) (Identity, bool) {
-	// Authorization: Basic base64(user:password)
-	user, password, ok := r.BasicAuth()
-	if !ok {
-		return Identity{}, false
-	}
-	// প্রতিটা request-এ এই যাচাই। (অধ্যায় ৩-এ দেখব, এটা ইচ্ছা করে ধীর কাজ।)
-	return verifyPassword(user, password)
-}
-```
-
-প্রতিটা request-এর চেহারা তখন এরকম:
 
 ```mermaid
 sequenceDiagram
     actor Staff as কর্মী
     participant S as KenaKata server
 
-    Staff->>S: GET /manage/orders, সঙ্গে password
-    S->>S: password যাচাই
-    S-->>Staff: অর্ডারের তালিকা
-    Staff->>S: POST /manage/products/17/price, সঙ্গে password
-    S->>S: আবার password যাচাই
-    S-->>Staff: দাম বদলেছে
-    Staff->>S: GET /manage/orders, সঙ্গে password
-    S->>S: আবার password যাচাই
-    S-->>Staff: অর্ডারের তালিকা
+    Staff->>S: Protected request + Basic credential
+    S->>S: Credential থেকে user/password যাচাইয়ের তথ্য নাও
+    alt Credential অনুপস্থিত বা অবৈধ
+        S-->>Staff: 401 + WWW-Authenticate challenge
+    else Credential বৈধ
+        S->>S: পরিচয় যাচাই হয়েছে
+        S->>S: আলাদা authorization check
+        alt এই কাজের অনুমতি আছে
+            S-->>Staff: Request-এর ফল
+        else অনুমতি নেই
+            S-->>Staff: 403 Forbidden
+        end
+    end
 ```
+
+এই diagram-এ তিনটি আলাদা ফলাফল দেখা যাচ্ছে: credential না থাকলে বা ভুল হলে request প্রত্যাখ্যাত হয়; credential ঠিক হলেও নির্দিষ্ট কাজের অনুমতি নাও থাকতে পারে; আর দুটো শর্ত পূরণ হলেই request-এর কাজ এগোয়। বাস্তব server-এর সব response ঠিক এভাবেই হবে, এমন দাবি নয়, বরং ধারণাগত পার্থক্যটি বোঝানোর জন্য flow-টি সরল করা হয়েছে।
 
 কাজ হয়। কিন্তু দাম দিতে হয়:
 
-- **সবচেয়ে মূল্যবান secret সবচেয়ে বেশি ঘোরে।** Password এখন login-এর মুহূর্তে একবার নয়, প্রতিটা request-এ। Request যেখানে যেখানে পৌঁছায়, header-ও সেখানে: load balancer, reverse proxy, application, debug log, tracing tool। HTTPS network-এ আড়ি পাতা ঠেকায়, কিন্তু TLS শেষ হওয়ার পর server-এর ভেতরের প্রতিটা অংশে password-টা আছে। একটা ভুল debug log সব ফাঁস করে দিতে পারে।
+- **সবচেয়ে মূল্যবান secret বারবার পাঠানো হয়।** Password এখন login-এর মুহূর্তে একবার নয়, প্রতিটা request-এ। যে component request-টি পায় বা credential-সহ header log করে, তার কাছে password পৌঁছাতে পারে: যেমন TLS terminate করা reverse proxy, application, debug log বা tracing tool। HTTPS পথে আড়ি পাতা ঠেকায়, কিন্তু TLS terminate হওয়ার পর credential-এর সুরক্ষা নির্ভর করে কোন component সেটি পায় এবং কীভাবে সামলায় তার ওপর। ভুল logging হলে password ফাঁস হতে পারে।
 - **Client-কে password ধরে রাখতে হয়।** এক পেজ থেকে আরেক পেজে গেলেও পাঠাতে হবে, তাই client-এর কোথাও password থেকেই যাবে। কোন কোড সেটা পড়তে পারে, সেই প্রশ্ন আসবে অধ্যায় ৭-এ।
 - **Server-এর খরচ।** অধ্যায় ৩-এ দেখব, password যাচাই ইচ্ছা করেই ধীর বানানো হয়। তাহলে প্রতিটা request-এ সেই খরচ। আর ভুল password দিয়ে অসংখ্য request পাঠিয়ে server-এর CPU পোড়ানো আক্রমণকারীর জন্য সস্তা।
-- **সূক্ষ্মভাবে বাতিল করার উপায় নেই।** "শুধু এই ফোনের login বন্ধ করো" বলার জায়গা নেই, কারণ server-এর হাতে প্রমাণ একটাই: password। সব বাতিল করতে হলে password বদলাতে হয়।
+- **প্রতি-device session আলাদাভাবে বাতিল করার ব্যবস্থা নেই।** Basic Authentication নিজে থেকে login session তৈরি করে না, তাই "শুধু এই ফোনের login বন্ধ করো" ধরনের session-level revocation দেয় না। Credential বদলানো বা account/credential disable করা সম্ভব, কিন্তু সেটি আলাদা session-কে বেছে বাতিল করার সমতুল্য নয়।
 
 ### দুটো কাজকে আলাদা করা
 
@@ -379,9 +329,9 @@ sequenceDiagram
 | কী দেখতে পারে? | URL যেখানে যেখানে যায়: log, history, `Referer`, শেয়ার করা মেসেজ | Header যেখানে যেখানে পৌঁছায়, TLS শেষ হওয়ার পর সব জায়গায় |
 | চুরি হলে কী পায়? | শুধু `/manage` প্যানেল | account-এর পুরো চাবি, আর reuse হলে অন্য জায়গারও |
 | replay করতে পারে? | হ্যাঁ, যতবার খুশি | হ্যাঁ, যতবার খুশি |
-| কতক্ষণ access থাকে? | যতক্ষণ না URL বদলাই | যতক্ষণ না user password বদলায় |
+| কতক্ষণ access থাকে? | যতক্ষণ না URL বদলাই | Password বদলানো পর্যন্ত credential ঝুঁকিতে থাকে; ইতিমধ্যে চালু session আলাদা policy-র ওপর নির্ভর করে |
 | server কি ধরতে পারে? | না। কে ব্যবহার করল জানার উপায় নেই | আংশিক: ভুল চেষ্টা দেখা যায়, কিন্তু ঠিক password দিয়ে এলে বৈধ user থেকে আলাদা করা যায় না |
-| বাতিল করা যায়? | সবার জন্য একসঙ্গে, URL বদলে | শুধু password বদলে, সব device-এ একসঙ্গে |
+| বাতিল করা যায়? | সবার জন্য একসঙ্গে, URL বদলে | Password বদলালে credential বদলায়; চালু session-গুলোও বাতিল হবে কি না, তা application-কে স্পষ্টভাবে নির্ধারণ করতে হবে |
 | ক্ষতি কীভাবে সীমিত হবে? | কঠিন | কঠিন। পরে MFA আংশিক সাহায্য করবে (অধ্যায় ২২) |
 
 দুটো নকশাই একটা জায়গায় এক: **যার হাতে জিনিসটা, সে-ই সব।** পার্থক্য শুধু এই যে প্রথমটায় "কে" প্রশ্নের উত্তর নেই, আর দ্বিতীয়টায় উত্তর আছে কিন্তু প্রতি request-এ মূল্যবান secret ঘোরানোর দামে।
@@ -407,7 +357,7 @@ sequenceDiagram
 
 ---
 
-## ৮. Authentication কী সমাধান করে না
+## 🛑 ৮. Authentication কী সমাধান করে না
 
 এটা পরিষ্কার না থাকলে "authentication আছে, তাই আমরা নিরাপদ" ধরনের ভুল ধারণা তৈরি হয়।
 
@@ -468,7 +418,39 @@ sequenceDiagram
 - Credential হলো প্রমাণ। Authentication state হলো যাচাইয়ের ফল। যা দিয়ে সেই ফল বহন করা হয়, সেটা চরিত্রে credential-এরই মতো: যার হাতে, সে-ই ব্যবহার করতে পারে।
 - Authentication নতুন দায়ও আনে: secret সংরক্ষণ, state, recovery, ঘর্ষণ, আর login নিজেই লক্ষ্য হয়ে ওঠা।
 
-## পাঁচ মিনিটের পরীক্ষা
+## 🧠 এক মিনিটের সিদ্ধান্ত-খেলা
+
+**আগে উত্তরটা নিজে বেছে নাও, তারপর ব্যাখ্যা খোলো।**
+
+KenaKata-র `/manage/orders` URL তুমি জানো। কোনো login না করেই request পাঠালে server অর্ডার দেখিয়ে দিচ্ছে। প্রথমে কোন পরিবর্তনটি দরকার?
+
+- A. URL-টা আরও কঠিন করে নাম দেওয়া
+- B. Browser-এর JavaScript দিয়ে menu লুকিয়ে রাখা
+- C. Server-এ request-এর পরিচয় যাচাই করা
+- D. Log-এ request-এর IP address লেখা
+
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
+
+**সঠিক উত্তর: C. Server-এ request-এর পরিচয় যাচাই করা।**
+
+A কেবল URL গোপন রাখার ওপর নির্ভর করে। B-কে পাশ কাটিয়ে সরাসরি HTTP request পাঠানো যায়। D তদন্তে কিছু context দেয়, কিন্তু কে request পাঠিয়েছে তা নিশ্চিত করে না। Server-side authentication হলো প্রথম দরজা; এরপরও কোন user কোন order দেখতে পারবে, সেটা আলাদা করে authorization দিয়ে ঠিক করতে হবে।
+
+</details>
+
+### 🎯 নিজের বোঝাপড়া যাচাই
+
+রাফি login করে নিজের পরিচয় প্রমাণ করেছে। এরপর সে URL-এ order ID বদলে অন্য কর্মচারীর অর্ডার দেখতে চাইল। এখানে কোন প্রশ্নটির উত্তর এখনো দরকার?
+
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
+
+**Authorization।** Authentication বলেছে request-টি কোন user-এর পক্ষ থেকে এসেছে। কিন্তু সেই user নির্দিষ্ট অর্ডারটি দেখতে পারবে কি না, সেটা আলাদা করে যাচাই করতে হবে। অর্থাৎ পরিচয় জানা মানেই সব resource-এ অনুমতি থাকা নয়।
+
+</details>
+
+---
+## 🧪 পাঁচ মিনিটের পরীক্ষা
 
 নিজের কোনো project-এর staging-এ একটা সুরক্ষিত endpoint-এ কোনো credential ছাড়া `curl -i` চালাও। কী আসে? `401`, `403`, নাকি সফল response? তারপর log খুলে দেখো, সেখানে কি "কে" প্রশ্নের উত্তর থাকে, নাকি শুধু IP আর সময়?
 
@@ -494,7 +476,7 @@ sequenceDiagram
 - [RFC 7617: The 'Basic' HTTP Authentication Scheme](https://www.rfc-editor.org/rfc/rfc7617): প্রতি request-এ `user:password`, Base64, TLS ছাড়া অনিরাপদ
 - [W3C TAG: Good Practices for Capability URLs](https://www.w3.org/2001/tag/doc/capability-urls): URL ফাঁসের পথ, আর capability URL-এর ব্যবহার-শর্ত (এটা W3C TAG-এর লেখা, প্রমিত স্পেসিফিকেশন নয়)
 - Auguste Kerckhoffs, *La cryptographie militaire* (১৮৮৩): নকশা নয়, চাবির গোপনীয়তার ওপর নির্ভরতার নীতি
-- Go `net/http` ডকুমেন্টেশন: `Request.BasicAuth`, Go 1.22-এর method সহ routing pattern
+- Mermaid flowchart ও sequence diagram এই অধ্যায়ে process এবং request-এর ক্রম বোঝাতে ব্যবহৃত হয়েছে; protocol-সংক্রান্ত সিদ্ধান্তের ভিত্তি উপরের RFC-গুলো।
 
 ## Status
 

@@ -52,6 +52,10 @@ Trade-off
 
 > লক্ষ্য শুধু JWT, OAuth বা Session-এর definition মুখস্থ করানো নয়। লক্ষ্য হলো এমন একটি mental model তৈরি করা, যাতে একজন junior engineer নতুন application-এর authentication এবং authorization architecture নিয়ে নিজে reasoning করতে পারে।
 
+## শেখানোর গভীরতা
+
+এই সিরিজ মূল security theory, mental model, threat model, control-এর সীমা ও trade-off শেখায়। এটি কোনো নির্দিষ্ট programming language, framework বা security library-র implementation manual নয়। Tool-এর detail তখনই থাকবে, যখন মূল ধারণা বোঝাতে বা ভুল security assumption ঠেকাতে দরকার। Chapter-গুলো যেন tool-specific parameter বা implementation detail-এর rabbit hole-এ না ঢুকে যায়।
+
 ## Season 1
 
 ### Browser, Session এবং Token
@@ -223,9 +227,9 @@ Trade-off
 | [product/](product/README.md) | KenaKata-র তথ্য। Chapter লেখার আগে এটা পড়তে হবে |
 | [references/](references/README.md) | Spec আর cheat sheet-এর তালিকা। দাবি লেখার আগে এখান থেকে মিলিয়ে নিতে হবে |
 | [notes/](notes/glossary.md) | Glossary, ভুল ধারণা, আর সিদ্ধান্তের খাতা |
-| [diagrams/](diagrams/authentication/) | আঁকা ছবির জায়গা। এখন খালি। দরকার হলে chapter-এর সঙ্গে যোগ হবে |
-| [examples/go/](examples/go/authentication/) | ছোট Go উদাহরণের জায়গা। এখন খালি। পুরো backend এখানে বানানো হবে না |
+| [diagrams/](diagrams/authentication/) | একাধিক অধ্যায়ে কাজে লাগতে পারে এমন diagram-এর জায়গা; ছোট Mermaid diagram সাধারণত অধ্যায়ের ভেতরেই থাকবে |
+| [docs/code-example-policy.md](docs/code-example-policy.md) | Mermaid-first teaching, pseudocode ব্যবহারের সীমা এবং security review-এর নিয়ম |
 
-লেখার নিয়ম: [CONTRIBUTING.md](CONTRIBUTING.md)।
+লেখার নিয়ম: [CONTRIBUTING.md](CONTRIBUTING.md)। উদাহরণ ও diagram তৈরির নির্দিষ্ট নীতি: [docs/code-example-policy.md](docs/code-example-policy.md)।
 
 লাইসেন্স MIT। Copyright-এর নাম এখনো বসানো হয়নি, ফাইলে `[COPYRIGHT HOLDER]` লেখা আছে। দেখো [LICENSE](LICENSE)।

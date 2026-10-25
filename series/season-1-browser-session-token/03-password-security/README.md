@@ -23,44 +23,47 @@ status: draft
 
 ## ১. তিন সপ্তাহ আগে: আধ ঘণ্টার login
 
-অধ্যায় ১-এ আরিফ `authenticate` ফাংশনটা ফাঁকা রেখেছিল। অধ্যায় ২-এ আমরা ধরে নিয়েছিলাম সেটা নির্ভুল। কিন্তু কোনো একসময় ভেতরটা লিখতে হয়েছে, আর আরিফ সেটা লিখেছিল যেভাবে ব্যস্ত মানুষ লেখে: সবচেয়ে সোজা পথে।
+অধ্যায় ১-এ আরিফ `authenticate`-এর ভেতরের কাজটা ফাঁকা রেখেছিল। অধ্যায় ২-এ আমরা ধরে নিয়েছিলাম সেটা নির্ভুল। কিন্তু কোনো একসময় password যাচাইয়ের নিয়ম ঠিক করতে হয়েছে, আর আরিফ সেটা করেছে যেভাবে ব্যস্ত মানুষ করে: সবচেয়ে সোজা পথে।
 
-দুটো জিনিস দরকার ছিল। রাফি আর তার দুই কর্মীর email ও password রাখার জায়গা, আর অধ্যায় ১-এর সেই `verifyPassword` ফাংশন, যেটা বলে দেয় "এই email-password জোড়া ঠিক কি না"।
+দুটো জিনিস দরকার ছিল। রাফি আর তার দুই কর্মীর email ও password রাখার জায়গা, আর এমন একটি যাচাই-প্রক্রিয়া, যেটা বলে দেয় "এই email-password জোড়া ঠিক কি না"।
 
 | id | email | password |
 |---|---|---|
-| `user-1` | `rafi@example.com` | `rafi1985` |
-| `user-4` | `shuvo@example.com` | `shuvo@123` |
-| `user-7` | `tuli@example.com` | `Tuli2024!` |
+| `user-1` | `rafi@example.com` | `[দুর্বল উদাহরণ password]` |
+| `user-4` | `shuvo@example.com` | `[দুর্বল উদাহরণ password]` |
+| `user-7` | `tuli@example.com` | `[দুর্বল উদাহরণ password]` |
 
 (email আর password কাল্পনিক, আর ইচ্ছা করেই দুর্বল।)
 
-```go
-// আরিফের প্রথম সংস্করণ। কাজ করে, কিন্তু ভুল। কেন ভুল, সেটা সামনে।
-func verifyPassword(email, pw string) (Identity, bool) {
-	var id, stored string
-	err := db.QueryRow(
-		"SELECT id, password FROM users WHERE email = $1", email,
-	).Scan(&id, &stored)
-	if err != nil || stored != pw {
-		return Identity{}, false
-	}
-	return Identity{UserID: id}, true
-}
+```mermaid
+flowchart TD
+    R["Login request: email + password"] --> Q["Email দিয়ে account খোঁজো"]
+    Q --> U["Database থেকে stored password আনো"]
+    U --> C{"পাঠানো password<br/>stored password-এর সমান?"}
+    C -->|"হ্যাঁ"| OK["Login সফল"]
+    C -->|"না"| NO["Login ব্যর্থ"]
+    DB["Database-এ plaintext password রাখা"] -. "Dump ফাঁস হলে" .-> A["আক্রমণকারী সব password সরাসরি পড়ে"]
 ```
 
-(`db` আর `Identity` আগের অধ্যায়ের কাল্পনিক অংশ। query-তে `$1` ব্যবহার হয়েছে, মানে user-এর পাঠানো email সরাসরি SQL-এর ভেতরে বসানো হয়নি। সেটা আলাদা একটা ঝুঁকি, আর এখানে ঠিকই আছে।)
+এটি একটি ধারণাগত flow: account খোঁজার সময় user-এর পাঠানো email-কে database query-তে নিরাপদ parameter হিসেবে দিতে হবে, সরাসরি query string-এর সঙ্গে জুড়ে দেওয়া যাবে না।
 
-আরিফ test করল। ঠিক password দিলে ঢোকে। ভুল দিলে ঢোকে না। আধ ঘণ্টা, কাজ শেষ। কোডে "ভুল" বলে কিছু চোখে পড়ে না।
+আরিফের প্রথম পরীক্ষা সফল। ঠিক password দিলে ঢোকা যায়, ভুল দিলে যায় না। আধ ঘণ্টা, কাজ শেষ। সাধারণ ব্যবহারকারীর চোখে কোনো ভুল ধরা পড়ে না।
 
-এটাই এই অধ্যায়ের প্রথম শিক্ষা, আর এটা একটু অস্বস্তিকর: **এই কোড প্রতিটা functional test পাস করে, তবু নিরাপত্তার দিক থেকে ভাঙা।** Functional test জিজ্ঞেস করে "ঠিক মানুষ ঢুকছে তো?"। নিরাপত্তার প্রশ্ন আলাদা: "জিনিসটা অন্যের হাতে গেলে কী হবে?"
+এটাই এই অধ্যায়ের প্রথম শিক্ষা, আর এটা একটু অস্বস্তিকর: **সাধারণ functional test পাস করলেও password সংরক্ষণের নকশা নিরাপত্তার দিক থেকে ভাঙা হতে পারে।** Functional test জিজ্ঞেস করে "ঠিক মানুষ ঢুকছে তো?"। নিরাপত্তার প্রশ্ন আলাদা: "জিনিসটা অন্যের হাতে গেলে কী হবে?"
 
 ---
 
 ## ২. ফাঁস: dump খুললে আরিফ কী দেখল
 
-```sql
-SELECT id, email, password FROM users;
+```text
+Database থেকে পাওয়া তথ্যের ধারণাগত উদাহরণ:
+
+users table
+- id
+- email
+- password  ← এখানে plaintext password রাখা হয়েছিল
+
+আক্রমণকারী table-এর এই column-টিও পড়তে পারে, যদি dump-টি তার হাতে যায়।
 ```
 
 ```
@@ -97,22 +100,24 @@ SELECT id, email, password FROM users;
 flowchart LR
     subgraph Online["Online: আমাদের server-এর মধ্য দিয়ে"]
         A1["আক্রমণকারী"] -->|"email + অনুমান"| L["POST /login"]
-        L --> C{"rate limit, throttling, log, MFA"}
-        C -->|"সীমার মধ্যে"| V["Argon2id যাচাই"]
-        C -->|"সীমা পার"| B["আটকে দিই"]
+        L --> C{"Rate limit / throttling / monitoring"}
+        C -->|"অনুমোদিত"| V["Password hash যাচাই"]
+        C -->|"সীমা পার"| B["অনুরোধ ধীর বা আটকে দিই"]
+        V --> M["প্রয়োজনে অতিরিক্ত factor (MFA)"]
+        M --> ACCESS["প্রবেশের সিদ্ধান্ত"]
     end
     subgraph Offline["Offline: dump আক্রমণকারীর নিজের machine-এ"]
-        A2["আক্রমণকারী"] --> G["অনুমান → hash → মিলিয়ে দেখা"]
-        G -->|"মেলেনি"| G
-        G -->|"মিলল"| W["plaintext password পাওয়া গেল"]
+        A2["আক্রমণকারী"] --> GUESS["অনুমান → hash → মিলিয়ে দেখা"]
+        GUESS -->|"মেলেনি"| GUESS
+        GUESS -->|"মিলল"| W["password অনুমান মিলে গেল"]
     end
 ```
 
-ডানদিকের বাক্সে আমাদের কোনো নিয়ন্ত্রণ নেই। Rate limit সেখানে পৌঁছায় না, MFA-ও না। সেখানে একটাই জিনিস আক্রমণকারীকে আটকায়: **প্রতিটা অনুমানের খরচ।** পুরো অধ্যায়ের নকশা এই এক বাক্যের ওপর দাঁড়িয়ে। আজ যা বানাব, তার উদ্দেশ্য সেই খরচ বাড়ানো, আর তার সঙ্গে online দিকটাও সামলানো।
+ডানদিকের বাক্সে server-side rate limit, CAPTCHA বা login monitoring আক্রমণকারীর অনুমানগুলোকে নিয়ন্ত্রণ করতে পারে না, কারণ সেগুলো server-এর বাইরে চলছে। MFA hash cracking-এর খরচ বাড়ায় না, তবে চুরি হওয়া বা অনুমান করা password দিয়ে account-এ ঢোকা কঠিন করতে পারে। Offline আক্রমণের বিরুদ্ধে দুটি গুরুত্বপূর্ণ বিষয় হলো password অনুমান করা কতটা কঠিন, এবং প্রতিটি অনুমান করতে কত খরচ হয়।
 
 ---
 
-## ৩. ভুল প্রশ্ন: "password কীভাবে লুকাব?"
+## 💡 ৩. ভুল প্রশ্ন: "password কীভাবে লুকাব?"
 
 আরিফের প্রথম প্রতিক্রিয়া ছিল স্বাভাবিক: "ঠিক আছে, password-গুলো encrypt করে রাখি।"
 
@@ -133,12 +138,15 @@ flowchart LR
 
 তাহলে আমরা password রাখব না। রাখব তার hash। Login-এর সময় user যা দিল, তার hash বের করে stored hash-এর সঙ্গে মেলাব। Server কখনো আসল password রাখেনি, শুধু তার ছাপ।
 
-আরিফ SHA-256 বেছে নিল। এটা পরিচিত, শক্তিশালী হিসেবে সুনাম আছে, আর Go-র standard library-তেই আছে:
+আরিফ SHA-256 বেছে নিল। এটা পরিচিত cryptographic hash, কিন্তু password সংরক্ষণের জন্য খুব দ্রুত। Flowchart-এ দেখা যাক, এই দ্রুততার কারণে কী সমস্যা হয়:
 
-```go
-sum := sha256.Sum256([]byte(pw))
-stored := hex.EncodeToString(sum[:])
-// "password" → 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
+```mermaid
+flowchart TD
+    P["User-এর password"] --> H["দ্রুত SHA-256 hash"]
+    H --> S["একই password হলে একই hash"]
+    S --> D["Database dump"]
+    D --> A["আক্রমণকারী অনেক সম্ভাব্য password নিজে hash করে মিলিয়ে দেখে"]
+    A --> W["দুর্বল password দ্রুত পাওয়া যেতে পারে"]
 ```
 
 আগের চেয়ে ভালো। এখন dump খুলে `rafi1985` পড়া যায় না। কিন্তু এই নকশারও তিনটা ফাটল আছে, আর তিনটাই আক্রমণকারীর অনুমান করার ধরন থেকে আসে।
@@ -147,10 +155,29 @@ stored := hex.EncodeToString(sum[:])
 
 **ফাটল ২: আগেভাগে হিসাব করে রাখা যায়।** Hash একমুখী হলেও আক্রমণকারী উল্টো দিক থেকে কাজ করতে পারে: লক্ষ লক্ষ পরিচিত password আগেই hash করে একটা বিশাল তালিকা বানিয়ে রাখে। তারপর dump এলে শুধু খুঁজে নেয়, hash করার সময়ও লাগে না। (এই ধরনের তালিকার পরিচিত নাম rainbow table।)
 
-**ফাটল ৩: SHA-256 জন্মেছে দ্রুত হওয়ার জন্য।** এটা বানানো হয়েছে ফাইলের অখণ্ডতা যাচাই আর digital signature-এর মতো কাজে, যেখানে গতিই গুণ। আমি যে sandbox-এ কোড চালিয়ে দেখেছি (১টা vCPU), সেখানে একটা thread-এ ১০ লক্ষ SHA-256 শেষ হয়েছে প্রায় ০.১ সেকেন্ডে। মানে সেকেন্ডে এক কোটির মতো অনুমান, একটা core-এ। আক্রমণকারী GPU বা ভাড়া করা cloud machine ব্যবহার করে, আর OWASP নিজেই বলে, GPU আর ভাড়া-করা cloud machine দিয়ে password ভাঙার খরচ আক্রমণকারীর জন্য তুলনামূলকভাবে কম, বিশেষ করে hashing-এর ভালো চর্চা না মানা হলে।
+**ফাটল ৩: SHA-256 জন্মেছে দ্রুত হওয়ার জন্য।** এটা ফাইলের অখণ্ডতা যাচাই আর digital signature-এর মতো কাজে উপযোগী, যেখানে গতি গুণ। কিন্তু password guessing-এর ক্ষেত্রেও এই গতি আক্রমণকারীর সুবিধা: সাধারণ hardware-এ দ্রুত hash দিয়ে বিপুল সংখ্যক অনুমান যাচাই করা যায়। নির্দিষ্ট machine-এর benchmark বদলাবে, কিন্তু নকশাগত সমস্যা বদলায় না। আক্রমণকারী GPU বা ভাড়া করা cloud machine ব্যবহার করে, আর OWASP নিজেই বলে, GPU আর ভাড়া-করা cloud machine দিয়ে password ভাঙার খরচ আক্রমণকারীর জন্য তুলনামূলকভাবে কম, বিশেষ করে hashing-এর ভালো চর্চা না মানা হলে।
 
 এখানে যুক্তিটা উল্টে যায়। সাধারণত "দ্রুত" মানে ভালো। Password hash-এর ক্ষেত্রে দ্রুত হওয়াই আক্রমণকারীর সবচেয়ে বড় সুবিধা।
 
+
+## 🧠 Decision Game: database dump ফাঁস হলে কোন control কাজে দেবে?
+
+আরিফের কাছে এখন তিনটি প্রস্তাব এসেছে। Database backup আবার ফাঁস হয়েছে, আর আক্রমণকারীর হাতে password hash আছে। কোন control সরাসরি offline password guessing-এর খরচ বাড়াবে?
+
+- **A.** `/login`-এ প্রতি IP-তে rate limit বসানো
+- **B.** প্রতিটি password-এর জন্য random salt এবং Argon2id ব্যবহার
+- **C.** Login ব্যর্থ হলে CAPTCHA দেখানো
+
+নিজে উত্তর বেছে নাও। এখানে প্রশ্নটা কোন control ভালো, তা নয়; প্রশ্নটা হলো আক্রমণকারী এখন server-এর বাইরে থাকলে কোন control তার কাছে পৌঁছাতে পারবে।
+
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
+
+**সঠিক উত্তর: B।** Database dump হাতে থাকলে আক্রমণকারী নিজের machine-এ password অনুমান করে hash মিলিয়ে দেখতে পারে। `/login`-এর rate limit আর CAPTCHA server-এ আসা request নিয়ন্ত্রণ করে, তাই offline guessing থামায় না। Random salt precomputed তালিকা ও একাধিক account-এ একই hash-এর সুবিধা কমায়; Argon2id প্রতিটি অনুমানকে সময় ও memory-র দিক থেকে ব্যয়বহুল করে।
+
+**Edge case:** Argon2id দুর্বল password-কে শক্ত করে দেয় না। `rafi1985`-এর মতো সহজ password তবু অনুমান করা যেতে পারে, শুধু প্রতি অনুমানের খরচ বাড়ে। তাই password length, blocklist এবং online attack-এর বিরুদ্ধে আলাদা control-ও দরকার।
+
+</details>
 ---
 
 ## ৪. Salt: প্রতিটা password আলাদা করে ছোঁয়া
@@ -160,160 +187,70 @@ stored := hex.EncodeToString(sum[:])
 ফল:
 
 - দুজনের password এক হলেও salt আলাদা, তাই hash আলাদা। Dump দেখে কে কার সঙ্গে password ভাগ করছে, বোঝা যায় না।
-- আগেভাগে বানানো তালিকা অকেজো। প্রতিটা salt মানে একটা নতুন তালিকা, আর কোন salt আসবে সেটা আগে জানা যায় না।
+- আগে থেকে তৈরি hash table বা rainbow table পুনর্ব্যবহার করা অনেক কম কার্যকর হয়ে যায়। প্রতিটি salt-এর জন্য আলাদা হিসাব করতে হয়।
 - আক্রমণকারীকে প্রতিটা hash আলাদা আলাদা করে ভাঙতে হয়। OWASP-র ভাষায়, hash যত বেশি, সময় তার সমানুপাতে বাড়ে।
 
 এখানে একটা বিষয় অনেকে ভুল বোঝে। **Salt গোপন নয়।** NIST-এর নির্দেশনা বলছে salt আর hash দুটোই একসঙ্গে সংরক্ষণ করতে হবে। আক্রমণকারী dump থেকে salt পায়, এবং সেটাই প্রত্যাশিত। Salt-এর কাজ গোপনীয়তা নয়। কাজ হলো আক্রমণকারীর পরিশ্রম প্রতিটা account-এর জন্য আলাদা করে দেওয়া। অধ্যায় ১-এর Kerckhoffs-এর নীতি এখানেও খাটে: পদ্ধতি জানা থাকলেও system টিকে থাকবে, যদি আসল সুরক্ষা অন্য জায়গায় থাকে।
 
 ধারণাটা নতুনও নয়। Unix-এর password file-এ ১৯৭০-এর দশকেই salt ছিল (Robert Morris আর Ken Thompson-এর ১৯৭৯-এর লেখা এ নিয়ে একটা ঐতিহাসিক দলিল)। আমরা একটা পুরোনো শিক্ষা আবার শিখছি, নতুন কিছু আবিষ্কার করছি না।
 
-Salt বানানোর নিয়ম: নিরাপদ random উৎস থেকে (Go-তে `crypto/rand`, `math/rand` নয়), প্রতিটা password-এর জন্য নতুন, যথেষ্ট লম্বা। NIST-এর ন্যূনতম ৩২ bit। আমরা নেব ১২৮ bit, মানে ১৬ byte।
+প্রতিটি password-এর জন্য আলাদা random salt ব্যবহার করতে হবে। বিশ্বস্ত password-hashing library সাধারণত salt তৈরি ও সংরক্ষণের কাজ নিজেই সামলায়। পাঠকের জন্য মূল ধারণা: salt unique হওয়া দরকার, গোপন হওয়া নয়।
 
-**Salt কী ঠিক করে না:** একটা নির্দিষ্ট password-এর অনুমান করার গতি। আক্রমণকারী যদি বিশেষ করে `user-1`-কে লক্ষ্য করে, তার জন্য শুধু ওই একটা salt নিয়েই অনুমান চালাতে পারে। Salt থাকলেও প্রতিটা অনুমান তত দ্রুতই থাকে। ফাটল ৩ খোলা।
+**Salt কী ঠিক করে না:** একটা নির্দিষ্ট password-এর অনুমান করার খরচ। আক্রমণকারী যদি বিশেষ করে `user-1`-কে লক্ষ্য করে, তার জন্য ওই account-এর salt নিয়েই অনুমান চালাতে পারে। Salt একা প্রতিটি অনুমানকে ধীর করে না; সেই কাজ password-hashing algorithm করে। ফাটল ৩ খোলা।
 
 ---
 
 ## ৫. ধীর হওয়াটাই নকশা
 
-ফাটল ৩ বন্ধ করতে হলে hash-কে **ইচ্ছা করে ধীর** করতে হবে। অধ্যায় ১-এ `verifyPassword`-এর পাশে লিখেছিলাম, "এটা ইচ্ছা করে ধীর কাজ"। এই হলো সেই জায়গা।
+ফাটল ৩ বন্ধ করতে হলে password hashing-কে **ইচ্ছা করে ব্যয়বহুল** করতে হবে। সাধারণ hash দ্রুত হওয়াটাই তার কাজ; password storage-এর জন্য আমাদের এমন পদ্ধতি দরকার, যাতে প্রতিটি অনুমান করতে সময় ও memory দুটোই খরচ হয়।
 
-যুক্তিটা একটা অসামঞ্জস্যের ওপর। বৈধ user login করলে hash চলে **একবার**। সেটা ৫০ মিলিসেকেন্ড লাগলেও কেউ টের পায় না। আক্রমণকারী কোটি কোটি অনুমান চালায়। প্রতিটার দাম ৫০ মিলিসেকেন্ড হলে সেটা আর বাস্তবসম্মত থাকে না। আমরা এমন একটা কাজ বেছে নিচ্ছি যার খরচ আমাদের কাছে নগণ্য, আক্রমণকারীর কাছে পাহাড়সমান।
+যুক্তিটা হলো বৈধ user সাধারণত login-এ password যাচাই করায় অল্প কয়েকবার, কিন্তু database dump পাওয়া আক্রমণকারী বিপুল সংখ্যক অনুমান চালাতে পারে। প্রতিটি অনুমানে সময় ও memory খরচ করালে মোট খরচ বাড়ে। আক্রমণকারী parallel hardware ব্যবহার করতে পারে, তাই শুধু ধীর হওয়া নয়, memory ব্যবহারসহ সঠিক password-hashing নকশা গুরুত্বপূর্ণ।
 
-নিজের চোখে দেখার জন্য একই sandbox-এ এই দুটো মাপলাম:
+ধারণাটা বোঝাতে নিচে একটি illustrative তুলনা দেওয়া হলো। এগুলো সর্বজনীন benchmark নয়:
 
-| কাজ | সময় (১ vCPU, কয়েকবার চালিয়ে) |
+| কাজ | খরচের ধরন |
 |---|---|
-| ১০ লক্ষ × SHA-256 | প্রায় ০.০৯–০.১ সেকেন্ড |
-| ১ × Argon2id (নিচের parameter) | প্রায় ৪০–৫৫ মিলিসেকেন্ড |
+| ১০ লক্ষ × SHA-256 | খুব দ্রুত; প্রতিটি অনুমানের খরচ কম |
+| ১ × Argon2id (নির্বাচিত parameter) | ইচ্ছাকৃতভাবে বেশি সময় ও memory লাগে |
 
-সংখ্যাগুলো আপনার machine-এ আলাদা হবে, আর "পাঁচ মিনিটের পরীক্ষা"-য় নিজে চালানোর কোড আছে। তবে অনুপাতটা বুঝতে সংখ্যা ঠিক হওয়া জরুরি নয়: প্রতি অনুমানের খরচ কয়েক লক্ষ গুণ বেড়েছে। বৈধ user-এর কাছে এটা একটা অদৃশ্য বিলম্ব।
+সংখ্যাগুলো hardware ও configuration অনুযায়ী আলাদা হবে, তাই নির্দিষ্ট অনুপাতকে সর্বজনীন ধরে নেওয়া ঠিক নয়। মূল ধারণাটি হলো: password hash যাচাইয়ের প্রতিটি অনুমানকে ইচ্ছাকৃতভাবে ব্যয়বহুল করতে হবে। বৈধ user-এর কাছে এর মূল্য সামান্য বিলম্ব; আক্রমণকারীর কাছে তা অনেক বেশি মোট খরচ।
 
-### তিন প্রার্থী
+### কোন password-hashing পদ্ধতি, আর কেন?
 
-OWASP-র বর্তমান Password Storage Cheat Sheet যেভাবে সাজিয়েছে:
+Password storage-এর জন্য এমন পদ্ধতি দরকার, যা প্রতিটি অনুমানকে ইচ্ছাকৃতভাবে ব্যয়বহুল করে। সাধারণ-purpose hash যেমন SHA-256 দ্রুত কাজ করার জন্য তৈরি; password guessing-এর ক্ষেত্রে সেই গতি আক্রমণকারীর সুবিধা।
 
-**Argon2id** প্রথম পছন্দ। ২০১৫ সালের Password Hashing Competition-এর বিজয়ী Argon2-র যে রূপটা GPU আর side-channel দুই ধরনের আক্রমণের বিরুদ্ধেই ভারসাম্য রাখে। এটা শুধু সময় নয়, **memory-ও** দামি করে। প্রতিটা অনুমানের জন্য একটা বড় memory অংশ দরকার, তাই হাজার হাজার অনুমান একসঙ্গে চালানো GPU-র জন্য কঠিন হয়ে যায়। তিনটা parameter: memory (`m`), কয়বার ঘুরবে (`t`), আর parallelism (`p`)।
+**Argon2id** আধুনিক password storage-এর একটি ভালো default পছন্দ। এটি সময়ের পাশাপাশি memory-ও ব্যবহার করে, ফলে অনেক অনুমান একসঙ্গে চালানো আক্রমণকারীর জন্য ব্যয়বহুল হয়। **scrypt** এবং **PBKDF2**-ও নির্দিষ্ট পরিস্থিতিতে ব্যবহারযোগ্য; **bcrypt** পুরোনো system-এ দেখা যেতে পারে, তবে legacy সীমাবদ্ধতা বুঝে নিতে হয়। এই নামগুলো মুখস্থ করাই অধ্যায়ের লক্ষ্য নয়। মূল ধারণা হলো, password সংরক্ষণের জন্য সাধারণ দ্রুত hash নয়, password-guessing প্রতিরোধে তৈরি উপযুক্ত algorithm ব্যবহার করতে হয়।
 
-**scrypt** Argon2id না পাওয়া গেলে দ্বিতীয় পছন্দ, এটাও memory-hard।
+Algorithm বেছে নেওয়ার পর তার configuration-ও গুরুত্বপূর্ণ। খুব কম খরচ আক্রমণকারীকে বেশি অনুমানের সুযোগ দেয়; অতিরিক্ত খরচ বৈধ login-কে ধীর করতে পারে এবং server-এর resource নিঃশেষ করার ঝুঁকি তৈরি করতে পারে। তাই বাস্তব system-এ রক্ষণাবেক্ষণাধীন, বিশ্বস্ত library-এর সুপারিশ অনুসরণ করে নিজের workload-এ configuration যাচাই করতে হয়। এখানে কোনো একটি parameter set-কে সব system-এর জন্য সঠিক বলা হচ্ছে না।
 
-**bcrypt** এখন OWASP-র তালিকায় শুধু legacy system-এর জন্য। ন্যূনতম work factor ১০, আর password ৭২ byte-এর বেশি হলে সমস্যা। (আরেকটা বিকল্প PBKDF2: FIPS-140 মানতে হলে ছাড়া এটা প্রথম পছন্দ নয়।)
+### Stored hash record: পরে যাচাই করার মতো তথ্য
 
-আর একটা ছোট কিন্তু শিক্ষণীয় ব্যাপার: OWASP-র আগের সংস্করণগুলোতে bcrypt ছিল দ্বিতীয় পছন্দ। পাতাটা বদলেছে। আমাদের repository-র `references/` ফাইল ঠিক এই কারণেই বলে, মনে থাকা পরামর্শ অধ্যায়ে জমিয়ে রাখা যাবে না। যে সোর্স থেকে লিখছি, সেটা প্রতিবার আবার খুলে দেখতে হয়।
+Password সংরক্ষণের সময় server শুধু hash রাখে না; ব্যবহৃত algorithm ও তার configuration-সহ যাচাইয়ের জন্য দরকারি metadata-ও সংরক্ষণ করে। অনেক system-এ এগুলো একটি encoded record-এ থাকে। এতে ভবিষ্যতে algorithm বা configuration উন্নত করার সময় পুরোনো password hash কোন পদ্ধতিতে তৈরি হয়েছিল, তা বোঝা যায়।
 
-### bcrypt-এর ৭২ byte আর বাংলা password
-
-bcrypt শুধু প্রথম ৭২ byte পড়ে। OWASP বলে, বেশিরভাগ implementation-এ এই সীমা আছে, তাই ৭২ byte-এর বেশি password আটকাতে হবে। আমার পরীক্ষা করা Go library (`golang.org/x/crypto` v0.31.0) এমন password-এ error দেয়:
-
-```go
-_, err := bcrypt.GenerateFromPassword([]byte(strings.Repeat("a", 73)), 12)
-fmt.Println(err) // bcrypt: password length exceeds 72 bytes
+```mermaid
+flowchart TD
+    P["User password"] --> S["প্রতি password-এর জন্য আলাদা random salt"]
+    S --> H["Password storage-এর জন্য তৈরি ধীর hash"]
+    H --> R["Hash + salt + algorithm/configuration-এর তথ্য সংরক্ষণ"]
+    R --> L["পরের login-এ password আবার যাচাই"]
+    L --> V{"Stored record গ্রহণযোগ্য এবং password মেলে?"}
+    V -->|হ্যাঁ| OK["Login সফল"]
+    V -->|না| NO["Login ব্যর্থ"]
 ```
 
-সব implementation এমন ভদ্র নয়। কিছু চুপচাপ ছেঁটে ফেলে, আর তখন user ভাবে তার ৩০ অক্ষরের password কাজ করছে, অথচ যাচাই হচ্ছে শুধু প্রথম অংশ। NIST-এর নির্দেশনা স্পষ্ট: verifier-কে পুরো password যাচাই করতে হবে, ছাঁটা চলবে না।
+এখানে দুটি মূল কথা মনে রাখো: salt গোপন রাখার জিনিস নয়, আর database-এ hash থাকলেই password ভাঙা অসম্ভব হয়ে যায় না। এই record-এর নির্দিষ্ট format কী, বা কোনো library-তে তার প্রতিটি field কীভাবে validate করতে হয়, সেগুলো implementation detail। বাস্তব system-এ record-কে অবিশ্বাস্য input ধরে supported library-এর নির্দেশনা অনুসরণ করতে হবে; অজানা বা অগ্রহণযোগ্য record দিয়ে যাচাই চালানো যাবে না।
 
-এখানে একটা স্থানীয় বিষয় আছে। UTF-8-এ বাংলা অক্ষর সাধারণত ৩ byte নেয়। অর্থাৎ ২৪টা বাংলা অক্ষরেই ৭২ byte পূর্ণ। বাংলায় একটা লম্বা passphrase বেছে নিলে bcrypt-এর সীমা সবার আগে তাকেই ধাক্কা দেয়। Argon2id-তে এমন ছোট সীমা নেই।
+### 🧪 Edge case: database-এর record-ও কি বিশ্বাস করব?
 
-### Argon2id parameter
+ধরো, কেউ database-এর একটি password-hash record বদলে দিল। Stored data-তে algorithm বা configuration-এর তথ্য থাকলেও সেটি অন্ধভাবে বিশ্বাস করা যাবে না। ভুল বা অস্বাভাবিক তথ্য ব্যবহার করলে login যাচাই নিজেই অতিরিক্ত resource খরচ করাতে পারে, অথবা password যাচাইয়ের নিয়ম দুর্বল হয়ে যেতে পারে।
 
-OWASP-র ন্যূনতম configuration-গুলো সমমানের সুরক্ষা দেয়, শুধু CPU আর RAM-এর মধ্যে বদল:
-
-| `m` (memory) | `t` (iteration) | `p` (parallelism) |
-|---|---|---|
-| 46 MiB | 1 | 1 |
-| **19 MiB** | **2** | **1** |
-| 12 MiB | 3 | 1 |
-| 9 MiB | 4 | 1 |
-| 7 MiB | 5 | 1 |
-
-RFC 9106 নিজে parameter বাছাইয়ের আলাদা নির্দেশনা দেয়। যেসব library আর issue thread RFC-র পাঠ উদ্ধৃত করেছে, সেখানে আমি দুটো সুপারিশ দেখেছি: বেশি memory থাকলে 2 GiB, `t=1`, `p=4`। কম memory থাকলে 64 MiB, `t=3`, `p=4`। (RFC-র মূল পাঠ আমি সরাসরি খুলে মেলাইনি, দেখো §তথ্যসূত্রের টীকা।) সংখ্যা যা-ই হোক, নীতি এক: নিজের server-এ মেপে ঠিক করো। OWASP-র সাধারণ নিয়ম, একটা hash বানাতে এক সেকেন্ডের কম লাগা উচিত।
-
-KenaKata-র মতো ছোট একটা server-এর জন্য আরিফ বেছে নিল OWASP-র মাঝের সারি: **19 MiB, `t=2`, `p=1`**।
-
-```go
-package passwd
-
-import (
-	"crypto/rand"
-	"crypto/subtle"
-	"encoding/base64"
-	"errors"
-	"fmt"
-	"strings"
-
-	"golang.org/x/crypto/argon2"
-)
-
-const (
-	memoryKiB = 19 * 1024 // 19 MiB
-	passes    = 2
-	lanes     = 1
-	saltLen   = 16 // 128 bit
-	keyLen    = 32
-)
-
-var b64 = base64.RawStdEncoding
-
-// Hash: $argon2id$v=19$m=19456,t=2,p=1$<salt>$<hash>
-func Hash(pw string) (string, error) {
-	salt := make([]byte, saltLen)
-	if _, err := rand.Read(salt); err != nil {
-		return "", err
-	}
-	key := argon2.IDKey([]byte(pw), salt, passes, memoryKiB, lanes, keyLen)
-	return fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
-		argon2.Version, memoryKiB, passes, lanes,
-		b64.EncodeToString(salt), b64.EncodeToString(key)), nil
-}
-
-// Verify: stored string থেকে salt আর parameter পড়ে আবার hash করে, তারপর মেলায়।
-func Verify(pw, encoded string) (bool, error) {
-	parts := strings.Split(encoded, "$") // ["", "argon2id", "v=19", "m=..,t=..,p=..", salt, hash]
-	if len(parts) != 6 || parts[1] != "argon2id" {
-		return false, errors.New("unsupported hash format")
-	}
-	var version int
-	var m, t uint32
-	var p uint8
-	if _, err := fmt.Sscanf(parts[2], "v=%d", &version); err != nil || version != argon2.Version {
-		return false, errors.New("unsupported argon2 version")
-	}
-	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &m, &t, &p); err != nil {
-		return false, errors.New("bad parameters")
-	}
-	salt, err := b64.DecodeString(parts[4])
-	if err != nil {
-		return false, err
-	}
-	want, err := b64.DecodeString(parts[5])
-	if err != nil {
-		return false, err
-	}
-	got := argon2.IDKey([]byte(pw), salt, t, m, p, uint32(len(want)))
-	return subtle.ConstantTimeCompare(got, want) == 1, nil
-}
-
-// NeedsRehash: stored hash-এর parameter আজকের parameter থেকে আলাদা কি না।
-func NeedsRehash(encoded string) bool {
-	want := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$", argon2.Version, memoryKiB, passes, lanes)
-	return !strings.HasPrefix(encoded, want)
-}
-```
-
-কোডটা আমি Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে চালিয়ে দেখেছি। একটা আসল ফল এরকম:
-
-```
-$argon2id$v=19$m=19456,t=2,p=1$6ntZMPHCqYWOGNTS1t1w7Q$17RAHmtm7vQxx7rPGBzYLctpWOwUS4GG8oybUXxYO6Y
-```
-
-এই এক লাইনে পুরো গল্প আছে। কোন algorithm, কোন version, কোন parameter, কোন salt, আর ফলাফল hash। Salt-এর জন্য আলাদা column লাগেনি। আর পরে parameter বা algorithm বদলাতে চাইলে পুরোনো hash নিজেই বলে দেয় সে কোন নিয়মে বানানো। এই আকারের নাম **PHC string format**, আর OWASP এটাকে এই কারণেই সুপারিশ করে।
-
-দুটো ছোট খুঁটিনাটি কোডে আছে। `subtle.ConstantTimeCompare` তুলনা করে এমনভাবে, যাতে কতটুকু অংশ মিলল তার ওপর সময় নির্ভর না করে। আর `rand.Read` এসেছে `crypto/rand` থেকে।
+মূল নিরাপত্তার নিয়মটি সহজ: **শুধু সমর্থিত ও গ্রহণযোগ্য password-hash record দিয়েই যাচাই চালাও; অন্যথায় login ব্যর্থ করো।** ঠিক কোন field, format বা সীমা validate করতে হবে, তা ব্যবহৃত standard ও library-র documentation-এর বিষয়। এই অধ্যায়ে নির্দিষ্ট parser-এর implementation শেখানো হচ্ছে না।
 
 ### এই নিরাপত্তার দাম: আমাদেরই server
 
-ইচ্ছাকৃত ধীর কাজ আমাদের নিজেদের জন্যও কাজ। একটা hash-এর জন্য ১৯ MiB memory লাগে। হাজার জন একসঙ্গে login চেষ্টা করলে আমাদের server-এ প্রায় ১৯ GB memory দরকার। এমন সংখ্যা কেউ ইচ্ছা করে ডাকলে সেটা DoS আক্রমণ। OWASP নিজেই সতর্ক করে, work factor অতি বেশি হলে আক্রমণকারী অসংখ্য login চেষ্টা দিয়ে server-এর CPU নিঃশেষ করে দিতে পারে।
+Password যাচাইকে ইচ্ছাকৃতভাবে ব্যয়বহুল করলে আক্রমণকারীর প্রতিটি অনুমানের খরচ বাড়ে, কিন্তু server-এর প্রতিটি login-এর খরচও বাড়ে। অনেক login একসঙ্গে এলে বা আক্রমণকারী প্রচুর অনুরোধ পাঠালে CPU ও memory নিঃশেষ হতে পারে।
 
-তাই `/login` এখন একটা ভারী endpoint। একসঙ্গে কতগুলো hash চলবে তার সীমা রাখতে হয় (Go-তে একটা buffered channel দিয়ে semaphore বানানো যায়), আর online দিকের rate limit এই কারণেও দরকার। নিরাপত্তা এক জায়গায় খরচ বাঁচায়, অন্য জায়গায় খরচ চাপায়।
+তাই password storage-কে আলাদা করে দেখা যাবে না। Rate limiting, একসঙ্গে চলা password verification-এর সীমা, এবং login abuse শনাক্ত করার ব্যবস্থা একসঙ্গে দরকার। মূল trade-off হলো: বৈধ user-এর login ব্যবহারযোগ্য রাখতে হবে, আবার stolen hash নিয়ে offline guessing-ও যতটা সম্ভব ব্যয়বহুল করতে হবে।
 
 ### Pepper: আরেক স্তর, ছোট করে
 
@@ -333,65 +270,41 @@ flowchart TD
     P --> R1["পড়লেই account দখল"]
     E --> R2["চাবি পেলে সব একসঙ্গে"]
     F --> R3["দুর্বল password দ্রুত ভাঙে<br/>একই password-এর hash এক"]
-    S --> R4["আগেভাগে বানানো তালিকা অকেজো<br/>কিন্তু প্রতি অনুমান এখনো সস্তা"]
-    A --> R5["প্রতি অনুমান দামি<br/>শক্ত password প্রায় অসম্ভব"]
+    S --> R4["আগে থেকে তৈরি table পুনর্ব্যবহার কঠিন<br/>কিন্তু প্রতি অনুমান এখনো সস্তা"]
+    A --> R5["প্রতি অনুমান দামি<br/>শক্ত password guess করা কঠিন"]
 ```
 
 নিচের দিকে যত যাই, প্রতিটা ধাপ আগের ধাপের একটা নির্দিষ্ট ফাঁক বন্ধ করে। কোনোটাই একা যথেষ্ট নয়। আর শেষ ঘরে "শক্ত password" শর্তটা লক্ষ করো, কারণ নিচে ঠিক সেখানেই সমস্যা শুরু হবে।
 
 ---
 
-## ৬. Login endpoint: ভালো hash-ও ভুল দরজায় নষ্ট হয়
+## ⚠️ ৬. Login endpoint: ভালো hash-ও ভুল দরজায় নষ্ট হয়
 
 Hash ঠিক হলো। কিন্তু `/login` নিজেই আক্রমণকারীকে অনেক কিছু জানিয়ে দিতে পারে, যদি আমরা অসাবধান থাকি।
 
 **বার্তায় তথ্য ফাঁস।** Login ব্যর্থ হলে আরিফ যদি লেখে "এই email-এ কোনো account নেই", আর password ভুল হলে লেখে "password ভুল", তাহলে আক্রমণকারী এই বার্তা দেখেই বুঝে নেয় কোন email আমাদের user। OWASP-র নির্দেশনা: password ভুল না user ভুল, দুই ক্ষেত্রেই একই, সাধারণ বার্তা, আর HTTP status-ও এক। এর দাম আছে। বৈধ user এতে বিভ্রান্ত হতে পারে, কারণ সে জানতে পারে না কোথায় ভুল। এটা একটা UX ছাড় যা মেনে নিতে হয়।
 
-**সময়ে তথ্য ফাঁস।** বার্তা এক রাখলেও আরেকটা সংকেত থেকে যায়: সময়। Email না পাওয়া গেলে server যদি সঙ্গে সঙ্গে ফিরে যায় (৫ ms), আর পাওয়া গেলে ৪০ ms ধরে Argon2id চালায়, তাহলে বার্তা এক হলেও response-এর সময় আলাদা। আক্রমণকারী হাজার request পাঠিয়ে গড় মেপে বলে দিতে পারে কোন email আছে। OWASP-র সমাধান: email না পেলেও একই পরিমাণ কাজ করো, যেমন একটা নকল (dummy) hash-এর সঙ্গে মিলিয়ে দেখো।
+**সময়ে তথ্য ফাঁস।** বার্তা এক রাখলেও আরেকটা সংকেত থেকে যায়: সময়। Account না পাওয়া গেলে server যদি সঙ্গে সঙ্গে ফিরে যায়, আর account পাওয়া গেলে password hash যাচাই করে, তাহলে একই error message দিলেও response time আলাদা হতে পারে। অনেক অনুরোধের সময় তুলনা করে আক্রমণকারী account আছে কি না অনুমান করতে পারে। OWASP-এর পরামর্শ হলো failure path-এও কাছাকাছি ধরনের কাজ করা, যেমন আগে থেকে তৈরি dummy hash যাচাই করা। এতে timing-এর পার্থক্য কমে, কিন্তু সব timing signal পুরোপুরি দূর হয়েছে এমন নিশ্চয়তা নয়।
 
-নিচের কোডে দুটো সূক্ষ্ম জায়গা আছে। প্রথমটা `!found || !ok` শর্ত: নকল hash-এর সঙ্গে মিলে গেলেও (যদি কেউ ঠিক সেই নকল password-টাই পাঠায়) user পাওয়া না গেলে অনুমতি দেওয়া যাবে না। দ্বিতীয়টা `NeedsRehash`: login-ই একমাত্র মুহূর্ত যখন আসল password আমাদের হাতে থাকে, তাই পুরোনো parameter-এর hash নতুনে বদলে নেওয়ার সুযোগ এখনই।
+এই flow-তে দুটো সূক্ষ্ম বিষয় আছে। প্রথমত, dummy hash-এর সঙ্গে password মিলে গেলেও account না পাওয়া গেলে login সফল হবে না। দ্বিতীয়ত, password যাচাই সফল হলে পুরোনো parameter-এ তৈরি hash-কে বর্তমান policy অনুযায়ী rehash করার সুযোগ থাকে।
 
-```go
-var dummyHash, _ = passwd.Hash("এই-password-কেউ-দেবে-না") // শুরুতে একবার বানানো
-
-func verifyPassword(email, pw string) (Identity, bool) {
-	u, found := findUserByEmail(email) // কাল্পনিক: (user, পাওয়া গেছে কি না)
-
-	stored := dummyHash // user না পেলেও একই পরিমাণ কাজ করি
-	if found {
-		stored = u.PasswordHash
-	}
-
-	ok, err := passwd.Verify(pw, stored)
-	if err != nil || !found || !ok {
-		return Identity{}, false
-	}
-
-	if passwd.NeedsRehash(stored) { // এখন plaintext আমাদের হাতে, আজকের parameter-এ আবার hash
-		if h, err := passwd.Hash(pw); err == nil {
-			updateHash(u.ID, h) // কাল্পনিক
-		}
-	}
-	return Identity{UserID: u.ID}, true
-}
-
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, 4<<10) // ৪ KiB-এর বেশি body নয়
-	email, pw := r.FormValue("email"), r.FormValue("password")
-
-	id, ok := verifyPassword(email, pw)
-	if !ok {
-		// email নেই, না password ভুল, বাইরে কখনো আলাদা করে বলি না
-		http.Error(w, "email বা password ঠিক নয়", http.StatusUnauthorized)
-		return
-	}
-	_ = id // একবার যাচাই হলো। পরের request-গুলোর কী হবে, সেটা অধ্যায় ৪।
-}
+```mermaid
+flowchart TD
+    R["Login: email + password"] --> Q["Email দিয়ে account খোঁজো"]
+    Q --> F{"Account পাওয়া গেছে?"}
+    F -->|"হ্যাঁ"| S["Stored password hash বেছে নাও"]
+    F -->|"না"| D["আগে থেকে তৈরি dummy hash বেছে নাও"]
+    S --> V["একই password-verification পদ্ধতি চালাও"]
+    D --> V
+    V --> O{"Account পাওয়া গেছে এবং<br/>password যাচাই সফল?"}
+    O -->|"না"| X["সাধারণ login failure"]
+    O -->|"হ্যাঁ"| Y["Login সফল"]
+    S -. "Hash-এর parameter পুরোনো?" .-> U["সফল login-এর পর নিরাপদে rehash"]
 ```
 
 (অধ্যায় ১-এর টীকা এখানেও খাটে: `401`-এর সঙ্গে `WWW-Authenticate` header আর browser-এর জন্য login পেজে redirect, এসব বাদ দিয়েছি। এই অধ্যায়ের প্রশ্ন অন্য।)
 
-আরও দুটো ছোট কিন্তু জরুরি নিয়ম, যেগুলো কোডে দেখানো যায় না। প্রথমত, password কখনো log-এ যাবে না। অধ্যায় ১-এ আমরা দেখেছিলাম একটা ভুল debug log প্রতিটা header ফাঁস করতে পারে। Request body log করার আগে `password` field মুছে ফেলতে হয়। দ্বিতীয়ত, password শুধু HTTPS-এ যাবে। TLS ছাড়া hash-এর কোনো মানে থাকে না, কারণ password তার আগেই পথে ধরা পড়ে।
+আরও দুটো ছোট কিন্তু জরুরি নিয়ম, যেগুলো diagram-এ আলাদা করে মনে রাখতে হবে। প্রথমত, password কখনো log-এ যাবে না। অধ্যায় ১-এ আমরা দেখেছিলাম একটা ভুল debug log প্রতিটা header ফাঁস করতে পারে। Request body log করার আগে `password` field মুছে ফেলতে হয়। দ্বিতীয়ত, password শুধু HTTPS-এ যাবে। TLS ছাড়া hash-এর কোনো মানে থাকে না, কারণ password তার আগেই পথে ধরা পড়ে।
 
 পুরো প্রবাহটা একসঙ্গে দেখা যাক। প্রশ্নটা হলো: password কোথায় plaintext, কোথায় শুধু hash?
 
@@ -405,12 +318,12 @@ sequenceDiagram
     U->>S: email + password (HTTPS)
     S->>S: policy যাচাই (দৈর্ঘ্য, blocklist)
     S->>S: নতুন random salt, Argon2id চালানো
-    S->>DB: PHC string সংরক্ষণ (algorithm, parameter, salt, hash)
+    S->>DB: hash record সংরক্ষণ (algorithm, configuration, salt, hash)
     Note over U,DB: Login
     U->>S: email + password (HTTPS)
     S->>DB: email দিয়ে stored hash আনা (না পেলে dummy hash)
     S->>S: stored string থেকে salt আর parameter পড়ে আবার hash
-    S->>S: constant-time তুলনা
+    S->>S: password যাচাইয়ের ফল নিরাপদভাবে যাচাই
     S-->>U: সফল হলে Identity, নইলে সবসময় একই বার্তা
 ```
 
@@ -428,38 +341,33 @@ sequenceDiagram
 
 NIST-এর SP 800-63B-4, যা আগের SP 800-63B-কে প্রতিস্থাপন করেছে, password নিয়ে কিছু নির্দেশ দেয় যেগুলো অনেকের পুরোনো অভ্যাসের উল্টো:
 
-- **দৈর্ঘ্য:** শুধু password-ই যে একমাত্র factor, তার ন্যূনতম ১৫ অক্ষর। MFA-র অংশ হিসেবে শুধু ব্যবহার হলে ন্যূনতম ৮। সর্বোচ্চ সীমা কমপক্ষে ৬৪ অক্ষর হওয়া উচিত।
+- **দৈর্ঘ্য:** NIST SP 800-63B-4 অনুযায়ী password-ই একমাত্র factor হলে ন্যূনতম ১৫ অক্ষর; MFA-র অংশ হিসেবে ব্যবহার হলে ন্যূনতম ৮। সর্বোচ্চ দৈর্ঘ্য কমপক্ষে ৬৪ অক্ষর সমর্থন করা উচিত। এটি ওই standard-এর নির্দেশনা, সব service-এর জন্য স্বয়ংক্রিয়ভাবে প্রয়োগ করা policy নয়।
 - **কোনো composition rule নয়:** "বড় হাতের অক্ষর আর সংখ্যা লাগবেই" ধরনের শর্ত চাপানো নিষিদ্ধ (SHALL NOT)।
 - **নিয়মিত বদল নয়:** ৯০ দিন পরপর password বদলাতে বাধ্য করা চলবে না। তবে compromise-এর প্রমাণ থাকলে বদলাতে বাধ্য করতে হবে।
-- **Blocklist:** নতুন password পরিচিত, ফাঁস-হওয়া, অভিধানের শব্দ, বা প্রসঙ্গ-নির্দিষ্ট শব্দ (service-এর নাম, username) হলে প্রত্যাখ্যান। পুরো password মেলাতে হবে, শুধু অংশ নয়। প্রত্যাখ্যান করলে কারণ আর ভালো password বাছার পরামর্শ দিতে হবে।
+- **Blocklist:** পরিচিত বা ফাঁস-হওয়া password এবং service-সংশ্লিষ্ট অনুমানযোগ্য password প্রত্যাখ্যান করো। Blocklist-এ পুরো password মিলিয়ে দেখো, কেবল তার কোনো অংশ মিলে গেল বলে নয়। প্রত্যাখ্যান করলে কারণ ও ভালো password বাছার পরামর্শ দাও।
 - **সুবিধা:** password manager আর autofill অনুমোদন (SHALL), paste অনুমোদন (SHOULD), আর password দেখানোর বিকল্প (SHOULD)।
 - **নিষিদ্ধ:** password hint আর security question ("প্রথম পোষা প্রাণীর নাম কী?")।
 
 কেন composition rule নয়? কারণ ওগুলো মানুষকে একই পূর্বানুমেয় পথে ঠেলে দেয়। বরং দৈর্ঘ্য আর blocklist আসল কাজ করে। NIST-এর মূল যুক্তি পাওয়া যাবে তাদের Appendix A-তে।
 
-```go
-func checkPolicy(email, pw string) error {
-	n := utf8.RuneCountInString(pw) // অক্ষর গোনা code point ধরে, byte ধরে নয়
-	switch {
-	case n < 15:
-		return errors.New("password কমপক্ষে ১৫ অক্ষরের হতে হবে")
-	case n > 128:
-		return errors.New("password ১২৮ অক্ষরের বেশি হতে পারে না")
-	}
-	if isBlocked(pw, email) { // কাল্পনিক: ফাঁস-হওয়া/পরিচিত তালিকা, "kenakata", email-এর অংশ
-		return errors.New("এই password খুব পরিচিত বা অনুমানযোগ্য, অন্যটা বেছে নিন")
-	}
-	return nil // "বড় হাতের অক্ষর + সংখ্যা + চিহ্ন" ধরনের কোনো শর্ত নেই
-}
+```mermaid
+flowchart TD
+    P["Password জমা"] --> N["Unicode password হলে<br/>একই normalization policy (যেমন NFC)"]
+    N --> L{"Password যথেষ্ট দীর্ঘ এবং<br/>service policy-তে গ্রহণযোগ্য?"}
+    L -->|"না"| R["ব্যবহারকারীকে কারণ জানাও"]
+    L -->|"হ্যাঁ"| B{"পুরো password কি পরিচিত,<br/>ফাঁস-হওয়া বা অনুমানযোগ্য?"}
+    B -->|"হ্যাঁ"| R
+    B -->|"না"| A["Password গ্রহণ"]
+    A -.-> X["বড় হাতের অক্ষর + সংখ্যা + চিহ্ন বাধ্যতামূলক নয়"]
 ```
 
 ফাঁস-হওয়া password-এর তালিকার জন্য OWASP একটা সহজ রাস্তা দেখায়: Pwned Passwords-এর মতো সেবা, যেটা নিজের server-এ চালানোও যায়। আর NIST সতর্ক করে, তালিকা অতি বিশাল হওয়ার সুবিধা কম, কারণ এটা online আক্রমণের জন্য, আর সেখানে আলাদা করে throttling আছে।
 
 ### বাংলা password আর Unicode
 
-NIST বলে Unicode অক্ষর গ্রহণ করা উচিত, আর প্রতিটা code point একটা অক্ষর হিসেবে গোনা হবে (তাই উপরে `utf8.RuneCountInString`)। একই সঙ্গে সতর্ক করে: hash করার আগে NFC নামের normalization চালানো উচিত।
+NIST password-এ Unicode অক্ষর সমর্থন করার এবং একইভাবে উপস্থাপিত password-কে সামঞ্জস্যপূর্ণভাবে যাচাই করার গুরুত্ব তুলে ধরে। বাংলাসহ বিভিন্ন ভাষায় একই রকম দেখতে password অক্ষর ভিন্ন internal representation-এ আসতে পারে। ফলে password তৈরি করার সময় একরকমভাবে সামলানো হলেও login-এর সময় অন্যরকম হলে user নিজের সঠিক password দিয়েও ঢুকতে নাও পারে।
 
-বাংলায় এটা সত্যিকারের সমস্যা। একই দেখতে লাগা অক্ষর দুভাবে সংরক্ষিত হতে পারে। যেমন "ো" একটা একক code point (U+09CB) হতে পারে, আবার "ে" আর "া" দুটো আলাদা code point (U+09C7 ও U+09BE) পরপর বসেও একই রূপ দিতে পারে। সব keyboard, ফোন আর browser একই রূপে সংরক্ষণ করবে, এমন নিশ্চয়তা নেই। NIST নিজেও সতর্ক করে, কিছু endpoint কিছু অক্ষর আলাদাভাবে উপস্থাপন করতে পারে। Normalization না করলে user এক device-এ password বানিয়ে অন্য device-এ ঢুকতে পারবে না, আর বুঝতেও পারবে না কেন। Go-তে `golang.org/x/text/unicode/norm` প্যাকেজের `norm.NFC.String(pw)` দিয়ে এটা করা যায়, policy-র আগে আর hash-এর আগে।
+NIST Unicode password-এর জন্য NFC normalization ব্যবহারের পরামর্শ দেয়। মূল শিক্ষা: **password গ্রহণ, সংরক্ষণ এবং যাচাইয়ের সময় একই normalization policy ধারাবাহিকভাবে প্রয়োগ করতে হবে।** NFC কীভাবে code point বদলায়, তার অভ্যন্তরীণ বিশদ এই অধ্যায়ের লক্ষ্য নয়।
 
 ### বৈধ user-এর খরচ
 
@@ -523,7 +431,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 ---
 
-## ১০. Threat model: password-এর পাশে আক্রমণকারী
+## 🔍 ১০. Threat model: password-এর পাশে আক্রমণকারী
 
 এখন পুরো ছবিটা আক্রমণকারীর দৃষ্টিকোণ থেকে। এখানে credential হলো password, আর server যা রাখে, সেই hash হলো তার **যাচাইয়ের উপাত্ত** (verifier)। অধ্যায় ১-এর টেবিলে "server-এ থাকে যাচাইয়ের উপাত্ত" বলে যে ফাঁকা জায়গা রেখেছিলাম, সেটা এখন ভরা।
 
@@ -544,7 +452,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 ## ১১. Trade-off
 
-- **ঘর্ষণ।** ১৫ অক্ষর, password manager-এর ওপর নির্ভরতা, আর login-এ ৪০–৫০ ms-এর (আমার sandbox-এ) বাড়তি বিলম্ব। শেষটা প্রায় অদৃশ্য, প্রথম দুটো নয়।
+- **ঘর্ষণ।** ১৫ অক্ষরের ন্যূনতম দৈর্ঘ্য, password manager-এর ওপর নির্ভরতা, আর password যাচাইয়ের সামান্য বাড়তি বিলম্ব। শেষটা সাধারণত ছোট, প্রথম দুটো user-এর অভিজ্ঞতায় বেশি প্রভাব ফেলতে পারে।
 - **Server-এর খরচ আর নতুন লক্ষ্য।** Memory-hard hash মানে `/login` এখন ভারী, আর ভারী endpoint DoS-এর লোভনীয় জায়গা। Concurrency-র সীমা আর rate limit তাই আবশ্যক।
 - **Lockout বনাম availability।** কঠোর lockout আক্রমণকারীর হাতে নতুন অস্ত্র। ক্রমশ-বাড়া অপেক্ষা ভালো, কিন্তু সেটা বাস্তবায়ন আর পরিমাপে বেশি কাজ।
 - **নির্দিষ্ট বার্তা বনাম UX।** সাধারণ বার্তা user চেনা আটকায়, আবার বৈধ user-কেও বিভ্রান্ত করে।
@@ -555,7 +463,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 ---
 
-## ১২. এই সমাধান কী সমাধান করে না
+## 🛑 ১২. এই সমাধান কী সমাধান করে না
 
 - **দুর্বল password।** Argon2id `rafi1985`-কে আটকাতে পারে না, শুধু প্রতি অনুমানের দাম বাড়ায়। Policy আর blocklist আলাদা কাজ করে।
 - **Phishing, keylogger, malware।** আক্রমণকারী যদি user-এর টাইপ করা মুহূর্তেই password পেয়ে যায়, hash-এর আর কোনো ভূমিকা নেই। Password phishing-resistant নয় (NIST)। এর উত্তর passkey আর WebAuthn, অধ্যায় ২২।
@@ -579,7 +487,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 **"Salt গোপন রাখতে হবে।"** না। Salt hash-এর পাশেই থাকে। গোপন রাখার মতো জিনিস হলো pepper।
 
-**"Salt থাকলে password ভাঙা যায় না।"** Salt আগেভাগে বানানো তালিকা আর একসঙ্গে ভাঙা বন্ধ করে। একটা নির্দিষ্ট দুর্বল password অনুমান করা সহজই থাকে।
+**"Salt থাকলে password ভাঙা যায় না।"** Salt আগে থেকে তৈরি table-এর সুবিধা কমায় এবং একই password-এর hash-গুলোকে আলাদা করে। একটা নির্দিষ্ট দুর্বল password অনুমান করা সহজই থাকে।
 
 **"bcrypt বা Argon2id দিলে দুর্বল password-ও চলে।"** Hash সময় কেনে। দুর্বল password-এ সেই সময় কম লাগে।
 
@@ -603,7 +511,7 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 | কেন এসেছে? | Authentication-এর জন্য এমন একটা প্রমাণ দরকার, যা সহজে বহন করা যায় আর যেকোনো device থেকে দেওয়া যায় |
 | কী সমাধান করে? | বেনামি প্রবেশ। Database ফাঁসে plaintext-এ সরাসরি ক্ষতি (hashing-এর ফলে) |
 | কী সমাধান করে না? | দুর্বল password, phishing, keylogger, server-এ ঢোকা আক্রমণকারী, database-এ লেখার সুযোগ, reuse-এর ক্ষতি, recovery-র নিরাপত্তা, পরিচয় ধরে রাখা (§১২) |
-| কোথায় থাকে? | User-এর মাথায় বা password manager-এ। Server-এর memory-তে login-এর কয়েক মিলিসেকেন্ড। Database-এ শুধু hash (PHC string) |
+| কোথায় থাকে? | User-এর মাথায় বা password manager-এ। Server-এর memory-তে login-এর কয়েক মিলিসেকেন্ড। Database-এ hash এবং যাচাইয়ের জন্য দরকারি metadata |
 | কে ব্যবহার করে? | User দেয়। Server যাচাই করে। Hash শুধু server-এর যাচাই-কাজে লাগে |
 | কীভাবে আক্রান্ত হয়? | অনুমান (brute force, stuffing, spraying), database ফাঁসের পর offline cracking, phishing, enumeration, lockout-কে অস্ত্র বানানো, reset-এর পথ |
 | ভেঙে পড়লে ক্ষতি? | ওই user-এর পরিচয়ে কাজ। Reuse থাকলে অন্য account-ও (§১০) |
@@ -618,54 +526,49 @@ OWASP তিন ধরনের আক্রমণ আলাদা করে:
 
 ## আমরা কী শিখলাম? (What did we learn?)
 
-- Functional test পাস করা আর নিরাপদ হওয়া এক নয়। "ঠিক মানুষ ঢুকছে তো?" আর "জিনিসটা অন্যের হাতে গেলে কী হবে?" আলাদা প্রশ্ন।
+- সাধারণ functional test পাস করা আর নিরাপদ হওয়া এক নয়। "ঠিক মানুষ ঢুকছে তো?" আর "জিনিসটা অন্যের হাতে গেলে কী হবে?" আলাদা প্রশ্ন।
 - Server-কে password **জানতে** হয় না, শুধু **চিনতে** হয়। যে system password ফিরিয়ে দিতে পারে, সে ভুল জিনিস রাখছে।
-- Dump হাতে এলে আক্রমণকারী আমাদের নিয়ন্ত্রণের বাইরে, **offline**। তখন একমাত্র বাধা প্রতি অনুমানের খরচ।
-- Salt প্রতিটা password-কে আলাদা করে। Salt গোপন নয়। ধীর, memory-hard hash (Argon2id) প্রতিটা অনুমান দামি করে। দুটোই দরকার, আর একা কেউ যথেষ্ট নয়।
-- Hash-এর শক্তি password-এর শক্তিকে ছাড়িয়ে যায় না। দৈর্ঘ্য আর blocklist composition rule-এর চেয়ে বেশি কাজের। বাংলা password-এর জন্য NFC আর ৭২ byte-এর সীমা বিশেষ গুরুত্বপূর্ণ।
-- Online আর offline দুটো আলাদা যুদ্ধক্ষেত্র। Rate limit আর MFA শুধু online-এ কাজ করে।
-- সাধারণ বার্তা আর সমান সময় (dummy hash) enumeration আটকায়। Lockout নিজেই অস্ত্র হতে পারে।
+- Dump হাতে এলে আক্রমণকারী আমাদের নিয়ন্ত্রণের বাইরে, **offline**। তখন গুরুত্বপূর্ণ প্রতিরক্ষা হলো password অনুমান করা কঠিন রাখা এবং প্রতিটি অনুমানের খরচ বাড়ানো।
+- Salt প্রতিটা password-এর hash আলাদা করে এবং precomputed table-এর সুবিধা কমায়। Salt গোপন নয়, আর নিজে থেকে প্রতিটি অনুমান ধীর করে না। উপযুক্ত ধীর, memory-hard password-hashing algorithm প্রতিটি অনুমানের খরচ বাড়ায়।
+- Hash-এর শক্তি password-এর শক্তিকে ছাড়িয়ে যায় না। দৈর্ঘ্য আর blocklist composition rule-এর চেয়ে বেশি কাজের। বাংলা password-সহ Unicode password সামঞ্জস্যপূর্ণভাবে সামলানো গুরুত্বপূর্ণ।
+- Online আর offline দুটো আলাদা যুদ্ধক্ষেত্র। Rate limit offline guessing থামায় না; MFA hash cracking-এর খরচ বাড়ায় না, তবে password ফাঁস হলেও account takeover-এর ঝুঁকি কমাতে পারে।
+- সাধারণ error message ও কাছাকাছি processing time account enumeration-এর সংকেত কমায়, পুরোপুরি নির্মূলের নিশ্চয়তা দেয় না। Lockout নিজেই অস্ত্র হতে পারে।
 - Password আর তার hash আলাদা জিনিস: একটা credential, অন্যটা যাচাইয়ের উপাত্ত। আর পুরোনো হওয়ার জন্য hash-এর algorithm আর parameter সংরক্ষিত থাকে।
 - ফাঁসের পর ক্রম গুরুত্বপূর্ণ: আগে নতুন সংরক্ষণ চালু, তারপর reset। আর reset-এর পথ নিজেই একটা নতুন দরজা।
 
-## পাঁচ মিনিটের পরীক্ষা
+## 🎯 নিজের বোঝাপড়া যাচাই
 
-**এক।** নিজের machine-এ একই কাজ মাপো। `golang.org/x/crypto/argon2` প্যাকেজ লাগবে:
+ধরা যাক, database-এ `$argon2id$...` hash আছে, কিন্তু password খুব সহজ। আক্রমণকারীর কাছে dump আছে, তবে application server-এ প্রবেশাধিকার নেই। কোন কথাটি সবচেয়ে সঠিক?
 
-```go
-package main
+<details>
+<summary>উত্তর ও ব্যাখ্যা দেখো</summary>
 
-import (
-	"crypto/sha256"
-	"fmt"
-	"time"
+Argon2id ও salt offline guessing-কে ব্যয়বহুল করে, কিন্তু দুর্বল password-কে অসম্ভব করে না। Server-side rate limit এই offline কাজ থামাতে পারবে না, কারণ অনুমানগুলো server-এর বাইরে চলছে। শক্ত passphrase/blocklist, সঠিক password hashing, এবং online আক্রমণের জন্য আলাদা throttling দরকার।
 
-	"golang.org/x/crypto/argon2"
-)
+</details>
 
-func main() {
-	pw := []byte("correct horse battery staple")
-	salt := []byte("0123456789abcdef") // শুধু পরীক্ষার জন্য ধ্রুব salt
+## 🧪 পাঁচ মিনিটের পরীক্ষা
 
-	start := time.Now()
-	for i := 0; i < 1_000_000; i++ {
-		sha256.Sum256(pw)
-	}
-	fmt.Println("১০ লক্ষ × SHA-256:", time.Since(start))
+**এক।** আগের চারটি প্রশ্নের উত্তর flowchart দেখে নিজে যাচাই করো।
 
-	start = time.Now()
-	argon2.IDKey(pw, salt, 2, 19*1024, 1, 32)
-	fmt.Println("১ × Argon2id     :", time.Since(start))
-}
+```text
+পাঁচ মিনিটের চিন্তার অনুশীলন
+
+১. SHA-256 আর Argon2id-এর মধ্যে কোনটি password guess করা ব্যয়বহুল করে, এবং কেন?
+২. একই password-এর জন্য দুটি account-এর hash যেন এক না হয়, তার জন্য কোন উপাদানটি দরকার?
+৩. Registration-এ NFC normalization করা হলেও login-এ না করলে কী সমস্যা হতে পারে?
+৪. Database dump ফাঁস হলে rate limit কেন offline guessing থামাতে পারে না?
+
+নিজের উত্তরের পাশে সংশ্লিষ্ট flowchart-এর security invariant লিখে দেখো। বাস্তব benchmark বা code চালানো এই অধ্যায়ের শেখার শর্ত নয়।
 ```
 
-দুটো সময়ের অনুপাত দেখো। তারপর `t` আর `m` বদলে দেখো, কোন parameter-এ তোমার machine-এ এক সেকেন্ডের কাছাকাছি যায়।
+বাস্তব system-এ password-hashing configuration বেছে নিতে target hardware ও concurrent login load বিবেচনা করতে হয়। এই সিরিজে নির্দিষ্ট configuration শেখার বদলে সেই trade-off-এর কারণ বোঝাই লক্ষ্য।
 
-**দুই।** নিজের কোনো project-এর **staging** database-এ (production-এ নয়) `users` table খোলো। Password column-টা পড়া যায়? যায় যদি, সেটা কী: plaintext, দ্রুত hash, নাকি `$argon2id$...`-এর মতো কিছু? তারপর application log-এ `grep` করে দেখো কোথাও password বা তার ধরনের কিছু লেখা আছে কি না।
+**দুই।** কাল্পনিক একটি database dump-এ `password` column দেখলে কী প্রশ্ন করবে? সেখানে plaintext password আছে, নাকি password-guessing কঠিন করার জন্য তৈরি hash আছে? এরপর log-এ password বা credential-সংক্রান্ত তথ্য থাকার ঝুঁকি ব্যাখ্যা করো।
 
 ## একটা অস্বস্তিকর প্রশ্ন (One uncomfortable question)
 
-ধরে নিলাম আরিফ এবার সব ঠিকঠাক করল। Password Argon2id-তে, salt আছে, policy আছে, dummy hash আছে। রাফি login করল, আর server সফলভাবে তাকে চিনল। এ পর্যন্ত খরচ হলো ৪০–৫০ মিলিসেকেন্ড আর ১৯ MiB memory, ইচ্ছা করেই।
+ধরে নিলাম আরিফ এবার password storage, salt, policy আর login failure-এর মৌলিক নিয়মগুলো ঠিক করল। রাফি login করল, আর server সফলভাবে তাকে চিনল। Password যাচাই ইচ্ছাকৃতভাবে resource-intensive, তাই প্রতিটি পরের request-এ একই কাজ আবার করা অকার্যকর হবে।
 
 এবার রাফির dashboard একটা পেজ খুলতে পাঠায় দশটা request। প্রতিটায় এই খরচ দিয়ে password যাচাই করা যাবে না। অধ্যায় ১-এর সেই "প্রতি request-এ password" নকশা এখন শুধু অনিরাপদ নয়, অচল। আবার যাচাই না করলে server কীসের ভরসায় বলবে, "এই request-টাও রাফির"?
 
@@ -681,19 +584,19 @@ func main() {
 
 ## তথ্যসূত্র
 
-- [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html): Argon2id-র ন্যূনতম configuration, scrypt, bcrypt (legacy, ৭২ byte), PBKDF2, salt, pepper, work factor, hash হালনাগাদের কৌশল, PHC string format-এর সুপারিশ। এই লেখার সময় পাতাটা পুরো পড়ে মেলানো হয়েছে।
+- [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html): Argon2id-র ন্যূনতম configuration, scrypt, bcrypt (legacy, নির্দিষ্ট input-length limitation), PBKDF2, salt, pepper, work factor, hash হালনাগাদের কৌশল, encoded hash record format-এর সুপারিশ। এই লেখার সময় পাতাটা পুরো পড়ে মেলানো হয়েছে।
 - [NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management](https://pages.nist.gov/800-63-4/sp800-63b.html): §3.1.1 Passwords (দৈর্ঘ্য, composition rule নিষেধ, নিয়মিত বদল নিষেধ, blocklist, password manager আর paste, Unicode আর NFC, salt ও hash সংরক্ষণ, keyed hashing), §3.2.2 Rate Limiting, §3.2.7 Replay Resistance (password replay-resistant নয়)। লেখার সময় পড়ে মেলানো হয়েছে।
 - [OWASP Credential Stuffing Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Credential_Stuffing_Prevention_Cheat_Sheet.html): brute force, credential stuffing আর password spraying-এর পার্থক্য, MFA, proxy দিয়ে ছড়ানো আক্রমণ, ফাঁস-হওয়া password শনাক্তকরণ, অস্বাভাবিক ঘটনায় user-কে জানানো, unpredictable username। পড়ে মেলানো হয়েছে।
-- [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ বার্তা, response-এর সময়ে তথ্য ফাঁস, dummy hash। (এই খসড়া লেখার সময় শুধু প্রাসঙ্গিক অংশ দেখা হয়েছে। Technical Review-এ পূর্ণ পাঠ মেলাতে হবে।)
-- [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): parameter-এর সংজ্ঞা আর বাছাইয়ের নির্দেশনা। (মূল RFC-র পাঠ সরাসরি মেলানো হয়নি। দুটো সুপারিশের সংখ্যা এসেছে RFC উদ্ধৃত করা অন্য সোর্স থেকে। Technical Review-এ মেলাতে হবে।)
-- [PHC string format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md): `$argon2id$v=19$m=...,t=...,p=...$salt$hash` গঠন। (OWASP-র পাতা যে লিঙ্ক দেয়, সেটা। সরাসরি পড়া হয়নি।)
-- `golang.org/x/crypto/argon2` আর `golang.org/x/crypto/bcrypt`: এই অধ্যায়ের কোড Go 1.22 আর `golang.org/x/crypto` v0.31.0 দিয়ে compile করে চালিয়ে দেখা হয়েছে (hash বানানো, যাচাই, ভুল password, না-থাকা user, `NeedsRehash`, bcrypt-এর ৭২ byte error)। `norm.NFC` আর `checkPolicy`-র মতো ছোট টুকরো আলাদা করে চালানো হয়নি।
+- [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html): সাধারণ error response, response-time discrepancy এবং automated attack প্রতিরোধ।
+- [RFC 9106: Argon2, the Memory-Hard Function for Password Hashing and Proof-of-Work Applications](https://www.rfc-editor.org/rfc/rfc9106.html): Argon2-র নকশা ও password hashing-এ memory-hard পদ্ধতির ভূমিকার প্রাথমিক specification। এই অধ্যায়ে RFC-র configuration-গুলো মুখস্থ করানো বা নির্দিষ্ট deployment-এর parameter বেছে দেওয়া লক্ষ্য নয়।
+- Password hashing implementation-এর সঠিকতা শুধু diagram দেখে প্রমাণ করা যায় না। বাস্তব system-এ রক্ষণাবেক্ষণাধীন library-এর official documentation অনুসরণ করতে হবে। এই সিরিজের উদাহরণগুলো implementation নয়, শেখার মডেল; এখানে লক্ষ্য algorithm, salt, offline guessing এবং trade-off-এর মূল ধারণা বোঝা।
+
 - Robert Morris, Ken Thompson, *Password Security: A Case History*, Communications of the ACM, ১৯৭৯: Unix-এর password file-এ salt-এর ঐতিহাসিক উদাহরণ। (ঐতিহাসিক সূত্র, স্পেসিফিকেশন নয়। সরাসরি মেলানো হয়নি।)
 - Unicode Standard Annex #15, *Unicode Normalization Forms* (NFC): NIST-এর নির্দেশনার সূত্রে। (সরাসরি পড়া হয়নি।)
 
 ## লেখার অবস্থা
 
 - [x] Draft
-- [ ] Technical Review
-- [ ] Security Review
+- [x] Technical Review (conceptual claims ও authoritative references পর্যালোচিত; implementation audit নয়)
+- [x] Security Review (threat model, limitations ও গুরুত্বপূর্ণ failure path পর্যালোচিত; production certification নয়)
 - [ ] Published

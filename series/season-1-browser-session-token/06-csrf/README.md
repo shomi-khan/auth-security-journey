@@ -11,13 +11,15 @@ status: draft
 
 *যে আক্রমণকারী আমাদের session ID কখনো দেখেনি, সে কি তবু শুভর browser দিয়ে শুভর নামে request পাঠাতে পারে?*
 
-পরদিন সকালে সে staging-এ রাফির (`user-1`, Owner) নামে login করল। নিজের laptop-এ একটা test পাতা বানাল, যার ভেতরে লুকোনো একটা form, `action` সোজা staging-এর `POST /manage/orders/1042/refund`, আর একটা এক লাইনের JavaScript যা পাতা খুললেই form-টা submit করে দেয়। তারপর অন্য একটা ট্যাবে সেই test পাতা খুলল।
+পরদিন সকালে সে staging-এ রাফির (`user-1`, Owner) নামে login করল। নিজের laptop-এ একটা test পাতা বানাল, যার ভেতরে লুকোনো একটা form, `action` সোজা staging-এর `POST /manage/orders/1051/cancel`, আর একটা এক লাইনের JavaScript যা পাতা খুললেই form-টা submit করে দেয়। তারপর অন্য একটা ট্যাবে সেই test পাতা খুলল।
 
 Server-এর log-এ request এল। কিন্তু cookie ছাড়া।
 
 ```text
-POST /manage/orders/1042/refund   cookie নেই   401
+POST /manage/orders/1051/cancel   cookie নেই   401
 ```
+
+এই opening ঘটনাটি KenaKata-র fictional staging scene, বাস্তব browser test-এর report নয়। আধুনিক browser-এ cookie কীভাবে পাঠানো হয়, সেটি নির্দিষ্ট supported-browser matrix-এ আলাদা করে যাচাই করতে হবে.
 
 আরিফ একটু অবাক হয়ে বসে রইল। তারপর হাসল। অধ্যায় ৪-এ সে `SameSite=Lax` লিখেছিল "যেহেতু সবাই লেখে" গোছের মনোভাবে। আজ ওই একটা শব্দ শুভকে, আর রাফিকে, বাঁচাল। Lax-এর নিয়মে অন্য site থেকে আসা `POST`-এ browser cookie পাঠায় না।
 
@@ -30,13 +32,13 @@ POST /manage/orders/1042/refund   cookie নেই   401
 আরিফ অর্ডারের তালিকা খুলল। ১০৫১-এর পাশে লেখা: *বাতিল*। কে করল? অধ্যায় ৫-এর পর সে জানে প্রথম প্রশ্নটা কী: **session চুরি হয়েছে?** সে log খুলল।
 
 ```text
-11:42:09Z GET  /manage/orders/1051/cancel   sid=3fa9c2b1 user=user-1 ip=192.0.2.21
+11:42:09Z GET  /manage/orders/1051/cancel   sid_hash=3fa9c2b1d7e5a4c8f2b6d0e9a1c3f507 user=user-1 ip=192.0.2.21
           (reverse proxy-র access log থেকে মিলিয়ে) referer=https://courier-track.example/
 ```
 
-(IP নমুনা, ডকুমেন্টেশনের জন্য আলাদা করা range থেকে। সময় UTC, অধ্যায় ৫-এর মতোই। `sid` ID-র hash-এর প্রথম আট অক্ষর।)
+(IP নমুনা, ডকুমেন্টেশনের জন্য আলাদা করা range থেকে। সময় UTC, অধ্যায় ৫-এর মতোই। `sid_hash` raw session ID নয়; এটি keyed HMAC-ভিত্তিক দীর্ঘ correlation value-এর illustrative উদাহরণ। বাস্তবে key management, retention ও log access আলাদা করে সুরক্ষিত রাখতে হয়।)
 
-প্রতিটা সংকেত আরিফ মিলিয়ে দেখল। IP রাফির দোকানের Wi-Fi-র একই `/24`। User-Agent রাফির browser-এর। অধ্যায় ৫-এ যে context signal বানিয়েছিল, `Suspicious()`, সেটা একটা শব্দও করেনি। রাফি সকাল থেকে কাজ করছিল, শেষ request তিন মিনিট আগের, তাই ৩০ মিনিটের idle ঘড়িও ঠিক ছিল, ৮ ঘণ্টার absolute ঘড়িও। Session সম্পূর্ণ বৈধ। কেউ cookie চুরি করেনি। রাফির password Argon2id-র পেছনে।
+প্রতিটা সংকেত আরিফ মিলিয়ে দেখল। IP রাফির দোকানের Wi-Fi-র একই `/24`। User-Agent রাফির browser-এর। অধ্যায় ৫-এ যে context-signal policy ছিল, সেটি কোনো সতর্কতা দেয়নি। রাফি সকাল থেকে কাজ করছিল, শেষ request তিন মিনিট আগের, তাই ৩০ মিনিটের idle ঘড়িও ঠিক ছিল, ৮ ঘণ্টার absolute ঘড়িও। Session সম্পূর্ণ বৈধ। কেউ cookie চুরি করেনি। রাফির password Argon2id-র পেছনে।
 
 শুধু একটা জিনিস খাপ খাচ্ছে না। `referer`। `courier-track.example` KenaKata-র কোনো পাতা নয়।
 
@@ -46,13 +48,12 @@ POST /manage/orders/1042/refund   cookie নেই   401
 
 আরিফ চুপ করে গেল। গত সপ্তাহের কাজটা তার মনে পড়ছিল। নীরা চেয়েছিল, নতুন অর্ডারের ইমেইলে একটা "বাতিল করুন" লিঙ্ক থাকুক, যাতে রাফি ফোন থেকে এক ক্লিকে বাতিল করতে পারে। আরিফ বানিয়েছিল:
 
-```go
-// গত সপ্তাহে আরিফের লেখা। কাজ করে, নীরা খুশি।
-mux.Handle("GET /manage/orders/{id}/cancel",
-	requireAuthentication(http.HandlerFunc(cancelOrder)))
+```http
+GET /manage/orders/1051/cancel HTTP/1.1
+Cookie: __Host-id=<browser-এর পাঠানো session cookie>
 ```
 
-এই কোডে কোনো ভুল নেই, অন্তত যে ভুল আমরা এতদিন খুঁজেছি। অধ্যায় ৪-এর `requireAuthentication` ঠিকঠাক কাজ করেছে। session বৈধ ছিল। `user-1` সত্যিই অর্ডার বাতিল করতে পারে, অর্থাৎ অধ্যায় ২-এর authorization-ও আপত্তি তোলেনি। অধ্যায় ৫-এর সব নতুন যন্ত্র (মেয়াদ, rotate, context signal) নিজের কাজ ঠিকঠাক করেছে।
+এই request-এ আগের স্তরগুলোর কোনো ভুল ছিল না, অন্তত যে ভুল আমরা এতদিন খুঁজেছি। অধ্যায় ৪-এর authentication check ঠিকঠাক কাজ করেছে। session বৈধ ছিল। `user-1` সত্যিই অর্ডার বাতিল করতে পারে, অর্থাৎ অধ্যায় ২-এর authorization-ও আপত্তি তোলেনি। অধ্যায় ৫-এর সব নতুন যন্ত্র (মেয়াদ, rotate, context signal) নিজের কাজ ঠিকঠাক করেছে।
 
 আর যে প্রশ্নটা অধ্যায় ৪ থেকে ঝুলছিল, আর অধ্যায় ৫-এর শেষে আরও তীক্ষ্ণ হলো, সেটা এখন ঘরের ভেতরে বসে আছে। server-এর চোখে দুটো request হুবহু এক: একটা রাফি নিজে করেছে, আরেকটা রাফির browser-কে দিয়ে অন্য কেউ করিয়েছে। **তফাতটা server কীভাবে ধরবে?**
 
@@ -104,13 +105,13 @@ Authentication বলে *কে*। CSRF-এর পুরো গল্প *ই�
 
 "কিন্তু same-origin policy?" প্রশ্নটা আসবেই। SOP আর CORS মূলত অন্য origin-এর **response পড়া** আটকায়। আক্রমণকারীর response পড়ার দরকারই নেই। আর MDN-এর বিবরণ অনুযায়ী `<form>` submit-এর মতো "simple request" cross-origin পাঠানো যায়, কারণ web-এর শুরু থেকে form তা পারত, আর compatibility-র কারণে সেটা ভাঙা হয়নি।
 
-MDN CSRF সম্ভব হওয়ার তিনটা শর্ত দেয়। তিনটাই লাগে। একটা ভাঙলেই হামলা ব্যর্থ। এই তিন শর্তই এই অধ্যায়ের মানচিত্র:
+এই দৃশ্যকে তিনটি প্রশ্নে নামিয়ে আনা যায়: (১) request কি server-side state বদলাতে পারে? (২) browser কি নিজে থেকে authentication credential জুড়ে দেয়? (৩) আক্রমণকারী কি server-এর গ্রহণযোগ্য request তৈরি করাতে পারে, এমন কোনো গোপন প্রমাণ ছাড়াই যা তার জানা নেই? প্রতিরক্ষা এক বা একাধিক শর্ত ভাঙবে। এটি শেখানোর জন্য সরল model, প্রতিটি বাস্তব CSRF ঘটনার সর্বজনীন সংজ্ঞা নয়:
 
 | # | শর্ত | KenaKata-র আজকের অবস্থা | কোন প্রতিরক্ষা এটা ভাঙে |
 | - | ---- | ----------------------- | ----------------------- |
 | ১ | HTTP request দিয়ে server-এ state বদলায় | হ্যাঁ, অর্ডার বাতিল | নিরাপদ method-এ state বদলানো বন্ধ (§৪.১) |
 | ২ | request কার, তা যাচাই হয় শুধু cookie দিয়ে | হ্যাঁ, `__Host-id` | request-এর উৎস যাচাই (§৪.২), আর cookie ছাড়া আরেকটা প্রমাণ (§৪.৩) |
-| ৩ | request-এর parameter আক্রমণকারী অনুমান করতে পারে | হ্যাঁ, URL-ই `/manage/orders/1051/cancel` | অনুমান-অযোগ্য token (§৪.৩) |
+| ৩ | request গ্রহণ করতে server-এর কাছে কোনো অজানা secret proof লাগে না | হ্যাঁ, URL-ই যথেষ্ট | session-নির্দিষ্ট, অনুমান-অযোগ্য CSRF token (§৪.৩) |
 
 `SameSite` শর্ত ২-কে আংশিক ভাঙে: কিছু ক্ষেত্রে cookie-ই পাঠাতে দেয় না।
 
@@ -172,7 +173,7 @@ browser কিছু header নিজে বসায়, যেগুলো প
 | `Sec-Fetch-Site` | request-এর উৎস আর গন্তব্যের সম্পর্ক | `same-origin`, `same-site`, `cross-site`, `none` (user নিজে: bookmark, address bar) |
 | `Origin` | উৎসের origin (scheme, host, port) | যেমন `https://courier-track.example` |
 
-OWASP `Sec-Fetch-Site`-কে এই কাজের প্রধান সংকেত বলে, আর জানায় এটা সব বড় browser-এ ২০২৩-এর মার্চ থেকে আছে (প্রায় ৯৮% coverage)। তবে পুরোনো browser-এর জন্য `Origin`/`Referer`-ভিত্তিক fallback রাখা বাধ্যতামূলক বলেছে।
+OWASP `Sec-Fetch-Site`-কে প্রধান সংকেত বলে। `Sec-` দিয়ে শুরু হওয়া request header browser-এর `fetch` API থেকে JavaScript বদলাতে পারে না, কারণ Fetch Standard এগুলোকে forbidden request header হিসেবে সংরক্ষণ করে। তবে non-browser client নিজের ইচ্ছায় এই header লিখতে পারে; তাই header একা authentication নয়। OWASP Fetch Metadata না থাকলে origin যাচাইয়ের fallback রাখতে বলে। KenaKata-র policy-তে `Sec-Fetch-Site` অনুপস্থিত হলে server-configured target origin-এর সঙ্গে `Origin` হুবহু মেলানো হবে; `Origin`-ও অনুপস্থিত বা `null` হলে request প্রত্যাখ্যাত হবে।
 
 আরিফের সিদ্ধান্তগুলো ছবিতে। প্রশ্ন: একটা `POST` কোন কোন পরীক্ষা পেরোলে ঢুকতে পারে?
 
@@ -181,45 +182,27 @@ flowchart TD
     R["POST /manage/orders/1051/cancel আসছে"] --> M{"method কি GET, HEAD বা OPTIONS?"}
     M -- "হ্যাঁ" --> OK1["পার হয়। তাই এখানে state বদলানো চলবে না"]
     M -- "না" --> S{"Sec-Fetch-Site কী?"}
-    S -- "same-origin বা none" --> OK2["পার হয়"]
-    S -- "cross-site বা same-site" --> NO1["403, প্রত্যাখ্যান"]
-    S -- "নেই বা অচেনা মান" --> O{"Origin হুবহু https://kenakata.example?"}
-    O -- "হ্যাঁ" --> OK3["পার হয়"]
+    S -- "same-origin" --> OK2["পরের স্তরে যায়: session ও token যাচাই"]
+    S -- "cross-site, same-site, none বা অচেনা মান" --> NO1["403, প্রত্যাখ্যান"]
+    S -- "header নেই" --> O{"Origin হুবহু https://kenakata.example?"}
+    O -- "হ্যাঁ" --> OK3["পরের স্তরে যায়: session ও token যাচাই"]
     O -- "না, খালি বা null" --> NO2["403, প্রত্যাখ্যান"]
 ```
 
-কোডে এটা এত ছোট:
+নীতিটা সংক্ষেপে:
 
-```go
-const trustedOrigin = "https://kenakata.example" // server-এর কনফিগে লেখা, request থেকে নেওয়া নয়
+**KenaKata-র policy table** (এটি শিক্ষামূলক সিদ্ধান্ত, কোনো framework-এর universal default নয়):
 
-func isSafeMethod(m string) bool {
-	return m == http.MethodGet || m == http.MethodHead || m == http.MethodOptions
-}
+| State-changing request-এ কী দেখা গেল | সিদ্ধান্ত | কারণ |
+| --- | --- | --- |
+| `Sec-Fetch-Site: same-origin` | পরের স্তরে যাও | browser জানায় request একই origin থেকে এসেছে; token-ও যাচাই করতে হবে |
+| `cross-site`, `same-site`, `none` বা অচেনা value | `403` | `none` user-initiated navigation-এর সংকেত হতে পারে, কিন্তু একে একা sensitive action-এর অনুমতি হিসেবে ধরা হবে না |
+| `Sec-Fetch-Site` নেই, `Origin` exact configured origin-এর সঙ্গে মেলে | পরের স্তরে যাও | compatibility fallback |
+| `Sec-Fetch-Site` নেই এবং `Origin` missing, `null` বা mismatch | `403` | KenaKata fail-safe বেছে নিয়েছে |
 
-func sameOriginRequest(r *http.Request) bool {
-	switch r.Header.Get("Sec-Fetch-Site") {
-	case "same-origin", "none":
-		return true
-	case "cross-site", "same-site": // same-site মানে সহোদর subdomain-ও। তাদের বিশ্বাস করছি না
-		return false
-	default:
-		// header নেই (পুরোনো browser, proxy-র মুছে-ফেলা header, browser নয় এমন client) বা অচেনা মান
-		return r.Header.Get("Origin") == trustedOrigin // "null" আর খালি, দুটোই প্রত্যাখ্যান
-	}
-}
+KenaKata-র policy ইচ্ছাকৃতভাবে কঠোর: OWASP-এর সাধারণ Fetch Metadata guidance forward compatibility-র জন্য অচেনা value ignore করতে বলে, কিন্তু এখানে unknown value-ও reject করা হচ্ছে। এতে ভবিষ্যতে নতুন value এলে বৈধ request-ও block হতে পারে; production-এ enforce করার আগে log-only rollout ও compatibility monitoring দরকার।
 
-func crossSiteGuard(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Vary", "Sec-Fetch-Site, Origin")
-		if isSafeMethod(r.Method) || sameOriginRequest(r) {
-			next.ServeHTTP(w, r)
-			return
-		}
-		http.Error(w, "cross-site request rejected", http.StatusForbidden)
-	})
-}
-```
+`GET`, `HEAD` ও `OPTIONS`-এর মতো safe method-এ state বদলানো যাবে না। HTTP semantics-এ `TRACE`-ও safe method হিসেবে সংজ্ঞায়িত, তবে KenaKata-র এই দৃশ্যে সেটি চালু endpoint নয়। Safe method-এ state বদলানো থাকলে এই guard-কে পাশ কাটানো যায়, তাই handler-এর আচরণই প্রথম invariant.
 
 প্রতিটা সিদ্ধান্তের পেছনে একটা trade-off:
 
@@ -231,17 +214,9 @@ func crossSiteGuard(next http.Handler) http.Handler {
 
 **`Vary` header।** এটা response-এ বসে, সিদ্ধান্তের পরে। প্রতিরক্ষায় কিছু বদলায় না। কিন্তু response যদি এই header-ভেদে আলাদা হয়, cache যেন তা গুলিয়ে না ফেলে। OWASP এটা rollout-এর পরামর্শে রাখে।
 
-**Go-র standard library।** Go 1.25 থেকে `net/http`-এ `CrossOriginProtection` আছে। ডকুমেন্টেশন অনুযায়ী সেটা `Sec-Fetch-Site`, অথবা সেটা না থাকলে `Origin` আর `Host`-এর hostname মিলিয়ে cross-origin ধরে, safe method সবসময় ছেড়ে দেয়, আর **দুটো header-ই না থাকা request-কে same-origin বা browser-নয় ধরে ঢুকতে দেয়**। মানে ডিফল্টে সেটা fail-open, আমাদের কোডের উল্টো। ব্যবহার সরল:
+**Framework-এর built-in protection।** কোনো framework-এ CSRF protection থাকলে সেটি সাধারণত ভালো starting point, তবে তার default policy ও compatibility behavior বুঝে নিতে হবে। বিশেষ করে metadata header অনুপস্থিত হলে request allow হবে, reject হবে, না token যাচাইয়ে যাবে, সেটা স্পষ্ট করে নাও। KenaKata-র সিদ্ধান্ত হলো state-changing request-এ `Sec-Fetch-Site` অনুপস্থিত থাকলে exact configured `Origin` fallback; দুটোই অনুপস্থিত বা `Origin: null` হলে fail-safe reject।
 
-```go
-cop := http.NewCrossOriginProtection()
-// cop.AddTrustedOrigin("https://partner.example") // জেনেবুঝে ছাড়, তার আগে নয়
-handler := cop.Handler(mux)
-```
-
-এই টুকরোটা আমি **চালাইনি**, কারণ আমার পরীক্ষার পরিবেশ Go 1.22.2 (অধ্যায় ৪-এর মতোই)। শুধু ডকুমেন্টেশন পড়েছি। আরেকটা কথা: pkg.go.dev-র ওই পাতার ওপরে `CrossOriginProtection`-এর একটা vulnerability (GO-2025-3955, bypass pattern নিয়ে) তালিকাভুক্ত দেখেছি। advisory পড়িনি। `AddInsecureBypassPattern` ব্যবহার করতে চাইলে আগে Go-র সর্বশেষ patch আর advisory দেখে নিয়ো।
-
-**rollout।** OWASP-র পরামর্শ: আগে "শুধু log" মোডে চালাও, কী কী আটকাত দেখো, তারপর enforce। speculative navigation (prefetch/prerender) আর header-মুছে-দেওয়া proxy নিয়ে সতর্ক থাকো। আমাদের কোডে log-only মোড নেই। production-এ যাওয়ার আগে যোগ করা উচিত।
+**rollout।** OWASP-র পরামর্শ: আগে "শুধু log" মোডে চালিয়ে কী কী আটকাত তা পর্যালোচনা করো, তারপর enforce করো। speculative navigation (prefetch/prerender) আর header-মুছে-দেওয়া proxy legitimate request-এ false positive তৈরি করতে পারে। এই chapter কোনো production rollout বা browser test দাবি করছে না.
 
 ### ৪.৩ স্তর ২: CSRF token
 
@@ -272,72 +247,32 @@ sequenceDiagram
 
 token-এর ধর্ম (OWASP): প্রতি session-এ আলাদা, গোপন, অনুমান-অযোগ্য (CSPRNG)। synchronizer pattern-এ token **cookie-তে নয়**। URL-এ নয়, log-এ নয়, কারণ `GET` URL browser history, log আর `Referer`-এ ফাঁস হয়। token-কে কোনো *মেয়াদ* দেওয়ার দরকার নেই, session-এর সঙ্গেই তার জীবন (অধ্যায় ৫-এর idle ৩০ মিনিট আর absolute ৮ ঘণ্টা), আর OWASP স্পষ্ট বলে, CSRF token কোনো access token নয়। per-request token বেশি নিরাপদ হলেও "Back" বাটনে ভাঙে, তাই আমরা per-session।
 
-কোড। অধ্যায় ৫-এর `record`-এ (যেখানে এখন `Next`, `StartedAt`, `LastSeen`, `UA`, `Net` আছে) একটা ফিল্ড বাড়ে, আর session ID-র পাশে আরেকটা, **স্বাধীন** random মান বানানো হয়:
+সার্ভারের session record-এ CSRF token-এর জন্য আলাদা field রাখতে হবে। প্রতিটি নতুন session-এর সময় session ID থেকে **স্বাধীন** একটি random মান তৈরি করে সেই session-এর সঙ্গে যুক্ত করতে হবে:
 
-```go
-type record struct {
-	UserID    string
-	Next      string
-	CSRF      string // নতুন: এই session-এর CSRF token
-	StartedAt time.Time
-	LastSeen  time.Time
-	UA        string
-	Net       netip.Prefix
-}
-
-// put-এর ভেতরে, যেখানে session ID বানানো হয় তার ঠিক পাশে, একটা লাইন বাড়ে:
-if r.CSRF, err = randomToken(); err != nil { // session ID থেকে স্বাধীন, আলাদা random মান
-	return "", err
-}
-
-// CSRFToken: Lookup এখন পুরো record ফেরত দেয় (অধ্যায় ৫), তাই এটা এক লাইন।
-func (s *Store) CSRFToken(token string) (string, bool) {
-	rec, ok := s.Lookup(token)
-	return rec.CSRF, ok
-}
+```mermaid
+flowchart TD
+    A["নতুন anonymous বা authenticated session তৈরি"] --> B["CSPRNG দিয়ে স্বাধীন, অনুমান-অযোগ্য CSRF token তৈরি"]
+    B --> C["Server-side session record-এ token রাখা"]
+    C --> D["বিশ্বস্ত page-এ hidden form field বা custom header-এ token দেওয়া"]
+    D --> E["State-changing request-এ browser token ফেরত পাঠায়"]
+    E --> F{"Session-এর token-এর সঙ্গে মেলে?"}
+    F -->|হ্যাঁ| G["পরের authorization ও business validation"]
+    F -->|না / নেই / session নেই| H["403, request প্রত্যাখ্যান"]
 ```
 
-কেন স্বাধীন? token পাতার HTML-এ যায়, আর session ID `HttpOnly` cookie-তে। token যদি session ID-র হুবহু রূপ বা তা থেকে বানানো হতো, পাতায় বসানো মান থেকে session ID-র দিকে একটা সূত্র তৈরি হতো। আলাদা random মানে সেই সূত্র নেই। `put` ডাকে login-এর আগের anonymous session আর login-এর মুহূর্তের `Rotate` দুটোই, তাই প্রতিটা session-এর নিজের token থাকে, আর `Rotate` নতুন session বানালে নতুন token-ও আসে, আলাদা কিছু করতে হয় না। অধ্যায় ৫-এর "login-এর সময় ID বদলাও" এখানে বিনা খরচে মিলে যায়। login-এর আগের session-এর token কেন লাগে, সেটা §৫-এ।
+কেন স্বাধীন? token পাতার HTML-এ যায়, আর session ID `HttpOnly` cookie-তে। token যদি session ID-র হুবহু রূপ বা তা থেকে বানানো হতো, পাতায় বসানো মান থেকে session ID-র দিকে একটা সূত্র তৈরি হতো। আলাদা random মানে সেই সূত্র নেই। Login-এর আগে anonymous session তৈরি হলে তারও নিজস্ব token থাকবে। Login সফল হলে পুরোনো anonymous session বাতিল করে নতুন session ID ও নতুন token তৈরি করতে হবে। এতে অধ্যায় ৫-এ শেখা session fixation প্রতিরক্ষার সঙ্গে CSRF token lifecycle-ও মিলে যায়। login-এর আগের session-এর token কেন লাগে, সেটা §৫-এ।
 
-middleware আর পাতা:
+Server-side validation ও page form:
 
-```go
-// tokenMatches: request-এর token (header বা form) আর session-এর token তুলনা করে।
-func tokenMatches(r *http.Request, want string) bool {
-	got := r.Header.Get("X-CSRF-Token") // JavaScript-এর ডাকের জন্য (অধ্যায় ১০)
-	if got == "" {
-		got = r.PostFormValue("csrf") // form-এর hidden field
-	}
-	return want != "" && subtle.ConstantTimeCompare([]byte(got), []byte(want)) == 1
-}
+Token যাচাইয়ের security invariant:
 
-func requireCSRFToken(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if isSafeMethod(r.Method) {
-			next.ServeHTTP(w, r)
-			return
-		}
-		c, err := r.Cookie(cookieName)
-		if err != nil {
-			http.Error(w, "forbidden", http.StatusForbidden)
-			return
-		}
-		want, ok := sessions.CSRFToken(c.Value)
-		if !ok || !tokenMatches(r, want) {
-			http.Error(w, "csrf token missing or invalid", http.StatusForbidden)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
+- Token session ID থেকে **স্বাধীন random value** হবে, session ID থেকে derive করা যাবে না।
+- Server token-টিকে session-এর সঙ্গে যুক্ত রাখবে; form field বা custom request header দিয়ে ফেরত আসা মানের সঙ্গে মিলিয়ে দেখবে।
+- Missing token, empty token, expired session বা mismatch হলে state-changing action চলবে না।
+- Token-কে URL, log, analytics event বা `Referer`-এ ফাঁস হতে দেওয়া যাবে না। HTML form-এ বসালে framework-এর safe templating/escaping ব্যবহার করতে হবে।
+- Per-session token সাধারণত browser-এর Back/refresh flow-কে per-request token-এর তুলনায় কম ভাঙে; token আলাদা expiry clock নয়, session lifecycle-এর অংশ.
 
-var orderPage = template.Must(template.New("o").Parse(
-	`<form method="post" action="/manage/orders/{{.ID}}/cancel">` +
-		`<input type="hidden" name="csrf" value="{{.CSRF}}">` +
-		`<button>অর্ডার বাতিল</button></form>`))
-```
-
-`html/template` মানটা নিজে escape করে। তুলনা `ConstantTimeCompare` দিয়ে, যেন সময় মাপে মিল-অমিল ধরা না যায়। আর `want != ""` শর্তটা শখের নয়: `ConstantTimeCompare` দুটো **খালি** মানকে সমান বলে। কোনো কারণে session-এর token খালি থাকলে, token-ছাড়া request-ও মিলে যেত।
+বাস্তব implementation-এ framework-এর নিরাপদ HTML templating ব্যবহার করতে হবে, missing/empty token স্পষ্টভাবে reject করতে হবে, এবং comparison-এর জন্য প্রতিষ্ঠিত security library-র guidance অনুসরণ করতে হবে। এই chapter কোনো নির্দিষ্ট language API বা timing behavior-এর implementation claim করছে না.
 
 stateless হলে (server-এ session নেই) OWASP-র বিকল্প *signed double-submit cookie*, যেখানে token session-এর সঙ্গে HMAC দিয়ে বাঁধা। সাধারণ (naive) double-submit OWASP-র হিসাবে **নিরুৎসাহিত**: সহোদর subdomain বা অন্য কোনো উপায়ে আক্রমণকারী cookie বসাতে পারলে মিলিয়ে দিতে পারে। আমাদের server-side session আছে, তাই synchronizer সবচেয়ে সরল।
 
@@ -355,33 +290,30 @@ OWASP বলে, অতি সংবেদনশীল কাজে re-authentic
 
 ```mermaid
 flowchart LR
-    Req["request"] --> G["crossSiteGuard<br/>কোথা থেকে এল?"]
-    G --> A["requireAuthentication<br/>কে? (অধ্যায় ৪)"]
-    A --> T["requireCSRFToken<br/>পাতার token আছে?"]
+    Req["request"] --> G["Origin / Fetch Metadata policy<br/>কোথা থেকে এল?"]
+    G --> A["Session authentication<br/>কে? (অধ্যায় ৪)"]
+    A --> T["CSRF token validation<br/>পাতার token আছে?"]
     T --> H["handler<br/>অর্ডার বাতিল"]
     G -. "403" .-> X["প্রত্যাখ্যান"]
     A -. "401 বা login-এ redirect" .-> X
     T -. "403" .-> X
 ```
 
-```go
-func newApp() http.Handler {
-	manage := http.NewServeMux()
-	manage.HandleFunc("GET /manage/orders/{id}", showOrder)             // শুধু দেখা, ভেতরে POST বাটন
-	manage.HandleFunc("POST /manage/orders/{id}/cancel", cancelOrder)   // state বদলায়, শুধু POST
+**Route policy** এক নজরে:
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /login", loginPage)    // anonymous session (অধ্যায় ৫) আর পাতায় তার token (§৫)
-	mux.HandleFunc("POST /login", loginHandler) // নিজেই token মেলায়, কারণ user তখনো authenticated নয়
-	mux.Handle("POST /logout", requireAuthentication(requireCSRFToken(http.HandlerFunc(logoutHandler))))
-	mux.Handle("/manage/", requireAuthentication(requireCSRFToken(manage)))
-	return crossSiteGuard(mux) // সবচেয়ে বাইরে: /login আর /logout-ও এর ভেতরে
-}
-```
+| কাজ | HTTP method | Authentication | CSRF protection |
+| --- | --- | --- | --- |
+| Login page দেখানো | `GET /login` | anonymous pre-session থাকতে পারে | পরের login `POST`-এর জন্য pre-session token issue |
+| Login submit | `POST /login` | credentials যাচাইয়ের আগে anonymous | origin guard + pre-session token |
+| Order page দেখা | `GET /manage/orders/{id}` | session | safe method; state বদলাবে না |
+| Order বাতিল | `POST /manage/orders/{id}/cancel` | session + authorization | origin guard + session token |
+| Logout | `POST /logout` | session | origin guard + session token |
 
-`crossSiteGuard` সবচেয়ে বাইরে। `/login` নিজের token নিজে মেলায় (পরের অংশ), কারণ ওখানে `requireCSRFToken` চলে না, চলার মতো authenticated session তখনো নেই।
+Middleware-এর ক্রম implementation-এ বদলাতে পারে, কিন্তু security invariant বদলাবে না: state-changing handler-এর আগে origin policy, session/authentication, CSRF token এবং resource authorization প্রযোজ্য হবে। Login-এর ক্ষেত্রে authenticated session এখনও নেই, তাই anonymous pre-session token ব্যবহার করা হয়.
 
-আমি এই কোড (সঙ্গে অধ্যায় ৫-এর store-এর ছোট করা একটা রূপ) Go 1.22.2-তে compile করে তেরোটা test চালিয়েছি (§তথ্যসূত্রে বিস্তারিত)। তার মধ্যে দুটো এই অধ্যায়ের সবচেয়ে গুরুত্বপূর্ণ প্রমাণ। এক, guard থাকা সত্ত্বেও `GET`-এ অর্ডার বাতিল করলে বাতিল হয়ে যায়, কারণ guard safe method-এর প্রতি অন্ধ (এটা §৯-এ ফিরবে)। দুই, আক্রমণকারীর **নিজের বৈধ session-এর token** রাফির session-এ কাজ করে না, কারণ token session-নির্দিষ্ট।
+Origin/Fetch Metadata policy state-changing request-এ প্রথম দিকেই প্রযোজ্য। `/login`-এ authenticated session এখনও নেই, তাই login CSRF ঠেকাতে anonymous pre-session-এর token আলাদাভাবে যাচাই হয়।
+
+এগুলো conceptual flow, executable implementation নয়। তাই এখানে compile/test ফলের দাবি করা হচ্ছে না। গুরুত্বপূর্ণ failure path হলো: safe method দিয়ে state change করার route থাকলে CSRF guard সেটিকে আটকাবে না; আর আক্রমণকারীর নিজের session-এর token victim-এর session-এ মেলার কথা নয়, কারণ token session-নির্দিষ্ট।
 
 ---
 
@@ -391,38 +323,43 @@ func newApp() http.Handler {
 
 KenaKata-র এখনকার একটাই দোকান, তাই ঝুঁকিটা কল্পনার। কিন্তু যেদিন একাধিক দোকান আসবে (অধ্যায় ১৫), রাফি অজান্তে অন্য কারও account-এ ক্রেতার তালিকা তুলে দিলে সেটা সত্যিকারের তথ্য ফাঁস।
 
-OWASP-র সুপারিশ: login-এর আগে একটা *pre-session* বানিয়ে তাতে token বসাও, আর login-এর পর সেটা **ধ্বংস করে নতুন session** দাও (নইলে fixation)। এখানে অধ্যায় ৫-এর কাজ আমাদের সোজা সুবিধা দেয়। সেখানে নীরার "login-এর পর ঠিক ওই পাতায় ফেরো" দাবির জন্য আরিফ একটা anonymous session বানিয়েছিল, আর login-এর মুহূর্তে `Rotate` পুরোনোটা মেরে নতুন দেয়। pre-session আমাদের আগেই আছে। সেই session-এর record-এ (§৪.৩) একটা token-ও আছে। login পাতা সেটা form-এ বসায়, login handler সেটা মেলায়:
+OWASP-র সুপারিশ: login-এর আগে একটা *pre-session* বানিয়ে তাতে token বসাও, আর login-এর পর সেটা **ধ্বংস করে নতুন session** দাও (নইলে fixation)। এখানে অধ্যায় ৫-এর নকশা আমাদের সোজা সুবিধা দেয়। নীরার "login-এর পর ঠিক ওই পাতায় ফেরো" দাবির জন্য আরিফ anonymous session তৈরি করেছিল, আর login-এর মুহূর্তে পুরোনো session বাতিল করে নতুন session ID দিয়েছিল। pre-session আমাদের আগেই আছে। সেই session-এর record-এ (§৪.৩) একটা token-ও আছে। login পাতা সেটা form-এ বসায়, login handler সেটা মেলায়:
 
-```go
-c, err := r.Cookie(cookieName)
-var pre record
-ok := false
-if err == nil {
-	pre, ok = sessions.Lookup(c.Value) // login-এর আগের anonymous session
-}
-if !ok || !tokenMatches(r, pre.CSRF) {
-	http.Error(w, "login পাতাটা পুরোনো, আবার খুলুন", http.StatusForbidden)
-	return
-}
-// ... password যাচাই (অধ্যায় ৩) ...
-token, err := sessions.Rotate(c.Value, userID, r.UserAgent(), clientIP(r)) // পুরোনো ID মরে, নতুন ID আর নতুন token
+```mermaid
+sequenceDiagram
+    actor Rafi as রাফি
+    participant B as রাফির browser
+    participant K as KenaKata server
+
+    B->>K: GET /login
+    K-->>B: Anonymous session cookie + login form-এ pre-session token T₁
+    Rafi->>B: Email/password ও T₁ submit
+    B->>K: POST /login + anonymous cookie + T₁
+    K->>K: Origin policy ও pre-session token যাচাই
+    K->>K: Credentials যাচাই
+    alt যেকোনো যাচাই ব্যর্থ
+        K-->>B: প্রত্যাখ্যান; authenticated session তৈরি নয়
+    else সব যাচাই সফল
+        K->>K: Anonymous session invalid; নতুন session ID ও নতুন token T₂
+        K-->>B: Set-Cookie: নতুন session ID; login সফল
+    end
 ```
 
-এই কাজ এখন দুই স্তরে হয়: সবচেয়ে বাইরের `crossSiteGuard` (header দেখে) আর এই token। আমার test পাঁচটা অবস্থা দেখেছে:
+Login flow-তে origin policy আর pre-session token দুটোই প্রযোজ্য। ফলাফলগুলো implementation test হিসেবে নয়, প্রত্যাশিত behavior হিসেবে পড়ো:
 
 | অবস্থা | ফল |
 | ------ | --- |
-| cross-site header, সঠিক token | `403`, কোনো `Set-Cookie` নেই (guard ফেরায়) |
-| same-origin header, কিন্তু anonymous session-ই নেই | `403` |
+| cross-site request, সঠিক token থাকলেও | `403`; token origin policy-কে override করে না |
+| same-origin signal, কিন্তু anonymous session নেই | `403` |
 | token নেই বা ভুল | `403` |
 | আক্রমণকারীর **নিজের** anonymous token, victim-এর anonymous cookie-তে | `403` |
-| সঠিক সবকিছু | `303`, নতুন ID, **আর নতুন token**। পুরোনো anonymous cookie আর token মৃত |
+| সঠিক origin, pre-session ও credentials | Login সফল; নতুন session ID ও নতুন token। পুরোনো anonymous session ও token অকার্যকর |
 
-শেষ সারির শেষ অংশটা অধ্যায় ৫-এর fixation-এর সঙ্গে মিলে যায়। আক্রমণকারী `X` বসিয়ে রাখলে সে `X`-এর token-ও জানে (একই পাতা চেয়ে নিলেই পাওয়া যায়)। কিন্তু login-এর মুহূর্তে `Rotate` `X` মুছে দেয়, তাই ওই token আর কোনো কাজেই লাগে না।
+শেষ সারির শেষ অংশটা অধ্যায় ৫-এর fixation-এর সঙ্গে মিলে যায়। আক্রমণকারী `X` বসিয়ে রাখলে সে `X`-এর token-ও জানে (একই পাতা চেয়ে নিলেই পাওয়া যায়)। কিন্তু login-এর মুহূর্তে পুরোনো anonymous session `X` বাতিল করে নতুন session ID তৈরি করা হয়, তাই ওই token আর কোনো কাজেই লাগে না।
 
-এর দাম আছে। anonymous session ৩০ মিনিটে মরে (অধ্যায় ৫)। কেউ login পাতা খুলে ৪০ মিনিট পরে submit করলে এখন `403` পাবে, আর তার টাইপ করা email হারাবে। ভালো নকশায় সেই ক্ষেত্রে login পাতা নতুন token সহ আবার দেখানো হয়, email-টা ভরা অবস্থায়। আমাদের ছোট কোডে সেটা নেই। আর anonymous session নিজেই একটা পৃষ্ঠ, অধ্যায় ৫ §১৩-এ যা বলা হয়েছে: লক্ষ লক্ষ `GET /login` store ভরাতে পারে। token থাকলে সেই সমস্যা বাড়ে না, কিন্তু কমেও না।
+এর দাম আছে। anonymous session ৩০ মিনিটে মরে (অধ্যায় ৫)। কেউ login পাতা খুলে ৪০ মিনিট পরে submit করলে এখন `403` পাবে, আর তার টাইপ করা email হারাবে। ভালো নকশায় সেই ক্ষেত্রে login পাতা নতুন token সহ আবার দেখানো হয়, email-টা ভরা অবস্থায়। এই অধ্যায়ের conceptual flow-তে সেই user-experience detail নির্দিষ্ট করা হয়নি। আর anonymous session নিজেই একটা পৃষ্ঠ, অধ্যায় ৫ §১৩-এ যা বলা হয়েছে: লক্ষ লক্ষ `GET /login` store ভরাতে পারে। token থাকলে সেই সমস্যা বাড়ে না, কিন্তু কমেও না।
 
-**Logout?** সেটা এখন `POST`, আর guard আর token দুটোর নিচে। test দেখিয়েছে: `GET /logout` পায় `405`। cross-site `POST /logout` পায় `403`, আর রাফির session তখনো বেঁচে থাকে। শুধু same-origin আর সঠিক token হলেই session মোছে।
+**Logout?** সেটা এখন `POST`, আর origin guard ও session token দুটোর নিচে। নিরাপদ method দিয়ে logout হওয়া উচিত নয়; cross-site request বা token mismatch হলে session অক্ষত থাকবে; বৈধ same-origin request ও সঠিক token-এর পরই session বাতিল হবে। এগুলো প্রত্যাশিত behavior, চালানো test-এর ফল নয়.
 
 ---
 
@@ -430,7 +367,7 @@ token, err := sessions.Rotate(c.Value, userID, r.UserAgent(), clientIP(r)) // �
 
 অধ্যায় ৪-এর §৫-এ একটা প্রশ্ন ঝুলিয়েছিলাম: credential `Authorization` header-এ পাঠালে CSRF-এর কী হয়?
 
-**যা কমে।** browser `Authorization` header নিজে বসায় না (Bearer ধরনের ক্ষেত্রে), JavaScript বসায়। অন্য সাইটের পাতার কাছে ওই মান নেই, আর MDN-এর বিবরণ অনুযায়ী custom header থাকলে request "simple" থাকে না, তাই cross-origin পাঠাতে CORS-এর অনুমতি লাগে। ambient authority-ই নেই, তাই classic CSRF-এর ভিত্তিই নেই।
+**যা কমে।** JavaScript-ভিত্তিক client যদি Bearer token নিজে `Authorization` header-এ বসায়, browser সাধারণত অন্য site-এর form থেকে সেই header আপনা-আপনি জুড়ে দেয় না। Custom header-এর cross-origin request-এ CORS preflight লাগে, এবং server-কে সেই origin ও header-কে স্পষ্টভাবে অনুমতি দিতে হয়। এতে cookie-র ambient authority-র ঝুঁকি কমে, কিন্তু token কোথায় রাখা হয়েছে, XSS, CORS configuration এবং credential-এর অন্য automatic behavior আলাদা করে দেখতে হয়.
 
 **যা আসে।** তিনটা নতুন প্রশ্ন।
 
@@ -438,7 +375,7 @@ token, err := sessions.Rotate(c.Value, userID, r.UserAgent(), clientIP(r)) // �
 
 দুই, CORS ভুল সাজালে দরজা আবার খোলে। MDN বলে, কোনো origin থেকে CSRF সম্ভব হবে যদি server সেই origin-কে `Access-Control-Allow-Origin` আর `Access-Control-Allow-Credentials` দুটোতেই অনুমতি দেয়।
 
-তিন, "`Authorization` header মানেই ambient নয়" কথাটা সবসময় সত্যি না। অধ্যায় ১-এর HTTP Basic মনে আছে? RFC 7617 client-কে অনুমতি দেয়, একই protection space-এর পরের request-এ আগেই credential পাঠাতে। browser তার password dialog-এর মান কীভাবে জমায় আর কখন পাঠায়, সেটা আমি এই লেখার সময় প্রমাণসহ মেলাইনি, তাই নিজের browser-এ পরীক্ষা করে নিয়ো। যদি জমা মান আপনা-আপনি যায়, তাহলে Basic-ও ambient, আর "header মানে নিরাপদ" ধরে নেওয়া ভুল।
+তিন, `Authorization` header সবসময় non-ambient নয়। RFC 7617 §2.2 অনুযায়ী HTTP Basic client একই protection space-এর পরের request-এ challenge ছাড়াই credential আগেভাগে পাঠাতে পারে। Browser-এর নির্দিষ্ট credential-storage behavior implementation-ভেদে যাচাই করতে হয়, তাই সব browser-এর আচরণ একই বলে দাবি করা হচ্ছে না। মূল শিক্ষা: header-এর নাম নয়, credential কে ও কখন স্বয়ংক্রিয়ভাবে request-এ যোগ করছে সেটাই CSRF model-এর জন্য গুরুত্বপূর্ণ.
 
 KenaKata-র এখনকার নকশায় header-ভিত্তিক credential নেই। token আসে মোবাইল app-এর সঙ্গে (অধ্যায় ৮)। তাই এই অংশ একটা আগাম নোট, সিদ্ধান্ত নয়।
 
@@ -458,7 +395,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 | credential leak হলে? | CSRF-এ credential leak হয় না। ক্ষতি = victim-এর ক্ষমতা। OWASP: আক্রমণকারী শুধু application-এর দেওয়া সামর্থ্য আর victim-এর অধিকারই কাজে লাগাতে পারে |
 | কতক্ষণ access? | একটা request। কিন্তু victim-এর session যতক্ষণ বৈধ আর সে ওই পাতা খোলে, ততক্ষণ প্রতিবার আবার। অধ্যায় ৫-এর নিয়মে সেটা idle ৩০ মিনিট (কাজের মাঝে ঘড়ি নতুন হয়) আর absolute ৮ ঘণ্টা। রাফি ৩০ মিনিট চুপ থাকলে session মরে, হামলা ব্যর্থ। session hijack-এর মতো টানা দখল নয় |
 | server কি ধরতে পারবে? | সাধারণ log-এ প্রায় না (শুরুর log দেখো)। অধ্যায় ৫-এর context signal (network, User-Agent) চুপ থাকে, কারণ request victim-এর নিজের browser থেকেই আসে। Fetch Metadata আর token থাকলে হ্যাঁ: cross-site `POST` আর token mismatch গোনা যায়। OWASP বলে এমন ঘটনা log করতে, কিন্তু token-এর মান log-এ নয় |
-| server কি revoke করতে পারবে? | প্রযোজ্য নয়, কারণ কিছু চুরি হয়নি। বাতিল করার বদলে ক্ষতি **ফেরানো**: অর্ডার পুনরুদ্ধার, audit |
+| server কি revoke করতে পারবে? | CSRF নিজে credential চুরি করে না, তাই revocation মূল প্রতিরক্ষা নয়। Credential compromise-এর আলাদা প্রমাণ থাকলে session revoke করো; নইলে audit, ক্ষতি ফেরানো ও business recovery জরুরি |
 | ক্ষতি কীভাবে সীমিত হয়? | স্তর (§৪), ছোট ভূমিকা (অধ্যায় ২, ১৫), ফেরানো-যায় এমন কাজ (soft cancel), সংবেদনশীল কাজে আবার প্রমাণ (অধ্যায় ২২) |
 
 ---
@@ -479,7 +416,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 ## ৯. এই সমাধান কী সমাধান করে না
 
 - **XSS।** OWASP-র সবচেয়ে বড় সতর্কতা: XSS সব CSRF প্রতিরক্ষা ভেঙে দিতে পারে। আক্রমণকারীর script আমাদের নিজের পাতায় চললে request আসবে `same-origin` থেকে, `Origin` ঠিক থাকবে, পাতা থেকে token-ও পড়া যাবে। প্রতিটা স্তর পাস করবে। অধ্যায় ৭।
-- **`GET`-এ state বদল।** guard আর token দুটোই safe method ছেড়ে দেয়। কেউ আবার `GET /…/cancel` বানালে সব দেয়াল পাশ কাটানো হবে। আমার test এটা দেখিয়েছে।
+- **`GET`-এ state বদল।** guard safe method-কে CSRF check থেকে ছাড় দেয়, আর synchronizer token-ও safe request-এ সাধারণত যাচাই হয় না। `GET /…/cancel` থাকলে স্তরগুলো পাশ কাটানো যেতে পারে। তাই safe method-এ state change না হওয়াটাই মৌলিক invariant.
 - **client-side CSRF।** OWASP-র আলাদা একটা শ্রেণি: আমাদের নিজের JavaScript যদি URL-এর অংশ ধরে request বানায়, আক্রমণকারী সেই ইনপুট নিয়ন্ত্রণ করে নিজের পছন্দের request করিয়ে নিতে পারে। request তখন same-origin, token সহ, cookie সহ। `SameSite` আর token কিছুই ধরে না। এখন আমাদের JavaScript কম, কিন্তু SPA এলে (অধ্যায় ১০) এটা জীবন্ত হবে।
 - **session চুরি (অধ্যায় ৫)।** আক্রমণকারীর হাতে cookie থাকলে সে পাতা চেয়ে নিয়ে token-ও পায়। এই স্তরগুলো **browser-কে অপব্যবহার** থেকে বাঁচায়, credential-ধারী আক্রমণকারী থেকে নয়। `curl`-এ `Sec-Fetch-Site` লিখে দেওয়া যায়।
 - **অধ্যায় ৫-এর যন্ত্র।** মেয়াদ, rotate, revoke আর context signal, কোনোটাই CSRF ধরে না, কারণ কিছু চুরি বা বসানো হয়নি, request আসে victim-এর নিজের browser থেকে। শুধু idle timeout জানালা ছোট করে: রাফি ৩০ মিনিট চুপ থাকলে session মরে, তখন আসা জাল request ব্যর্থ। কিন্তু রাফি কাজের মাঝে থাকলে নয়।
@@ -495,7 +432,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 
 **"শুধু `POST` ব্যবহার করলেই চলবে।"** form-এর `POST` cross-origin পাঠানো যায়। অধ্যায়ের প্রথম পরীক্ষায় `POST` আটকেছে `SameSite`, `POST` নিজে নয়।
 
-**"JSON API হলে CSRF হয় না।"** OWASP সতর্ক করে: JSON API `text/plain` মেনে নিলে সেটা simple request, আর CSRF-যোগ্য। ঠিক সুরক্ষা হলো simple content type প্রত্যাখ্যান বা custom header দাবি করা, আর তা-ও token যোগ করলে ভালো।
+**"JSON API হলে CSRF হয় না।"** API যদি simple content type গ্রহণ করে বা browser-স্বয়ংক্রিয় credential ব্যবহার করে, ঝুঁকি থাকতে পারে। Custom header সাধারণত preflight বাধ্য করে, কিন্তু CORS exception ভুল হলে সুরক্ষা ভাঙতে পারে। API-এর authentication mode, accepted content types ও CORS policy একসঙ্গে যাচাই করতে হবে.
 
 **"CORS বসিয়েছি, তাই নিরাপদ।"** CORS অন্য origin-কে response *পড়তে* দেয় কি না ঠিক করে। হামলা response ছাড়াই চলে। উল্টো, ভুল CORS (credentials সহ উদার `Allow-Origin`) দরজা খুলে দেয়।
 
@@ -546,7 +483,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 
 - CSRF credential চুরি নয়। এটা browser-কে দিয়ে ইচ্ছার বাইরে কাজ করানো। authentication বলে *কে*, CSRF-এ প্রশ্ন *ইচ্ছা*।
 - কারণ ambient authority: cookie বাঁধা থাকে গন্তব্যের সঙ্গে, উদ্যোক্তার সঙ্গে নয়।
-- হামলা তিন শর্তে চলে (state বদলায়, শুধু cookie দিয়ে যাচাই, অনুমানযোগ্য parameter)। একটা ভাঙলেই হামলা ব্যর্থ। আমরা তিনটাই ভাঙলাম।
+- এই দৃশ্যে হামলা সম্ভব হয় কারণ request state বদলায়, browser ambient cookie পাঠায়, আর server-এর কাছে attacker-এর অজানা secret proof লাগে না। Safe method-এ state বদলানো বন্ধ করা, origin signal যাচাই এবং session-নির্দিষ্ট token চাওয়া এই পথ ভাঙে.
 - `SameSite=Lax` একটা ভালো প্রথম দেয়াল, কিন্তু শেষ দেয়াল নয়: top-level `GET`, সহোদর subdomain, পুরোনো client।
 - নিরাপদ method-এ state বদলানো হলে পরের সব স্তর অন্ধ। logout তাই `POST`।
 - request-এর উৎস দেখো browser-এর নিজে-বসানো header দিয়ে (`Sec-Fetch-Site`, `Origin`), আর target origin কনফিগে লেখো।
@@ -561,11 +498,18 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 
 **দুই।** একটা `POST` ডাকো cross-site header সহ। এটা তোমার *server-এর নিয়ম* পরীক্ষা করে, browser-এর আচরণ নয়:
 
-```bash
-curl -i -X POST https://staging.example/manage/orders/1051/cancel \
-  -H 'Cookie: __Host-id=<তোমার session>' \
-  -H 'Sec-Fetch-Site: cross-site'
-```
+| পরীক্ষা | কী যাচাই করবে | প্রত্যাশিত ফল |
+| --- | --- | --- |
+| সব `GET` route পর্যালোচনা | কোনো state change, logout, cancel বা delete আছে কি না | সব side effect unsafe method-এ সরানো |
+| `Sec-Fetch-Site: cross-site` | origin policy | state-changing request reject |
+| `Sec-Fetch-Site` নেই, `Origin` untrusted | fallback policy | reject |
+| `Sec-Fetch-Site` ও `Origin` দুটোই নেই | fail-safe policy | reject; compatibility trade-off নথিভুক্ত |
+| same-origin request, token নেই/ভুল | synchronizer token | reject |
+| login-এ token নেই বা পুরোনো pre-session | login CSRF ও lifecycle | authenticated session তৈরি নয় |
+| login সফল, পুরোনো anonymous token পুনর্ব্যবহার | session rotation | পুরোনো session/token অকার্যকর |
+| বাস্তব browser DevTools-এ form submit | browser-generated cookie ও Fetch Metadata | observed behavior নথিভুক্ত; কোনো নির্দিষ্ট browser matrix এই review-তে পরীক্ষা করা হয়নি |
+
+এগুলো staging-এ manual verification-এর checklist, এখানে চালানো test-এর দাবি নয়। Browser-এ বাস্তবে পরীক্ষা করার সময় browser version, cookie attribute, proxy/header behavior ও environment লিখে রাখো.
 
 `403` না এলে guard নেই।
 
@@ -593,28 +537,17 @@ curl -i -X POST https://staging.example/manage/orders/1051/cancel \
 
 ## তথ্যসূত্র
 
-যা সত্যিই পড়া হয়েছে আর যা হয়নি, আলাদা করে লিখলাম।
+এই অধ্যায়ের Technical Review ও Security Review হলো source-based conceptual review। কোনো application code compile/test, automated security test, বাস্তব browser compatibility matrix বা production configuration পরীক্ষা করা হয়নি। তাই এই review production security certification নয়.
 
-**এই লেখার সময় পুরো পড়া:**
-
-- [OWASP: Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html): synchronizer token, signed আর naive double-submit, Fetch Metadata (§৪.২-এর নীতি আর rollout), custom header, client-side CSRF, `SameSite`-এর সীমা, `Origin`/`Referer` যাচাই, `__Host-`, user interaction-ভিত্তিক প্রতিরক্ষা (CAPTCHA নয়), login CSRF, Go 1.25-এর `CrossOriginProtection`-এর উল্লেখ।
-- [MDN: Cross-site request forgery (CSRF)](https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/CSRF): পাতাটা ২০২৬-এর ২৯ সেপ্টেম্বর সর্বশেষ বদলানো। CSRF-এর তিন শর্ত, simple request, `Lax`-এর সীমা, method override, CORS-এর সঙ্গে সম্পর্ক, `Strict`/`Lax` দুই cookie-র পরামর্শ।
-- [Go: net/http (go1.25.0), `CrossOriginProtection`](https://pkg.go.dev/net/http@go1.25#CrossOriginProtection): type আর method-এর ডকুমেন্টেশন। ওই পাতার ওপরে GO-2025-3955 তালিকাভুক্ত দেখেছি, **advisory নিজে পড়িনি।**
-
-**আংশিক পড়া:**
-
-- RFC 7617 §২.২: "client MAY preemptively send" বাক্যটা একটা search result-এর উদ্ধৃতাংশে দেখেছি, পুরো RFC পড়িনি। browser-এর Basic credential জমানোর আসল আচরণ **যাচাই করিনি** (§৬)।
-
-**এই repository থেকে পড়া:** অধ্যায় ৪ (পুরো, GitHub থেকে) আর অধ্যায় ৫ (পুরো। GitHub বারবার 503 দিয়েছিল, তাই লেখকের পাঠানো file থেকে)। অধ্যায় ১–৩ আর `product/domain-model.md`, `architecture.md` পড়া হয়নি।
-
-**এই অধ্যায়ের জন্য আবার পড়া হয়নি (অধ্যায় ৪ আর ৫-এর পাঠের ওপর নির্ভর):**
-
-- RFC 6265, draft-ietf-httpbis-rfc6265bis, MDN Set-Cookie: `SameSite`-এর সংজ্ঞা, same-site বনাম same-origin, `__Host-`, ambient authority শব্দটা। অধ্যায় ৪-এর তথ্যসূত্র দেখো।
-- W3C Fetch Metadata spec আর Fetch Standard-এর `Origin`/forbidden header নিয়ম: শুধু OWASP-র সারাংশ থেকে। `Sec-` দিয়ে শুরু হওয়া header-ও JavaScript বদলাতে পারে না, এই দাবিটা মূল spec থেকে **Technical Review-এ মেলাতে হবে**।
-- Barth, Jackson ও Mitchell-এর "Robust Defenses for Cross-Site Request Forgery" (login CSRF): OWASP-র সূত্রে উল্লেখ, নিজে পড়িনি।
-- Clickjacking: শুধু আলাদা সমস্যা বলে চিহ্নিত, যাচাই করা হয়নি।
-
-**Go কোড (Go 1.22.2):** §৪–§৫-এর কোড compile করে `go vet` আর `go test -race` চালানো হয়েছে, তেরোটা test। store-এর অংশ অধ্যায় ৫-এর দেখা API (`Policy`, `record`, `Lookup`, `Rotate`, `Authenticated`, মেয়াদ-নিয়ম) অনুযায়ী ছোট করে **পুনর্গঠিত**: `put` আর anonymous session শুরুর function-এর ভেতরের গড়ন আমি দেখিনি, নিজে লিখেছি। তাই আসল repo-র কোডে `put`-এ token-এর লাইনটা কোথায় বসবে, সেটা মিলিয়ে নিতে হবে। যা পরীক্ষিত: `GET` cancel guard-কে পাশ কাটায়; ঠিক করা app-এ `GET` cancel অর্ডার বদলায় না; `cross-site` আর `same-site` প্রত্যাখ্যান (সঠিক token থাকলেও); token ছাড়া, ভুল token, আর session ID-কে token বানালে প্রত্যাখ্যান; সঠিক token সহ সফল; header-এর token; আক্রমণকারীর নিজের session-এর token victim-এ ব্যর্থ; `Origin` fallback-এর আটটা অবস্থা; login-এর পাঁচ অবস্থা (cross-site, anonymous session নেই, token নেই বা ভুল, আক্রমণকারীর anonymous token, সঠিক) আর সঠিক login-এ নতুন ID ও নতুন token; login-এর পর পুরোনো anonymous cookie আর token মৃত; ৩১ মিনিট চুপ থাকার পর session মৃত, তাই জাল `POST` `401`; `GET /logout` `405`, cross-site `POST /logout` `403` আর session অক্ষত, বৈধ logout-এ session মৃত; `Set-Cookie`-তে শুধু session ID আর attribute ঠিক; `Vary` header। আরেকটা জিনিস test-এ ধরা পড়েছে: `ConstantTimeCompare` দুটো খালি মানকে সমান বলে, তাই `want != ""` লাগে। **যা চালানো হয়নি:** কোনো আসল browser (cookie আর header-এর আসল আচরণ), Go 1.25-এর `CrossOriginProtection`, একাধিক server, `X-Forwarded-For`।
+- [OWASP: Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html): synchronizer token, signed double-submit, Fetch Metadata, Origin/Referer validation, custom header, login CSRF, client-side CSRF, SameSite-এর সীমা ও rollout trade-off।
+- [MDN: Cross-site request forgery (CSRF)](https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/CSRF): simple request, CORS, SameSite=Lax/Strict এবং method override-এর সীমা।
+- [W3C: Fetch Metadata Request Headers](https://www.w3.org/TR/fetch-metadata/): `Sec-Fetch-Site`-এর মান, `none`-এর অর্থ, এবং `Sec-` prefix কেন JavaScript-এর মাধ্যমে পরিবর্তনযোগ্য নয়। এটি Working Draft, চূড়ান্ত Recommendation নয়।
+- [WHATWG: Fetch Standard, forbidden request-header names](https://fetch.spec.whatwg.org/): `Sec-` prefix browser API থেকে set/modify করা নিষিদ্ধ করে; non-browser client-এর ওপর এই নিশ্চয়তা প্রযোজ্য নয়।
+- [RFC 7617 §2.2: Reusing Credentials](https://www.rfc-editor.org/rfc/rfc7617.html#section-2.2): HTTP Basic client-কে একই protection space-এ credential preemptively পাঠানোর অনুমতি দেয়; নির্দিষ্ট browser-এর আচরণ এই review-তে পরীক্ষা করা হয়নি।
+- [RFC 9110 §9.2.1: Safe Methods](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1): safe method-এর অর্থ এবং কেন GET-এ state change করা যাবে না।
+- [Go `net/http` `CrossOriginProtection`](https://pkg.go.dev/net/http@go1.25#CrossOriginProtection): optional implementation reference, chapter-এর implementation নির্দেশনা নয়।
+- [Go vulnerability report GO-2025-3955](https://pkg.go.dev/vuln/GO-2025-3955): Go 1.25.0-এর `AddInsecureBypassPattern`-এর নির্দিষ্ট bypass issue; Go 1.25.1-এ সংশোধিত।
+- [OWASP: Clickjacking Defense Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html): CSRF-এর পাশের কিন্তু আলাদা framing/UI-redress threat.
 
 ## লেখার অবস্থা
 

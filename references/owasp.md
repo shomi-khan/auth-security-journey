@@ -23,8 +23,8 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 ## CSRF Prevention Cheat Sheet
 
 - কী বিষয়: Cross-site request forgery আটকানোর চর্চা।
-- কোন অধ্যায়: ৬।
-- কেন পড়া useful: CSRF কীভাবে আটকানোর কথা OWASP বলছে, সেটা অধ্যায়ের আগে পড়ো। কোন উপায় এখনকার ব্রাউজারে কী করে, সেটা browser-security রেফারেন্সের সঙ্গে মিলাও।
+- কোন অধ্যায়: ৬ এবং ১০।
+- কেন পড়া useful: CSRF কীভাবে আটকানোর কথা OWASP বলছে, সেটা অধ্যায়ের আগে পড়ো। কোন উপায় এখনকার ব্রাউজারে কী করে, সেটা browser-security রেফারেন্সের সঙ্গে মিলাও। Chapter 6-এ synchronizer token, Fetch Metadata, origin verification, login CSRF এবং client-side CSRF-এর সীমা ব্যবহার করা হয়েছে।
 - [Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
 
 ## XSS Prevention Cheat Sheet
@@ -33,6 +33,10 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 - কোন অধ্যায়: ৭।
 - কেন পড়া useful: HttpOnly নিয়ে কথা বলার আগে XSS-এর পাতা পড়ো, যাতে flag-টাকে পুরো XSS-এর সমাধান বলে না বসে।
 - [Cross Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [DOM based XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html)
+- [Content Security Policy Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
+
+Chapter 7-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-depth ভূমিকা ব্যাখ্যা করতে এই দুইটি উৎসও পড়ো। CSP-কে output encoding বা sanitization-এর বিকল্প হিসেবে দেখাবে না।
 
 ## Authorization Cheat Sheet
 
@@ -58,3 +62,25 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 - কোন অধ্যায়: ১৬–২১।
 - কেন পড়া useful: RFC 6749 আর RFC 9700-এর পাশে পড়ো। Cheat sheet আর RFC 9700 না মিললে RFC 9700 মানবে। মিল না থাকলে অধ্যায়ে সেটা লুকিয়ে ফেলবে না।
 - [OAuth 2.0 Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/OAuth2_Cheat_Sheet.html)
+
+## Cookie Theft Mitigation Cheat Sheet
+
+- কী বিষয়: চুরি হওয়া session cookie-র অপব্যবহার শনাক্ত করা, context signal-এর সীমা, reauthentication এবং DBSC।
+- কোন অধ্যায়: ৫।
+- কেন পড়া useful: IP বা User-Agent বদলকে নিশ্চিত প্রমাণ ভাবা যাবে না; false positive ও false negative দুটোই আছে। সন্দেহ হলে account-bound authenticator দিয়ে reauthentication বেশি নির্ভরযোগ্য।
+- [Cookie Theft Mitigation Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cookie_Theft_Mitigation_Cheat_Sheet.html)
+
+
+## HTML5 Security Cheat Sheet
+
+- কী বিষয়: Browser storage APIs-এ sensitive data রাখার ঝুঁকি, বিশেষ করে localStorage ও sessionStorage।
+- কোন অধ্যায়: ১০।
+- কেন পড়া useful: Same-origin JavaScript storage-এর data পড়তে পারে; XSS থাকলে token disclosure-এর ঝুঁকি বোঝার জন্য।
+- [HTML5 Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)
+
+## Session Management Cheat Sheet — browser token storage
+
+- কী বিষয়: Browser storage ও session credential-এর নিরাপত্তা।
+- কোন অধ্যায়: ৪, ৫, এবং ১০।
+- কেন পড়া useful: Cookie, localStorage, sessionStorage এবং authentication credential-এর trade-off মিলিয়ে দেখো।
+- [Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)

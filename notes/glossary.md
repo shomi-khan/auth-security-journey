@@ -27,7 +27,15 @@ Browser যে ছোট ডেটা জমিয়ে রাখে এবং প
 ## CSRF
 
 সহজ ভাষায়:
-User login করা থাকা অবস্থায় অন্য সাইট থেকে তার নামে request পাঠানো। বিস্তারিত অধ্যায় ৬।
+Browser-এর স্বয়ংক্রিয় credential (যেমন session cookie) ব্যবহার করে user-এর ইচ্ছার বাইরে তার নামে কোনো site-এ request করানো। আক্রমণকারীকে cookie বা response পড়তে হবে এমন নয়। বিস্তারিত অধ্যায় ৬।
+
+## Synchronizer Token
+
+Server-side session-এর সঙ্গে যুক্ত একটি গোপন, অনুমান-অযোগ্য মান। Page সেটি form field বা request header-এ দেয়, আর server state-changing request গ্রহণের আগে session-এর মানের সঙ্গে মিলিয়ে দেখে। বিস্তারিত অধ্যায় ৬।
+
+## Fetch Metadata
+
+Browser-এর request header-এর একটি গোষ্ঠী, যেমন `Sec-Fetch-Site`, যা request কোন context থেকে এসেছে তা জানায়। এটি signal, authentication নয়; non-browser client header জাল করতে পারে। বিস্তারিত অধ্যায় ৬।
 
 ## XSS
 
@@ -37,7 +45,7 @@ User login করা থাকা অবস্থায় অন্য সাই�
 ## Token
 
 সহজ ভাষায়:
-Client যেটা দেখিয়ে বলে, এই request কোন পরিচয়ের। Cookie session-এর বাইরে এই কথাটা অধ্যায় ৮-এ আসে।
+কোনো client request-এ বহন করা মান, যা server-কে পরিচয় বা নির্দিষ্ট access grant যাচাই করতে সাহায্য করে। Token নিজে সবসময় user identity বোঝায় না, আর token থাকা মানেই সব resource বা কাজের অনুমতি নয়। Cookie session-এর বাইরে access-token model অধ্যায় ৮-এ আসে।
 
 ## Access Token
 
@@ -52,7 +60,17 @@ Resource ডাকতে যে token দেখানো হয়। মেয়া�
 ## JWT
 
 সহজ ভাষায়:
-JSON Web Token। Token লেখার একটা format। কী নিশ্চিত করে আর কী করে না, সেটা অধ্যায় ৯।
+JSON Web Token। Claims বহনের একটি format; নিজে থেকে encryption বা নিরাপত্তার নিশ্চয়তা নয়। Signed JWT-এর payload সাধারণত decode করে পড়া যায়। বিস্তারিত অধ্যায় ৯।
+
+## JWS
+
+সহজ ভাষায়:
+JSON Web Signature। Content-এ signature বা MAC-ভিত্তিক integrity protection দেওয়ার format। এটি নিজে content গোপন করে না।
+
+## JWE
+
+সহজ ভাষায়:
+JSON Web Encryption। Content encrypt করে গোপনীয়তা দেওয়ার format। JWE আর JWS একই জিনিস নয়।
 
 ## OAuth 2.0
 
@@ -83,3 +101,39 @@ Multi-factor authentication। একের বেশি উপায়ে পর�
 
 সহজ ভাষায়:
 আগে থেকে login থাকা সত্ত্বেও কোনো সংবেদনশীল কাজে আরেক ধাপ চাওয়া। অধ্যায় ২২।
+
+## Session Hijacking
+
+চালু session-এর বৈধ পরিচয়পত্র, যেমন session ID-যুক্ত cookie, চুরি বা দখল করে ব্যবহার করা। বিস্তারিত অধ্যায় ৫।
+
+## Session Fixation
+
+আক্রমণকারী আগে থেকে জানা বা নিজের বেছে নেওয়া session ID-তে victim-কে login করাতে পারে, আর login-এর পর সেই ID-ই বৈধ থাকলে আক্রমণকারী session ব্যবহার করতে পারে। Login-এর সময় ID rotate করা গুরুত্বপূর্ণ। বিস্তারিত অধ্যায় ৫।
+
+## Idle Timeout
+
+শেষ activity-র পর নির্দিষ্ট সময় request না এলে session বাতিল হওয়ার সীমা। আক্রমণকারী নিজেই request পাঠিয়ে এই ঘড়ি চালু রাখতে পারে।
+
+## Absolute Timeout
+
+Session login হওয়ার পর সর্বোচ্চ কতক্ষণ বৈধ থাকবে, তার সীমা। Activity হলেও এই ঘড়ি নতুন করে শুরু হয়।
+
+## localStorage
+
+Browser-এর origin-ভিত্তিক persistent key-value storage, যা page reload ও browser restart-এর পরও সাধারণত থাকে। একই origin-এর JavaScript এটি পড়তে পারে। Authentication credential রাখার আগে XSS-এর ঝুঁকি বিবেচনা করতে হবে। বিস্তারিত অধ্যায় ১০।
+
+## sessionStorage
+
+Browser-এর origin ও tab-এর page session-ভিত্তিক key-value storage। localStorage-এর তুলনায় lifetime সীমিত, কিন্তু একই tab-এ চলা JavaScript এটি পড়তে পারে। বিস্তারিত অধ্যায় ১০।
+
+## In-memory Token Storage
+
+Token browser-এর চলমান JavaScript execution context-এর memory-তে রাখা। Persistent storage-এ token রেখে দেওয়ার exposure কমাতে পারে, কিন্তু active XSS থেকে token বা authenticated action সুরক্ষিত রাখার নিশ্চয়তা নয়। বিস্তারিত অধ্যায় ১০।
+
+## HttpOnly Cookie
+
+Set-Cookie header-এর attribute, যা cookie value-কে page-এর JavaScript API থেকে আড়াল রাখে। এটি নিজে থেকে CSRF বা XSS-এর সব প্রভাব আটকায় না। বিস্তারিত অধ্যায় ৭ ও ১০।
+
+## Backend for Frontend (BFF)
+
+একটি frontend বা SPA-র জন্য নির্দিষ্ট backend component, যা browser request সামলায় এবং sensitive token server-side-এ রাখতে পারে। Browser সাধারণত session cookie দিয়ে BFF-কে চেনে; BFF প্রয়োজনীয় API call-এ token যোগ করে। বিস্তারিত অধ্যায় ১০।
