@@ -39,8 +39,8 @@ OIDC-এর ধারণাকে KenaKata-র Google login feature-এ প্�
 - Framework-specific setup tutorial
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ২০: OIDC](../21-oidc/README.md)
-পরে: [অধ্যায় ২২: MFA এবং Step-up Authentication](../../season-3-production-security/23-mfa-step-up/README.md)
+আগে: [অধ্যায় ২১: OIDC](../21-oidc/README.md)
+পরে: [অধ্যায় ২৩: MFA এবং Step-up Authentication](../../season-3-production-security/23-mfa-step-up/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
