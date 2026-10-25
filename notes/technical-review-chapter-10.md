@@ -1,4 +1,4 @@
-# Chapter 9: Technical ও Security Review
+# Chapter 10: Technical ও Security Review
 
 Date: 2026-10-25  
 Branch: `improvements/chapters-engagement`  
@@ -6,7 +6,7 @@ Pull request: https://github.com/shomi-khan/auth-security-journey/pull/1
 
 ## Review scope
 
-Chapter 9-এর source-based conceptual Technical Review ও Security Review। Chapter-এর core claims-কে RFC 7519, RFC 7515 এবং RFC 8725-এর সঙ্গে মিলিয়ে দেখা হয়েছে; chapter scope, diagrams, examples, validation guidance এবং threat-model boundaries যাচাই করা হয়েছে।
+Chapter 10-এর source-based conceptual Technical Review ও Security Review। Chapter-এর core claims-কে RFC 7519, RFC 7515 এবং RFC 8725-এর সঙ্গে মিলিয়ে দেখা হয়েছে; chapter scope, diagrams, examples, validation guidance এবং threat-model boundaries যাচাই করা হয়েছে।
 
 এই review কোনো application implementation audit, browser/mobile test, Mermaid renderer test, বা production security certification নয়।
 
