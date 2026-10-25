@@ -6,7 +6,7 @@
 
 Token-এর signature যাচাই সফল হওয়া মানে trusted key ও গ্রহণযোগ্য algorithm-এর প্রেক্ষিতে integrity check পাস করেছে। কিন্তু সঠিক key নির্বাচন, issuer ও audience validation এবং application policy ছাড়া শুধু signature দেখে token-কে trusted বলা যায় না। Signature ঠিক থাকলেও token এখনো ব্যবহারযোগ্য কি না, revoke করা হয়েছে কি না, কিংবা request-টি আসল ব্যবহারকারীই পাঠিয়েছেন কি না, তা আলাদা প্রশ্ন। তাই token-এর lifetime এবং replay-কে আলাদা করে বুঝতে হবে।
 
-এই অধ্যায়ে KenaKata-র বর্তমান first-party mobile/API access-token model নিয়ে আলোচনা করছি। OAuth refresh-token flow এখনো চালু হয়নি; সেটি অধ্যায় ১২-তে আসবে। OAuth-নির্দিষ্ট নিয়মকে KenaKata-র বর্তমান login-এর implementation হিসেবে ধরে নিও না।
+এই অধ্যায়ে KenaKata-র বর্তমান first-party mobile/API access-token model নিয়ে আলোচনা করছি। Refresh-token-এর ধারণা ও mobile client-এর lifecycle অধ্যায় ১২–১৪-তে আসবে। OAuth authorization flow এবং তার protocol-specific নিয়ম অধ্যায় ১৬–২০-তে শেখানো হবে; সেগুলোকে KenaKata-র বর্তমান first-party login-এর implementation হিসেবে ধরে নিও না।
 
 ## ১. Expiration কোন সমস্যার সমাধান করে?
 
