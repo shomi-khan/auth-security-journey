@@ -33,13 +33,13 @@ OAuth access delegation ব্যাখ্যা করে, কিন্তু �
 - Identity provider-এর subject-কে application account-এর সঙ্গে যুক্ত করার ঝুঁকি বুঝতে
 
 ## এই অধ্যায়ে থাকবে না
-- Google-এর console/setup ধাপে ধাপে; অধ্যায় ২১
+- Google-এর console/setup ধাপে ধাপে; অধ্যায় ২২
 - OAuth flow-এর পুনরাবৃত্ত পূর্ণ walkthrough
 - নির্দিষ্ট OIDC library-র implementation
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৯: PKCE](../20-pkce/README.md)
-পরে: [অধ্যায় ২১: Google Login এবং Token Validation](../22-google-login/README.md)
+আগে: [অধ্যায় ২০: PKCE](../20-pkce/README.md)
+পরে: [অধ্যায় ২২: Google Login এবং Token Validation](../22-google-login/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
