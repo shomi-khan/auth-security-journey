@@ -7,11 +7,9 @@ status: draft
 
 # CORS: Browser কোন Response পড়তে পারবে?
 
-বৃহস্পতিবার সকাল। KenaKata-র web application-এ নতুন dashboard তৈরি হচ্ছে। নীরা frontend আর backend আলাদা deploy করতে চায়। Browser-এ frontend চলছে `https://app.kenakata.example`, আর API আছে `https://api.kenakata.example`-এ।
+বৃহস্পতিবার সকাল। আরিফ browser security নিয়ে একটা ছোট test scenario দেখছে। একটি পাতা চলছে `https://app.example`, আর সেটি `https://api.example`-এ থাকা API-র response পড়তে চায়। Browser-এ response এসেছে, কিন্তু JavaScript সেটি পড়তে পারছে না। Console-এ CORS error।
 
-আরিফ API call করল। Network panel-এ response এসেছে, কিন্তু browser-এর JavaScript সেটি পড়তে পারছে না। Console-এ CORS error।
-
-“API তো request-এর উত্তর দিয়েছে। তাহলে frontend data পাচ্ছে না কেন?” নীরা জিজ্ঞেস করল।
+নীরা জিজ্ঞেস করল, “API তো request-এর উত্তর দিয়েছে। তাহলে JavaScript data পাচ্ছে না কেন?”
 
 এখানে প্রথমে একটা গুরুত্বপূর্ণ পার্থক্য মনে রাখতে হবে। **Browser request পাঠাতে পারা, server request গ্রহণ করা, আর JavaScript response পড়তে পারা এক জিনিস নয়।** CORS মূলত শেষের প্রশ্নটির উত্তর দিতে সাহায্য করে।
 
@@ -35,7 +33,7 @@ CORS মানে server-এর API-তে কে ঢুকতে পারব�
 
 ```mermaid
 flowchart TD
-    A["KenaKata frontend: app.kenakata.example"] --> B["Browser API request পাঠায়"]
+    A["Example frontend: app.example"] --> B["Browser API request পাঠায়"]
     B --> C["API request process করে response দেয়"]
     C --> D{"Response-এর CORS policy মেলে?"}
     D -->|হ্যাঁ| E["Browser response JavaScript-কে পড়তে দেয়"]
@@ -131,7 +129,7 @@ CSRF defense-এর জন্য state-changing request-এ উপযুক্�
 
 Browser-এর বাইরে থাকা client-এর request-এ `Origin` header নকল করা সম্ভব। তাই server-side authorization-কে “শুধু অনুমোদিত Origin থেকে request আসে” ধারণার ওপর দাঁড় করানো যাবে না।
 
-## ৮. KenaKata-র সিদ্ধান্ত
+## ৮. Design decision
 
 আরিফের প্রথম প্রতিক্রিয়া ছিল সব origin অনুমোদন করে দেওয়া, যাতে frontend-এর CORS error চলে যায়। নীরা থামাল। Development-এর সুবিধার জন্য production-এ অনির্দিষ্ট origin trust করা ঠিক নয়।
 
@@ -145,7 +143,7 @@ Browser-এর বাইরে থাকা client-এর request-এ `Origin` h
 6. State-changing request-এর CSRF defense আলাদাভাবে বজায় থাকবে।
 7. Dynamic origin অনুযায়ী response বদলালে cache behavior-এ `Vary: Origin` প্রাসঙ্গিক কি না যাচাই করা হবে।
 
-এগুলো KenaKata-র design guideline, সব application-এর জন্য একটাই universal configuration নয়। কোন origin trusted, credential দরকার কি না, আর কোন response sensitive, তা application-এর threat model দিয়ে নির্ধারণ করতে হবে।
+এগুলো এই illustrative scenario-র design guideline, সব application-এর জন্য একটাই universal configuration নয়। কোন origin trusted, credential দরকার কি না, আর কোন response sensitive, তা application-এর threat model দিয়ে নির্ধারণ করতে হবে।
 
 ## আমরা কী শিখলাম?
 
