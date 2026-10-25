@@ -1,5 +1,5 @@
 ---
-chapter: 25
+chapter: 26
 season: 3
 title: "Capstone: পুরো KenaKata Security Architecture"
 status: planned
@@ -46,7 +46,7 @@ KenaKata-র নতুন organization customer, mobile app, SPA, Google login, 
 - আগের chapter-এর ধারণা নতুন করে পূর্ণাঙ্গভাবে ব্যাখ্যা
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ২৪: Context বদলালে Architecture কেন বদলায়?](../24-context-and-architecture/README.md)
+আগে: [অধ্যায় ২৪: Context বদলালে Architecture কেন বদলায়?](../25-context-and-architecture/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
