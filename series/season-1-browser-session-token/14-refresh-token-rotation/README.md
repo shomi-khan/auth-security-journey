@@ -17,7 +17,7 @@ status: draft
 
 ## ১. Rotation কী বদলায়?
 
-অধ্যায় ১২-তে দেখেছি, refresh token নতুন access token পাওয়ার credential। দীর্ঘমেয়াদি credential চুরি হলে attacker সেটি ব্যবহার করে নতুন access token চাইতে পারে। Rotation-এর ধারণা হলো, refresh সফল হলে আগের refresh token invalid করে নতুন refresh token ইস্যু করা।
+অধ্যায় ১৩-তে দেখেছি, refresh token নতুন access token পাওয়ার credential। দীর্ঘমেয়াদি credential চুরি হলে attacker সেটি ব্যবহার করে নতুন access token চাইতে পারে। Rotation-এর ধারণা হলো, refresh সফল হলে আগের refresh token invalid করে নতুন refresh token ইস্যু করা।
 
 ধারণাগত lifecycle:
 
@@ -127,7 +127,7 @@ RFC 9700 অনুযায়ী OAuth public client-এর refresh token replay �
 - Reuse detection একটি replay signal, কিন্তু শুধু ওই signal থেকে request পাঠানো ব্যক্তির পরিচয় নিশ্চিত করা যায় না।
 - Concurrent refresh request ও response হারিয়ে যাওয়ার পরিস্থিতি server-side state consistency এবং client recovery policy দিয়ে বিবেচনা করতে হবে।
 - Retry বা grace policy replay protection দুর্বল করতে পারে, তাই এর ঝুঁকি স্পষ্টভাবে মূল্যায়ন করতে হবে।
-- Refresh token family revoke করা হলে access token সঙ্গে সঙ্গে invalid হবে কি না, সেটি আলাদা access-token/revocation design-এর ওপর নির্ভর করে; বিস্তারিত অধ্যায় ১৪-তে।
+- Refresh token family revoke করা হলে access token সঙ্গে সঙ্গে invalid হবে কি না, সেটি আলাদা access-token/revocation design-এর ওপর নির্ভর করে; বিস্তারিত অধ্যায় ১৫-তে।
 
 ## নিজেকে যাচাই করো
 
@@ -148,11 +148,11 @@ RFC 9700 হলো OAuth 2.0 Security Best Current Practice। এর OAuth-spec
 
 ## ধারাবাহিকতা
 
-আগে: [অধ্যায় ১২: Refresh Token কেন?](../13-refresh-token/README.md)
+আগে: [অধ্যায় ১৩: Refresh Token কেন?](../13-refresh-token/README.md)
 
-পরে: [অধ্যায় ১৪: Logout, Revocation এবং Session Recovery](../15-logout-revocation/README.md)
+পরে: [অধ্যায় ১৫: Logout, Revocation এবং Session Recovery](../15-logout-revocation/README.md)
 
-[Product timeline](../../../product/timeline.md) অনুযায়ী mobile app-এ access token ও refresh token অধ্যায় ১০-এর SPA আসার আগেই আছে। এই অধ্যায় সেই first-party lifecycle-এর rotation ও reuse-detection ঝুঁকি ব্যাখ্যা করে।
+[Product timeline](../../../product/timeline.md) অনুযায়ী mobile app-এ access token ও refresh token অধ্যায় ১১-এর SPA আসার আগেই আছে। এই অধ্যায় সেই first-party lifecycle-এর rotation ও reuse-detection ঝুঁকি ব্যাখ্যা করে।
 
 ## লেখার অবস্থা
 
