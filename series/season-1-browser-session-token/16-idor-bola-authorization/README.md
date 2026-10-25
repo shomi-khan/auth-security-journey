@@ -1,5 +1,5 @@
 ---
-chapter: 15
+chapter: 16
 season: 1
 title: "IDOR/BOLA এবং Authorization Design"
 status: draft
@@ -158,9 +158,9 @@ OWASP-এর guidance এই অধ্যায়ের conceptual reference। �
 
 ## ধারাবাহিকতা
 
-আগে: [অধ্যায় ১৪: Logout, Revocation এবং Session Recovery](../14-logout-revocation/README.md)
+আগে: [অধ্যায় ১৪: Logout, Revocation এবং Session Recovery](../15-logout-revocation/README.md)
 
-পরে: [অধ্যায় ১৬: OAuth 2.0 কেন?](../../season-2-oauth-oidc/16-oauth/README.md)
+পরে: [অধ্যায় ১৬: OAuth 2.0 কেন?](../../season-2-oauth-oidc/17-oauth/README.md)
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী KenaKata এখন organization, membership এবং Owner, Admin, Member, Viewer role-সহ multi-organization SaaS। এই অধ্যায় সেই product model-এ authorization failure ব্যাখ্যা করে। OAuth delegation বা external identity flow এখানে আলোচ্য নয়।
 
