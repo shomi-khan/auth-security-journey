@@ -8,7 +8,7 @@
 
 গল্পে একটা fictional product আছে, নাম **KenaKata**। ছোট একটা দোকানের অ্যাপ থেকে সেটা ধীরে ধীরে SaaS platform হয়। সেই পথ ধরে Authentication, Authorization, আর Web/API Security শেখা হবে।
 
-এখনো কোনো অধ্যায় লেখা হয়নি। নিচের তালিকায় সব জায়গায় “লেখা হয়নি” আছে। অধ্যায় প্রকাশিত হলে তবেই সেটা বদলাবে।
+অধ্যায় ১–১১-এর draft content আছে; অধ্যায় ১২–২৫-এর জন্য পরিকল্পনা ও content brief তৈরি হচ্ছে। কোনো অধ্যায় Published হিসেবে গণ্য হবে না, যতক্ষণ না তার review ও publication status সেই অনুযায়ী বদলানো হয়। সূচিতে “Brief প্রস্তুত” মানে পূর্ণাঙ্গ article নয়।
 
 KenaKata সম্পর্কে যে তথ্য পুরো সিরিজে মিলিয়ে চলতে হবে, সেটা এখানে: [product/](product/README.md)।
 
@@ -118,7 +118,7 @@ Trade-off
 
 #### [অধ্যায় ১ — কেন Authentication দরকার?](series/season-1-browser-session-token/01-why-authentication/README.md)
 
-- [ ] লেখা হয়নি
+- [ ] পূর্ণাঙ্গ article লেখা বাকি
 
 #### [অধ্যায় ২ — Authentication বনাম Authorization](series/season-1-browser-session-token/02-authentication-vs-authorization/README.md)
 
@@ -168,7 +168,7 @@ Trade-off
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ১৪ — Logout এবং Revocation](series/season-1-browser-session-token/14-logout-revocation/README.md)
+#### [অধ্যায় ১৪ — Logout, Revocation এবং Session Recovery](series/season-1-browser-session-token/14-logout-revocation/README.md)
 
 - [ ] লেখা হয়নি
 
@@ -194,11 +194,11 @@ Trade-off
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২০ — OIDC](series/season-2-oauth-oidc/20-oidc/README.md)
+#### [অধ্যায় ২০ — OIDC: OAuth-এর ওপর Identity Layer](series/season-2-oauth-oidc/20-oidc/README.md)
 
 - [ ] লেখা হয়নি
 
-#### [অধ্যায় ২১ — Google Login এবং ID Token বনাম Access Token](series/season-2-oauth-oidc/21-google-login/README.md)
+#### [অধ্যায় ২১ — Google Login এবং Token Validation](series/season-2-oauth-oidc/21-google-login/README.md)
 
 - [ ] লেখা হয়নি
 

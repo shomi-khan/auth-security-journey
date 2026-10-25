@@ -1,6 +1,6 @@
 # Season 2 — OAuth, OIDC এবং Delegated Identity
 
-অধ্যায় ১৬–২১। একটাও এখনো লেখা হয়নি।
+অধ্যায় ১৬–২১। অধ্যায় ১৬–২১-এর brief প্রস্তুত; পূর্ণাঙ্গ article লেখা বাকি।
 
 Product-এর তথ্য [product/](../../product/README.md)-এ। Google login আর বাইরের application কখন চালু হয়, সেটা [timeline](../../product/timeline.md)-এ। এই season-এর শুরুতে দুটোই এখনো দাবি, চালু feature নয়।
 
@@ -27,8 +27,8 @@ OAuth, Authorization Code, `state`, redirect URI, PKCE, OIDC, ID Token, Access T
 17. [Authorization Code Flow এবং `state`](17-authorization-code-state/README.md)
 18. [Redirect URI এবং Authorization Code Theft](18-redirect-uri-code-theft/README.md)
 19. [PKCE](19-pkce/README.md)
-20. [OIDC](20-oidc/README.md)
-21. [Google Login এবং ID Token বনাম Access Token](21-google-login/README.md)
+20. [OIDC: OAuth-এর ওপর Identity Layer](20-oidc/README.md)
+21. [Google Login এবং Token Validation](21-google-login/README.md)
 
 ## Season শেষে reader কী বুঝতে পারবে?
 

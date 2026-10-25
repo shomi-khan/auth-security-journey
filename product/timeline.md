@@ -110,3 +110,28 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 | ২২ | MFA আর step-up চালু |
 | ২৩ | Microservice আর machine-to-machine authentication চালু |
 | ২৪–২৫ | শেষ architecture বর্তমান ছবি হিসেবে আলোচনা করা যায় |
+
+
+## Chapter plan status (২০২৬-১০-২৫)
+
+অধ্যায় ১–১০-এর content এই পরিকল্পনার অংশ হিসেবে rewrite করা হবে না। অধ্যায় ১১-এর বিদ্যমান draft অক্ষত রেখে তার scope brief যোগ করা হয়েছে। অধ্যায় ১২–২৫-এর README-তে পূর্ণাঙ্গ content লেখার আগে ব্যবহারযোগ্য brief থাকবে।
+
+| অধ্যায় | পরিকল্পিত শিরোনাম | Brief-এর মূল ফোকাস |
+| --- | --- | --- |
+| ১১ | Token Expiration এবং Replay Window | Token lifetime, replay window ও layered control |
+| ১২ | Refresh Token কেন? | Refresh lifecycle ও credential-এর গুরুত্ব |
+| ১৩ | Refresh Token Rotation এবং Reuse Detection | Rotation, reuse signal, race ও timeout recovery |
+| ১৪ | Logout, Revocation এবং Session Recovery | Local logout, server revocation ও incident recovery |
+| ১৫ | IDOR/BOLA এবং Authorization Design | Object-level ও tenant-level authorization |
+| ১৬ | OAuth 2.0 কেন? | Delegated authorization ও OAuth-এর সীমানা |
+| ১৭ | Authorization Code Flow এবং state | Flow sequence ও request/response correlation |
+| ১৮ | Redirect URI এবং Authorization Code Theft | Redirect validation ও code interception |
+| ১৯ | PKCE | Code verifier/challenge ও public client |
+| ২০ | OIDC: OAuth-এর ওপর Identity Layer | ID Token, claims ও validation |
+| ২১ | Google Login এবং Token Validation | Google OIDC, token validation ও account linking |
+| ২২ | MFA এবং Step-up Authentication | Sensitive action ও assurance |
+| ২৩ | Machine-to-Machine Authentication | Workload identity ও service credential |
+| ২৪ | Context বদলালে Architecture কেন বদলায়? | Threat model ও architecture trade-off synthesis |
+| ২৫ | Capstone: পুরো KenaKata Security Architecture | End-to-end architecture, abuse case ও residual risk |
+
+এগুলো planning brief, পূর্ণাঙ্গ article নয়। OAuth-specific normative guidance অধ্যায় ১৬–২০-এ থাকবে। অধ্যায় ১২–১৪-তে KenaKata-র first-party mobile refresh-token lifecycle শেখানো হবে; সেটিকে OAuth flow হিসেবে বর্ণনা করা হবে না।

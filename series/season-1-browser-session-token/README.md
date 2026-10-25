@@ -1,6 +1,6 @@
 # Season 1 — Browser, Session এবং Token
 
-অধ্যায় ১–১৫। একটাও এখনো লেখা হয়নি।
+অধ্যায় ১–১৫। অধ্যায় ১–১১-এর draft আছে; ১২–১৫-এর brief প্রস্তুত, পূর্ণাঙ্গ article লেখা বাকি।
 
 Product-এর তথ্য [product/](../../product/README.md)-এ। কোন অধ্যায়ে কী আগে থেকে আছে, সেটা [timeline](../../product/timeline.md)-এ।
 
@@ -39,7 +39,7 @@ Authentication, Authorization, Password, Session, Cookie, CSRF, XSS, Token, JWT,
 11. [Token Expiration এবং Replay Window](11-token-expiration-replay/README.md)
 12. [Refresh Token কেন?](12-refresh-token/README.md)
 13. [Refresh Token Rotation এবং Reuse Detection](13-refresh-token-rotation/README.md)
-14. [Logout এবং Revocation](14-logout-revocation/README.md)
+14. [Logout, Revocation এবং Session Recovery](14-logout-revocation/README.md)
 15. [IDOR/BOLA এবং Authorization Design](15-idor-bola-authorization/README.md)
 
 ## Season শেষে reader কী বুঝতে পারবে?

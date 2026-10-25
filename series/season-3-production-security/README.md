@@ -1,6 +1,6 @@
 # Season 3 — Production Security
 
-অধ্যায় ২২–২৫। একটাও এখনো লেখা হয়নি।
+অধ্যায় ২২–২৫। সব chapter brief প্রস্তুত; পূর্ণাঙ্গ article লেখা বাকি।
 
 শেষ ছবি [architecture](../../product/architecture.md)-এ। সেটা শেষ অবস্থা। আগের অধ্যায় সেটাকে বর্তমান system ধরে নেবে না। কখন কী চালু হয়, সেটা [timeline](../../product/timeline.md)-এ।
 
