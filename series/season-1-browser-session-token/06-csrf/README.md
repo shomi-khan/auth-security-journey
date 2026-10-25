@@ -531,7 +531,7 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 
 ## পরের অধ্যায়
 
-[অধ্যায় ৭: CORS: Browser কোন Response পড়তে পারবে?](../07-cors/README.md)। একটা input ঘরে script ঢোকে। Stored, Reflected আর DOM XSS, `HttpOnly` কী ঠেকায় আর কী ঠেকায় না, আর CSP।
+[অধ্যায় ৭: CORS: Browser কোন Response পড়তে পারবে?](../07-cors/README.md)। Browser অন্য origin-এর response কখন JavaScript-কে পড়তে দেয়, আর CORS কেন authentication, authorization বা CSRF defense নয়, সেটা দেখব।
 
 ---
 
