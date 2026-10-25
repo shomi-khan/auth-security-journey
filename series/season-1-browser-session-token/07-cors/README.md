@@ -18,10 +18,10 @@ status: draft
 একটি web origin গঠিত হয় তিনটি অংশ দিয়ে:
 
 - Scheme, যেমন `https`
-- Host, যেমন `app.kenakata.example`
+- Host, যেমন `app.example`
 - Port, যেমন `443`
 
-এই তিনটির কোনোটি আলাদা হলে origin আলাদা। তাই `https://app.kenakata.example` এবং `https://api.kenakata.example` আলাদা origin, যদিও দুটো একই site-এর অংশ হতে পারে। **Origin আর site একই ধারণা নয়।**
+এই তিনটির কোনোটি আলাদা হলে origin আলাদা। তাই `https://app.example` এবং `https://api.example` আলাদা origin, যদিও দুটো একই site-এর অংশ হতে পারে। **Origin আর site একই ধারণা নয়।**
 
 Browser-এর Same-Origin Policy (SOP) হলো মূল নিরাপত্তা নিয়ম: একটি origin-এর script সাধারণত অন্য origin-এর response ইচ্ছেমতো পড়তে পারে না। CORS হলো server-এর মাধ্যমে নির্দিষ্ট cross-origin response browser-কে পড়তে দেওয়ার একটি নিয়মভিত্তিক ব্যবস্থা।
 
@@ -84,7 +84,7 @@ CORS-এ কয়েকটি response header বিশেষভাবে গু�
 
 এগুলো browser-এর CORS decision-এ অংশ নেয়। এগুলো API-র business permission বা role check-এর বিকল্প নয়।
 
-কোনো API যদি শুধু নির্দিষ্ট frontend-কে response পড়তে দিতে চায়, তবে scheme, host এবং port-সহ নির্দিষ্ট origin allowlist-এ মিলিয়ে দেখতে হবে। যেকোনো `Origin` header-কে যাচাই ছাড়া response-এ ফেরত দেওয়া বিপজ্জনক হতে পারে। Origin-এ path থাকে না, আর `https://app.kenakata.example` ও `http://app.kenakata.example` এক origin নয়।
+কোনো API যদি শুধু নির্দিষ্ট frontend-কে response পড়তে দিতে চায়, তবে scheme, host এবং port-সহ নির্দিষ্ট origin allowlist-এ মিলিয়ে দেখতে হবে। যেকোনো `Origin` header-কে যাচাই ছাড়া response-এ ফেরত দেওয়া বিপজ্জনক হতে পারে। Origin-এ path থাকে না, আর `https://app.example` ও `http://app.example` এক origin নয়।
 
 ## ৫. Credential-সহ CORS
 
