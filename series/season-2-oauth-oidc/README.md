@@ -23,12 +23,12 @@ OAuth, Authorization Code, `state`, redirect URI, PKCE, OIDC, ID Token, Access T
 
 ## Chapter list
 
-17. [OAuth 2.0 কেন?](16-oauth/README.md)
-18. [Authorization Code Flow এবং `state`](17-authorization-code-state/README.md)
-19. [Redirect URI এবং Authorization Code Theft](18-redirect-uri-code-theft/README.md)
-20. [PKCE](19-pkce/README.md)
-21. [OIDC: OAuth-এর ওপর Identity Layer](20-oidc/README.md)
-22. [Google Login এবং Token Validation](21-google-login/README.md)
+17. [OAuth 2.0 কেন?](17-oauth/README.md)
+18. [Authorization Code Flow এবং `state`](18-authorization-code-state/README.md)
+19. [Redirect URI এবং Authorization Code Theft](19-redirect-uri-code-theft/README.md)
+20. [PKCE](20-pkce/README.md)
+21. [OIDC: OAuth-এর ওপর Identity Layer](21-oidc/README.md)
+22. [Google Login এবং Token Validation](22-google-login/README.md)
 
 ## Season শেষে reader কী বুঝতে পারবে?
 
