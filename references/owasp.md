@@ -23,20 +23,20 @@ API-র তালিকা নতুন সংস্করণে গেলে �
 ## CSRF Prevention Cheat Sheet
 
 - কী বিষয়: Cross-site request forgery আটকানোর চর্চা।
-- কোন অধ্যায়: ৬ এবং ১০।
+- কোন অধ্যায়: ৬ এবং ১১।
 - কেন পড়া useful: CSRF কীভাবে আটকানোর কথা OWASP বলছে, সেটা অধ্যায়ের আগে পড়ো। কোন উপায় এখনকার ব্রাউজারে কী করে, সেটা browser-security রেফারেন্সের সঙ্গে মিলাও। Chapter 6-এ synchronizer token, Fetch Metadata, origin verification, login CSRF এবং client-side CSRF-এর সীমা ব্যবহার করা হয়েছে।
 - [Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
 
 ## XSS Prevention Cheat Sheet
 
 - কী বিষয়: Cross-site scripting আটকানোর চর্চা।
-- কোন অধ্যায়: ৭।
+- কোন অধ্যায়: ৮।
 - কেন পড়া useful: HttpOnly নিয়ে কথা বলার আগে XSS-এর পাতা পড়ো, যাতে flag-টাকে পুরো XSS-এর সমাধান বলে না বসে।
 - [Cross Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
 - [DOM based XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html)
 - [Content Security Policy Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
 
-Chapter 7-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-depth ভূমিকা ব্যাখ্যা করতে এই দুইটি উৎসও পড়ো। CSP-কে output encoding বা sanitization-এর বিকল্প হিসেবে দেখাবে না।
+Chapter 8-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-depth ভূমিকা ব্যাখ্যা করতে এই দুইটি উৎসও পড়ো। CSP-কে output encoding বা sanitization-এর বিকল্প হিসেবে দেখাবে না।
 
 ## Authorization Cheat Sheet
 
@@ -52,14 +52,14 @@ Chapter 7-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-d
 এই ফাইল লেখার সময় OWASP-এর API-নির্দিষ্ট Top 10 ছিল 2023 সংস্করণ। পরের অধ্যায় সেটাকে “এখনকার” বলার আগে প্রজেক্টের পাতা আবার দেখো।
 
 - কী বিষয়: API-তে যে ঝুঁকিগুলো বারবার দেখা যায়, তাদের তালিকা।
-- কোন অধ্যায়: ১৫, ২৩, আর ২৪।
+- কোন অধ্যায়: ১৬, ২৪, আর ২৫।
 - কেন পড়া useful: BOLA-র নাম অধ্যায় ১৫-এর সঙ্গে মিলিয়ে রাখো। যে সংস্করণ পড়েছ, অধ্যায়ে সেই সংস্করণের কথা বলো।
 - [OWASP API Security Top 10 2023](https://owasp.org/API-Security/editions/2023/en/0x11-t10/)
 
 ## OAuth নিয়ে OWASP
 
 - কী বিষয়: OAuth 2.0 নিয়ে OWASP-এর cheat sheet।
-- কোন অধ্যায়: ১৬–২১।
+- কোন অধ্যায়: ১৭–২২।
 - কেন পড়া useful: RFC 6749 আর RFC 9700-এর পাশে পড়ো। Cheat sheet আর RFC 9700 না মিললে RFC 9700 মানবে। মিল না থাকলে অধ্যায়ে সেটা লুকিয়ে ফেলবে না।
 - [OAuth 2.0 Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/OAuth2_Cheat_Sheet.html)
 
@@ -74,13 +74,13 @@ Chapter 7-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-d
 ## HTML5 Security Cheat Sheet
 
 - কী বিষয়: Browser storage APIs-এ sensitive data রাখার ঝুঁকি, বিশেষ করে localStorage ও sessionStorage।
-- কোন অধ্যায়: ১০।
+- কোন অধ্যায়: ১১।
 - কেন পড়া useful: Same-origin JavaScript storage-এর data পড়তে পারে; XSS থাকলে token disclosure-এর ঝুঁকি বোঝার জন্য।
 - [HTML5 Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)
 
 ## Session Management Cheat Sheet — browser token storage
 
 - কী বিষয়: Browser storage ও session credential-এর নিরাপত্তা।
-- কোন অধ্যায়: ৪, ৫, এবং ১০।
+- কোন অধ্যায়: ৪, ৫, এবং ১১।
 - কেন পড়া useful: Cookie, localStorage, sessionStorage এবং authentication credential-এর trade-off মিলিয়ে দেখো।
 - [Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
