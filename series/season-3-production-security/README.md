@@ -22,10 +22,10 @@ MFA, Step-up Authentication, Machine-to-Machine Authentication, architecture ক
 
 ## Chapter list
 
-23. [MFA এবং Step-up Authentication](22-mfa-step-up/README.md)
-24. [Machine-to-Machine Authentication](23-machine-to-machine/README.md)
-25. [Context বদলালে Architecture কেন বদলায়?](24-context-and-architecture/README.md)
-26. [Capstone: পুরো KenaKata Security Architecture](25-capstone/README.md)
+23. [MFA এবং Step-up Authentication](23-mfa-step-up/README.md)
+24. [Machine-to-Machine Authentication](24-machine-to-machine/README.md)
+25. [Context বদলালে Architecture কেন বদলায়?](25-context-and-architecture/README.md)
+26. [Capstone: পুরো KenaKata Security Architecture](26-capstone/README.md)
 
 ## Season শেষে reader কী বুঝতে পারবে?
 
