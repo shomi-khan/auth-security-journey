@@ -41,7 +41,7 @@ status: planned
 
 Mermaid sequence diagram-এ mobile app, token-issuing component এবং protected resource API-র আলাদা ভূমিকা দেখানো হবে। Expired access token-এর পর refresh সফল হওয়ার পথের পাশাপাশি refresh token expired, revoked বা invalid হলে কী ঘটে, সেই failure path-ও থাকবে। Diagram-এ OAuth Authorization Code Flow, PKCE, rotation, reuse detection বা logout recovery-কে Chapter 12-ன் flow-তে আগেভাগে আনা হবে না।
 
-**মূল invariant:** Refresh token কেবল নতুন access token পাওয়ার জন্য নির্ধারিত trusted token-issuing component-এ পাঠানো হবে; protected resource-এ access চাওয়ার সময় access token ব্যবহার হবে। Refresh ব্যর্থ হলে client পুরোনো access token-কে বৈধ ধরে নেবে না, এবং policy অনুযায়ী user-কে পুনরায় authenticate করতে বলবে।
+**মূল invariant:** Refresh token কেবল নতুন access token পাওয়ার জন্য নির্ধারিত trusted token-issuing component-এ পাঠানো হবে; protected resource-এ access চাওয়ার সময় access token ব্যবহার হবে। Refresh request ব্যর্থ হলেই access token invalid, এমন সিদ্ধান্ত নেওয়া যাবে না: সাময়িক network failure আর server-এর নিশ্চিত invalid/expired-token response আলাদা। Access token এখনও বৈধ হলে policy অনুযায়ী সেটি ব্যবহার করা যেতে পারে; সেটি expired বা invalid বলে নিশ্চিত হলে protected resource access-এর জন্য আর ব্যবহার করা যাবে না। Refresh token expired, revoked বা invalid বলে নিশ্চিত হলে policy অনুযায়ী user-কে পুনরায় authenticate করতে বলা হবে।
 
 Diagram ধারণা শেখাবে, implementation নির্দেশনা দেবে না। কোনো language-specific code থাকবে না; pseudocode কেবল diagram দিয়ে মূল logic পরিষ্কার করা না গেলে বিবেচনা করা যাবে।
 
