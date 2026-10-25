@@ -143,7 +143,7 @@ Access token-এর কথা বলেছি, কিন্তু token-এর f
 ## তথ্যসূত্র
 
 - [RFC 6750: The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750): Bearer token, `Authorization` header, token disclosure ও replay risk। এই RFC OAuth bearer-token usage নিয়ে; এখানে শুধু bearer-token request model-এর ধারণা নেওয়া হয়েছে, KenaKata-র first-party login-কে OAuth flow বলা হয়নি।
-- [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749): OAuth context-এ access token-এর সংজ্ঞা। OAuth protocol flow-এর বিস্তারিত অধ্যায় ১৭–২২-এ আসবে।
+- [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749): OAuth context-এ access token-এর সংজ্ঞা। OAuth-specific protocol flow-এর বিস্তারিত অধ্যায় ১৭–২১-এ আসবে; Google login-এর ব্যবহার অধ্যায় ২২-এ দেখব।
 
 ## লেখার অবস্থা
 
