@@ -1,5 +1,5 @@
 ---
-chapter: 19
+chapter: 20
 season: 2
 title: "PKCE"
 status: planned
@@ -38,8 +38,8 @@ Public client-এ client secret গোপন রাখা যায় না। Au
 - Google login-এর পূর্ণ integration; অধ্যায় ২১
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৮: Redirect URI এবং Authorization Code Theft](../18-redirect-uri-code-theft/README.md)
-পরে: [অধ্যায় ২০: OIDC](../20-oidc/README.md)
+আগে: [অধ্যায় ১৮: Redirect URI এবং Authorization Code Theft](../19-redirect-uri-code-theft/README.md)
+পরে: [অধ্যায় ২০: OIDC](../21-oidc/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
