@@ -16,7 +16,7 @@ Storage তুলনা করার আগে আরিফ তিনটি প�
 2. Attacker কি browser-এর বাইরে token কপি করে নিয়ে যেতে চায়, নাকি user-এর browser দিয়েই কাজ করাতে চায়?
 3. Browser বন্ধ বা page reload হলে login টিকে থাকা কি product-এর প্রয়োজন, নাকি user আবার session শুরু করতে পারবে?
 
-এগুলো আলাদা threat। Chapter 6-এ CSRF দেখেছি: browser নিজে cookie যোগ করে এমন request পাঠাতে পারে, যা user ইচ্ছা করে শুরু করেনি। Chapter 7-এ XSS দেখেছি: attacker-এর JavaScript KenaKata-র origin-এর ভেতরে চলতে পারে। Storage decision এই দুই ঝুঁকির ভারসাম্য বদলায়, কিন্তু কোনোটাকেই জাদুর মতো মুছে দেয় না।
+এগুলো আলাদা threat। Chapter 6-এ CSRF দেখেছি: browser নিজে cookie যোগ করে এমন request পাঠাতে পারে, যা user ইচ্ছা করে শুরু করেনি। Chapter 9-এ XSS দেখেছি: attacker-এর JavaScript KenaKata-র origin-এর ভেতরে চলতে পারে। Storage decision এই দুই ঝুঁকির ভারসাম্য বদলায়, কিন্তু কোনোটাকেই জাদুর মতো মুছে দেয় না।
 
 ## ২. পাঁচটি option, পাঁচ রকম trade-off
 
@@ -210,7 +210,7 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 - **Refresh token lifecycle:** browser বা mobile client নতুন access token কীভাবে পাবে, rotation ও reuse detection কীভাবে কাজ করবে, অধ্যায় ১২–১৩।
 - **Logout ও revocation:** browser-এর local value মুছে ফেলা আর server-side credential বাতিল করা এক নয়; বিস্তারিত অধ্যায় ১৪।
 - **OAuth flow:** SPA OAuth client হলে authorization code, PKCE ও সংশ্লিষ্ট threat model Season 2-এ আসবে।
-- **XSS-এর সম্পূর্ণ প্রতিরোধ:** Chapter 7-এর output handling, CSP-এর সীমা এবং server-side authorization এখানে প্রতিস্থাপিত হচ্ছে না।
+- **XSS-এর সম্পূর্ণ প্রতিরোধ:** Chapter 9-এর output handling, CSP-এর সীমা এবং server-side authorization এখানে প্রতিস্থাপিত হচ্ছে না।
 
 ## নিজেকে যাচাই করো
 
@@ -238,4 +238,4 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 - [x] Security Review (source-based threat-model review; not a production audit)
 - [ ] Published
 
-Review record: [Chapter 10 Technical ও Security Review](../../../notes/technical-review-chapter-10.md).
+Review record: [Chapter 12 Technical ও Security Review](../../../notes/technical-review-chapter-10.md).
