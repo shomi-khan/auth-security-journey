@@ -39,7 +39,7 @@ Season 1-এ KenaKata নিজের user ও নিজের client-এর cre
 - OIDC ও Google login; অধ্যায় ২০–২১
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৫: IDOR/BOLA এবং Authorization Design](../../season-1-browser-session-token/15-idor-bola-authorization/README.md)
+আগে: [অধ্যায় ১৫: IDOR/BOLA এবং Authorization Design](../../season-1-browser-session-token/16-idor-bola-authorization/README.md)
 
 পরে: [অধ্যায় ১৭: Authorization Code Flow এবং state](../18-authorization-code-state/README.md)
 
