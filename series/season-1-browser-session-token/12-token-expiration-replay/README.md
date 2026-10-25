@@ -8,7 +8,7 @@
 
 Token-এর signature যাচাই সফল হওয়া মানে trusted key ও গ্রহণযোগ্য algorithm-এর প্রেক্ষিতে integrity check পাস করেছে। কিন্তু সঠিক key নির্বাচন, issuer ও audience validation এবং application policy ছাড়া শুধু signature দেখে token-কে trusted বলা যায় না। Signature ঠিক থাকলেও token এখনো ব্যবহারযোগ্য কি না, revoke করা হয়েছে কি না, কিংবা request-টি আসল ব্যবহারকারীই পাঠিয়েছেন কি না, তা আলাদা প্রশ্ন। তাই token-এর lifetime এবং replay-কে আলাদা করে বুঝতে হবে।
 
-এই অধ্যায়ে KenaKata-র বর্তমান first-party mobile/API access-token model নিয়ে আলোচনা করছি। Refresh-token-এর ধারণা ও mobile client-এর lifecycle অধ্যায় ১২–১৪-তে আসবে। OAuth authorization flow এবং তার protocol-specific নিয়ম অধ্যায় ১৬–২০-তে শেখানো হবে; সেগুলোকে KenaKata-র বর্তমান first-party login-এর implementation হিসেবে ধরে নিও না।
+এই অধ্যায়ে KenaKata-র বর্তমান first-party mobile/API access-token model নিয়ে আলোচনা করছি। Refresh-token-এর ধারণা ও mobile client-এর lifecycle অধ্যায় ১৩–১৫-তে আসবে। OAuth authorization flow এবং তার protocol-specific নিয়ম অধ্যায় ১৭–২১-তে শেখানো হবে; সেগুলোকে KenaKata-র বর্তমান first-party login-এর implementation হিসেবে ধরে নিও না।
 
 ## ১. Expiration কোন সমস্যার সমাধান করে?
 
@@ -246,8 +246,8 @@ Review record: [Chapter 12 Technical ও Security Review](../../../notes/technic
 
 **শেখার ফল:** পাঠক token expiration আর revocation আলাদা করতে পারবে, expiry কেন চুরি হওয়া token-কে সঙ্গে সঙ্গে বাতিল করে না তা ব্যাখ্যা করতে পারবে, এবং token lifetime-কে একা security solution না ধরে layered control-এর অংশ হিসেবে বিচার করতে পারবে।
 
-**এই অধ্যায়ে থাকবে না:** Refresh-token lifecycle-এর পূর্ণ আলোচনা (অধ্যায় ১২), rotation/reuse detection (অধ্যায় ১৩), logout/revocation recovery design (অধ্যায় ১৪), অথবা OAuth-specific normative flow (অধ্যায় ১৬–২০)। KenaKata-র mobile token flow-কে OAuth flow বলা হবে না।
+**এই অধ্যায়ে থাকবে না:** Refresh-token lifecycle-এর পূর্ণ আলোচনা (অধ্যায় ১৩), rotation/reuse detection (অধ্যায় ১৪), logout/revocation recovery design (অধ্যায় ১৫), অথবা OAuth-specific normative flow (অধ্যায় ১৭–২১)। KenaKata-র mobile token flow-কে OAuth flow বলা হবে না।
 
-**ধারাবাহিকতা:** আগে অধ্যায় ৮–১০-এ token, JWT ও SPA storage-এর mental model। পরে অধ্যায় ১২-তে refresh token কেন দরকার তা আলোচনা হবে।
+**ধারাবাহিকতা:** আগে অধ্যায় ৯–১১-এ token, JWT ও SPA storage-এর mental model। পরে অধ্যায় ১৩-তে refresh token কেন দরকার তা আলোচনা হবে।
 
 এই brief বিদ্যমান draft-এর scope স্পষ্ট করে; উপরের article ও review record মুছে বা প্রতিস্থাপন করে না।
