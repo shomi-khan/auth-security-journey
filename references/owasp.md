@@ -41,7 +41,7 @@ Chapter 8-এ DOM-based XSS-এর source/sink এবং CSP-এর defense-in-d
 ## Authorization Cheat Sheet
 
 - কী বিষয়: কে কোন কাজ করতে পারবে, সেই সিদ্ধান্ত কীভাবে শক্ত করা যায়।
-- কোন অধ্যায়: ২ আর ১৫।
+- কোন অধ্যায়: ২ আর ১৬।
 - কেন পড়া useful: IDOR আর BOLA-র অধ্যায়ের আগে এটা পড়ো। KenaKata-র Owner, Admin, Member, Viewer একটা সরল মডেল। Cheat sheet-এর সব সুপারিশ সরাসরি ওই মডেলে বসিয়ে দিয়ো না। মিল আর গরমিল অধ্যায়ে বলো।
 - [Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 
