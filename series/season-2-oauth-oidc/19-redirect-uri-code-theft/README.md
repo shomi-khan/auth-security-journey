@@ -32,13 +32,13 @@ Authorization Code Flow-এ browser-কে কোথায় ফেরানো �
 - Redirect allowlist review-এর checklist তৈরি করতে
 
 ## এই অধ্যায়ে থাকবে না
-- PKCE protocol detail; অধ্যায় ১৯
-- OIDC ID Token validation; অধ্যায় ২০
+- PKCE protocol detail; অধ্যায় ২০
+- OIDC ID Token validation; অধ্যায় ২১
 - Provider-specific console configuration walkthrough
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৭: Authorization Code Flow এবং state](../18-authorization-code-state/README.md)
-পরে: [অধ্যায় ১৯: PKCE](../20-pkce/README.md)
+আগে: [অধ্যায় ১৮: Authorization Code Flow এবং state](../18-authorization-code-state/README.md)
+পরে: [অধ্যায় ২০: PKCE](../20-pkce/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
