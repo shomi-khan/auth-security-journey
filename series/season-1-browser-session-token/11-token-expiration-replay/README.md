@@ -2,6 +2,8 @@
 
 একটা মঙ্গলবার সকাল। KenaKata-র দোকানমালিক রাফি dashboard-এ order দেখছে। Mobile app-এর জন্য আরিফ আগের অধ্যায়ে access token ব্যবহার শুরু করেছে। আজ support team জানাল, password বদলানোর পরও পুরোনো একটি request দিয়ে কিছুক্ষণ order দেখা গেছে। আরেকটি report-এ log-এ থাকা bearer token পরে অন্য client থেকেও ব্যবহার হয়েছে।
 
+এই incident একটি policy-র প্রশ্ন তোলে: password বদলালে আগে issue করা access token-ও কি invalidate হয়? এর উত্তর architecture ও revocation policy-র ওপর নির্ভর করে। Password বদলালেই সব system-এ already-issued access token স্বয়ংক্রিয়ভাবে বাতিল হয় না।
+
 প্রশ্নটি হলো: **একটি token কতক্ষণ বিশ্বাসযোগ্য, আর সেই সময়ের মধ্যে token কপি হয়ে গেলে কী হতে পারে?**
 
 Token-এর signature যাচাই সফল হওয়া মানে trusted key ও গ্রহণযোগ্য algorithm-এর প্রেক্ষিতে integrity check পাস করেছে। কিন্তু সঠিক key নির্বাচন, issuer ও audience validation এবং application policy ছাড়া শুধু signature দেখে token-কে trusted বলা যায় না। Signature ঠিক থাকলেও token এখনো ব্যবহারযোগ্য কি না, revoke করা হয়েছে কি না, কিংবা request-টি আসল ব্যবহারকারীই পাঠিয়েছেন কি না, তা আলাদা প্রশ্ন। তাই token-এর lifetime এবং replay-কে আলাদা করে বুঝতে হবে।
