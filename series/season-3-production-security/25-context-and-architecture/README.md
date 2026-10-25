@@ -38,8 +38,8 @@ KenaKata এখন ছোট দোকান নয়। একাধিক organi
 - নতুন authentication protocol শেখানো; এটি synthesis chapter
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ২৩: Machine-to-Machine Authentication](../24-machine-to-machine/README.md)
-পরে: [অধ্যায় ২৫: Capstone](../26-capstone/README.md)
+আগে: [অধ্যায় ২৪: Machine-to-Machine Authentication](../24-machine-to-machine/README.md)
+পরে: [অধ্যায় ২৬: Capstone](../26-capstone/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
