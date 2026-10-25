@@ -1,5 +1,5 @@
 ---
-chapter: 21
+chapter: 22
 season: 2
 title: "Google Login এবং Token Validation"
 status: planned
@@ -39,8 +39,8 @@ OIDC-এর ধারণাকে KenaKata-র Google login feature-এ প্�
 - Framework-specific setup tutorial
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ২০: OIDC](../20-oidc/README.md)
-পরে: [অধ্যায় ২২: MFA এবং Step-up Authentication](../../season-3-production-security/22-mfa-step-up/README.md)
+আগে: [অধ্যায় ২০: OIDC](../21-oidc/README.md)
+পরে: [অধ্যায় ২২: MFA এবং Step-up Authentication](../../season-3-production-security/23-mfa-step-up/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
