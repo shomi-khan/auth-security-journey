@@ -1,5 +1,5 @@
 ---
-chapter: 23
+chapter: 24
 season: 3
 title: "Machine-to-Machine Authentication"
 status: planned
@@ -39,8 +39,8 @@ Order service invoice তৈরি করতে billing service-কে ডাক
 - End-to-end architecture capstone; অধ্যায় ২৫
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ২২: MFA এবং Step-up Authentication](../22-mfa-step-up/README.md)
-পরে: [অধ্যায় ২৪: Context বদলালে Architecture কেন বদলায়?](../24-context-and-architecture/README.md)
+আগে: [অধ্যায় ২২: MFA এবং Step-up Authentication](../23-mfa-step-up/README.md)
+পরে: [অধ্যায় ২৪: Context বদলালে Architecture কেন বদলায়?](../25-context-and-architecture/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
