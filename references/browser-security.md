@@ -66,7 +66,7 @@ CORS browser-এর নিয়ম: অন্য origin-এর response পড়া 
 
 - কোন অধ্যায়: ৭-এ CORS-এর মূল ধারণা; অধ্যায় ১১-এ SPA-র cross-origin API request-এর প্রেক্ষাপট। পরে API-র অধ্যায়েও।
 - কেন গুরুত্বপূর্ণ: CORS header বসালেই কে কোন resource দেখতে পাবে, সেই প্রশ্ন শেষ হয় না। দুটোকে এক করে লিখবে না।
-- [MDN: CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+- [MDN: CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS)
 - [Fetch Living Standard](https://fetch.spec.whatwg.org/)
 
 ## Browser credential behavior
