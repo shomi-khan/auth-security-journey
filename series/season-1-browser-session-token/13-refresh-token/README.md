@@ -1,5 +1,5 @@
 ---
-chapter: 12
+chapter: 13
 season: 1
 title: "Refresh Token কেন?"
 status: draft
@@ -179,9 +179,9 @@ Diagram-টি failure handling-এর উচ্চস্তরের মডে�
 
 ## ধারাবাহিকতা
 
-আগে: [অধ্যায় ১১: Token Expiration এবং Replay Window](../11-token-expiration-replay/README.md)
+আগে: [অধ্যায় ১১: Token Expiration এবং Replay Window](../12-token-expiration-replay/README.md)
 
-পরে: [অধ্যায় ১৩: Refresh Token Rotation এবং Reuse Detection](../13-refresh-token-rotation/README.md)
+পরে: [অধ্যায় ১৩: Refresh Token Rotation এবং Reuse Detection](../14-refresh-token-rotation/README.md)
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী KenaKata-র mobile app-এ refresh token আগে থেকেই আছে। এই অধ্যায় সেই first-party lifecycle-এর ধারণা শেখায়, OAuth flow নয়।
 
