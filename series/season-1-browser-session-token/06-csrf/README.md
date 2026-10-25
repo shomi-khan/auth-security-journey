@@ -338,10 +338,10 @@ sequenceDiagram
     K->>K: Origin policy ও pre-session token যাচাই
     K->>K: Credentials যাচাই
     alt যেকোনো যাচাই ব্যর্থ
-        K-->>B: প্রত্যাখ্যান; authenticated session তৈরি নয়
+        K-->>B: প্রত্যাখ্যান, authenticated session তৈরি নয়
     else সব যাচাই সফল
-        K->>K: Anonymous session invalid; নতুন session ID ও নতুন token T₂
-        K-->>B: Set-Cookie: নতুন session ID; login সফল
+        K->>K: Anonymous session invalid, নতুন session ID ও নতুন token T₂
+        K-->>B: Set-Cookie: নতুন session ID, login সফল
     end
 ```
 
