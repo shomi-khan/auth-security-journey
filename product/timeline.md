@@ -99,17 +99,20 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 | ২ | সেই শুরুর দোকান। Authorization আলাদা প্রশ্ন। Organization এখনো নেই |
 | ৩ | Email আর password আছে |
 | ৪ | Session আর cookie আছে |
-| ৫–৭ | Cookie session আক্রান্ত। Token তখনকার ডিজাইন নয় |
-| ৮–৯ | Mobile app আছে। Access token আলোচনায়। JWT format হিসেবে আসতে পারে |
-| ১০ | SPA আছে। Mobile-এর refresh token আগে থেকে থাকতে পারে |
-| ১১–১৪ | মেয়াদ, refresh, rotation, logout, revocation |
-| ১৫ | Organization, membership, role, আর resource কার সেটা |
-| ১৬–২০ | Delegation শেখা হচ্ছে। Google login চালু নয়। বাইরের app-এর integration শেষ নয় |
-| ২১ | Google login চালু |
-| Season 2-এর শেষ | অধ্যায় ২১-এর পরে third-party integration চালু |
-| ২২ | MFA আর step-up চালু |
-| ২৩ | Microservice আর machine-to-machine authentication চালু |
-| ২৪–২৫ | শেষ architecture বর্তমান ছবি হিসেবে আলোচনা করা যায় |
+| ৫–৬ | Cookie session আক্রান্ত। Session hijacking/fixation ও CSRF |
+| ৭ | CORS-এর generic browser/API scenario; KenaKata-র architecture এখনো single web application |
+| ৮ | XSS ও HttpOnly-এর সীমা; cookie session এখনও আছে |
+| ৯–১০ | Mobile app আছে। Access token এবং JWT format নিয়ে আলোচনা |
+| ১১ | SPA আছে। Mobile-এর refresh token আগে থেকে থাকতে পারে; cross-origin API call-এর CORS প্রসঙ্গ এখানে product-এ আসে |
+| ১২–১৫ | Token expiry, refresh, rotation, logout ও revocation |
+| ১৬ | Organization, membership, role, আর resource কার সেটা |
+| ১৭–২১ | Delegation শেখা হচ্ছে। Google login চালু নয়। বাইরের app-এর integration শেষ নয় |
+| ২২ | Google login চালু |
+| Season 2-এর শেষ | অধ্যায় ২২-এর পরে third-party integration চালু |
+| ২৩ | MFA আর step-up চালু |
+| ২৪ | Microservice আর machine-to-machine authentication চালু |
+| ২৫–২৬ | শেষ architecture বর্তমান ছবি হিসেবে আলোচনা করা যায় |
+
 
 
 ## Chapter plan status (২০২৬-১০-২৫)
