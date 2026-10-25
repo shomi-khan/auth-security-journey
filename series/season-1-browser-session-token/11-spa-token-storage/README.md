@@ -175,7 +175,7 @@ flowchart TD
 1. **SPA সরাসরি API-তে access token পাঠাবে।** Token browser-এর JavaScript পরিচালনা করবে। Persistent storage এড়িয়ে in-memory access token বিবেচনা করা যায়, তবে reload, token renewal ও login continuity-এর design লাগবে। localStorage বা sessionStorage-এ credential রেখে XSS-কে হালকা করে দেখা যাবে না।
 2. **SPA একটি BFF-এর সঙ্গে কথা বলবে।** Browser-এ session cookie থাকবে, আর BFF server-side-এ token সামলাবে। এতে token exfiltration-এর ঝুঁকি কমে, কিন্তু backend complexity ও cookie-based CSRF defense-এর প্রয়োজন বাড়ে।
 
-এই অধ্যায়েই refresh-token rotation, reuse detection, expiry বা revocation-এর পূর্ণ lifecycle ঠিক করছি না। সেগুলো অধ্যায় ১১–১৪-এ আসবে। একইভাবে OAuth authorization flow-ও এখন চালু করছি না; Season 2-এ সেটি আলাদা করে শেখানো হবে। Persistent cookie ও server-side session-এর lifetime এখানে শুধু login-persistence trade-off বোঝানোর জন্য এসেছে, পূর্ণ session-lifecycle design হিসেবে নয়.
+এই অধ্যায়েই refresh-token rotation, reuse detection, expiry বা revocation-এর পূর্ণ lifecycle ঠিক করছি না। সেগুলো অধ্যায় ১২–১৫-এ আসবে। একইভাবে OAuth authorization flow-ও এখন চালু করছি না; Season 2-এ সেটি আলাদা করে শেখানো হবে। Persistent cookie ও server-side session-এর lifetime এখানে শুধু login-persistence trade-off বোঝানোর জন্য এসেছে, পূর্ণ session-lifecycle design হিসেবে নয়.
 
 ### 🧠 Decision Game: নীরার requirement বদলালে সিদ্ধান্ত বদলাবে?
 
@@ -206,9 +206,9 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 
 ## ৭. এই অধ্যায় কী solve করে না?
 
-- **Token lifetime ও expiry:** token কতক্ষণ valid থাকবে এবং মেয়াদ শেষ হলে কী হবে, অধ্যায় ১১।
-- **Refresh token lifecycle:** browser বা mobile client নতুন access token কীভাবে পাবে, rotation ও reuse detection কীভাবে কাজ করবে, অধ্যায় ১২–১৩।
-- **Logout ও revocation:** browser-এর local value মুছে ফেলা আর server-side credential বাতিল করা এক নয়; বিস্তারিত অধ্যায় ১৪।
+- **Token lifetime ও expiry:** token কতক্ষণ valid থাকবে এবং মেয়াদ শেষ হলে কী হবে, অধ্যায় ১২।
+- **Refresh token lifecycle:** browser বা mobile client নতুন access token কীভাবে পাবে, rotation ও reuse detection কীভাবে কাজ করবে, অধ্যায় ১৩–১৪।
+- **Logout ও revocation:** browser-এর local value মুছে ফেলা আর server-side credential বাতিল করা এক নয়; বিস্তারিত অধ্যায় ১৫।
 - **OAuth flow:** SPA OAuth client হলে authorization code, PKCE ও সংশ্লিষ্ট threat model Season 2-এ আসবে।
 - **XSS-এর সম্পূর্ণ প্রতিরোধ:** Chapter 8-এর output handling, CSP-এর সীমা এবং server-side authorization এখানে প্রতিস্থাপিত হচ্ছে না।
 
