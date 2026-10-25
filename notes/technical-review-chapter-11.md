@@ -46,3 +46,14 @@ Chapter 11-এর source-based conceptual Technical Review ও Security Review�
 - Mermaid diagrams were reviewed as source text only; no Mermaid renderer was run.
 - No application, mobile, browser or automated test suite was run.
 - This record is not a production security audit or certification.
+
+
+## Follow-up review: Chapter 11 in PR #2
+
+Date: 2026-10-25  
+Branch: `docs/chapters-11-25-blueprints`  
+Pull request: https://github.com/shomi-khan/auth-security-journey/pull/2
+
+Chapter 11-এর existing draft, Chapter 11 brief, Chapter 10 continuity, Chapter 12 boundary এবং product timeline আবার মিলিয়ে দেখা হয়েছে। এই follow-up-এ একটি narrative ambiguity ঠিক করা হয়েছে: password বদলানোর পর পুরোনো access token দিয়ে request সফল হওয়ার ঘটনাটি দেখে যেন পাঠক ধরে না নেয় যে password change সব architecture-এ access token স্বয়ংক্রিয়ভাবে invalidate করে। এখন opening-এ স্পষ্ট বলা আছে, এটি architecture ও revocation policy-র ওপর নির্ভর করে; password change নিজে থেকে সব already-issued access token বাতিল করে না।
+
+এই পরিবর্তনটি আলাদা commit-এ রাখা হয়েছে। মূল article-এর বাকি scope, learning sequence ও security claims-এ অপ্রয়োজনীয় rewrite করা হয়নি। এটি source-based conceptual follow-up; implementation test, link checker, Mermaid renderer বা production audit চালানো হয়নি।
