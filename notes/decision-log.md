@@ -208,3 +208,10 @@
 - Chapter 13-তে rotation, token-family/reuse detection, race condition ও breach response-এর গভীর আলোচনা থাকবে। Chapter 14-তে logout, revocation এবং ইতিমধ্যে issue হওয়া access token-এর আচরণ থাকবে।
 - OAuth-নির্দিষ্ট normative requirements শেখানোর সময় RFC 6749-এর পাশাপাশি RFC 9700-এর বর্তমান OAuth Security BCP ব্যবহার করতে হবে; generic first-party mobile flow-কে OAuth implementation বলা যাবে না।
 - এই scope note Chapter 12-এর draft নয়; লেখার আগে product documents, আগের chapter, authoritative references এবং `CONTRIBUTING.md` আবার মিলিয়ে নিতে হবে।
+
+
+## 2026-10-25 — Season 1-এ CORS অধ্যায় যোগ
+
+- CSRF (অধ্যায় ৬)-এর পরে এবং XSS (নতুন অধ্যায় ৮)-এর আগে CORS-কে অধ্যায় ৭ হিসেবে যুক্ত করা হয়েছে।
+- CORS browser-এর cross-origin response sharing নিয়ন্ত্রণ করে; এটি authentication, authorization বা CSRF defense-এর বিকল্প নয়।
+- পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়ে ৮–২৬ হয়েছে। Season 1 এখন অধ্যায় ১–১৬, Season 2 অধ্যায় ১৭–২২ এবং Season 3 অধ্যায় ২৩–২৬।
