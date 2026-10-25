@@ -1,20 +1,23 @@
-# Season 1: Chapters 4–7 Continuity Review
+# Season 1: Chapters 4–6 and 8 Continuity Review
 
 **Date:** 2026-10-25  
 **Branch:** `improvements/chapters-engagement`  
-**Scope:** Story timeline, product architecture, security-control boundaries, chapter transitions, terminology, and relative links across Chapters 4–7.  
+**Scope:** Story timeline, product architecture, security-control boundaries, chapter transitions, terminology, and relative links across the former Chapters 4–7. The former Chapter 7 is now Chapter 8 after the CORS insertion.  
 **Review type:** Source-based editorial and conceptual review. This is not a browser test, implementation audit, or production security certification.
 
 ## Summary
 
-Chapters 4–7 tell a coherent progression:
+> **Scope note after renumbering:** This review predates the insertion of CORS as Chapter 7. References to the former Chapter 7 mean the XSS chapter, now Chapter 8. CORS has its own separate draft and still requires technical and security review.
+
+
+Chapters 4–6 and the former Chapter 7 (now Chapter 8) tell a coherent progression:
 
 1. **Chapter 4:** The server needs a cookie-backed session so the user does not have to authenticate with a password on every request.
 2. **Chapter 5:** A valid session ID can be stolen or fixed; expiry, revocation, and rotation reduce risk but do not solve every request-origin problem.
 3. **Chapter 6:** CSRF can abuse the victim's browser without the attacker knowing the session ID.
 4. **Chapter 8:** XSS is different: attacker-controlled script runs in the trusted page context, so HttpOnly and CSRF controls alone do not solve it.
 
-The review found and fixed two continuity issues, made the Chapter 8-to-8 transition explicit, and aligned Chapter 4's cookie-RFC citation with Chapter 5's current-standard reference.
+The original review found and fixed two continuity issues, made the XSS chapter's transition explicit, and aligned Chapter 4's cookie-RFC citation with Chapter 5's current-standard reference.
 
 ## Fixes applied
 
@@ -40,7 +43,7 @@ File: `series/season-1-browser-session-token/04-session-and-cookie/README.md`
 
 **Fix:** Changed the phrase to “অধ্যায় ৬-এ” and added an explicit link to Chapter 9, including a short bridge that avoids presenting tokens as automatically safer than cookie sessions.
 
-File: `series/season-1-browser-session-token/07-xss-and-httponly/README.md`
+File: `series/season-1-browser-session-token/08-xss-and-httponly/README.md`
 
 ## Cross-chapter security consistency
 
