@@ -38,7 +38,7 @@ status: planned
 - Machine-to-machine authentication; অধ্যায় ২৩
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ২১: Google Login এবং Token Validation](../../season-2-oauth-oidc/21-google-login/README.md)
+আগে: [অধ্যায় ২১: Google Login এবং Token Validation](../../season-2-oauth-oidc/22-google-login/README.md)
 পরে: [অধ্যায় ২৩: Machine-to-Machine Authentication](../24-machine-to-machine/README.md)
 
 ## লেখার অবস্থা
