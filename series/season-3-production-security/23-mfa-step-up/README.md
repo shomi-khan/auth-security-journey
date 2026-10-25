@@ -1,5 +1,5 @@
 ---
-chapter: 22
+chapter: 23
 season: 3
 title: "MFA এবং Step-up Authentication"
 status: planned
@@ -39,7 +39,7 @@ status: planned
 
 ## ধারাবাহিকতা
 আগে: [অধ্যায় ২১: Google Login এবং Token Validation](../../season-2-oauth-oidc/21-google-login/README.md)
-পরে: [অধ্যায় ২৩: Machine-to-Machine Authentication](../23-machine-to-machine/README.md)
+পরে: [অধ্যায় ২৩: Machine-to-Machine Authentication](../24-machine-to-machine/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
