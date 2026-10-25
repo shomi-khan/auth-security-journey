@@ -34,12 +34,12 @@ Public client-এ client secret গোপন রাখা যায় না। Au
 
 ## এই অধ্যায়ে থাকবে না
 - OAuth server library-র implementation guide
-- OIDC identity validation; অধ্যায় ২০
-- Google login-এর পূর্ণ integration; অধ্যায় ২১
+- OIDC identity validation; অধ্যায় ২১
+- Google login-এর পূর্ণ integration; অধ্যায় ২২
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৮: Redirect URI এবং Authorization Code Theft](../19-redirect-uri-code-theft/README.md)
-পরে: [অধ্যায় ২০: OIDC](../21-oidc/README.md)
+আগে: [অধ্যায় ১৯: Redirect URI এবং Authorization Code Theft](../19-redirect-uri-code-theft/README.md)
+পরে: [অধ্যায় ২১: OIDC](../21-oidc/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
