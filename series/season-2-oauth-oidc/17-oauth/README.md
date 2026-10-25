@@ -33,15 +33,15 @@ Season 1-এ KenaKata নিজের user ও নিজের client-এর cre
 - পরের অধ্যায়গুলোর flow diagram পড়ার জন্য trust boundary চিহ্নিত করতে
 
 ## এই অধ্যায়ে থাকবে না
-- state-এর বিস্তারিত threat analysis; অধ্যায় ১৭
-- Redirect URI ও code theft-এর বিস্তারিত; অধ্যায় ১৮
-- PKCE; অধ্যায় ১৯
-- OIDC ও Google login; অধ্যায় ২০–২১
+- state-এর বিস্তারিত threat analysis; অধ্যায় ১৮
+- Redirect URI ও code theft-এর বিস্তারিত; অধ্যায় ১৯
+- PKCE; অধ্যায় ২০
+- OIDC ও Google login; অধ্যায় ২১–২২
 
 ## ধারাবাহিকতা
-আগে: [অধ্যায় ১৫: IDOR/BOLA এবং Authorization Design](../../season-1-browser-session-token/16-idor-bola-authorization/README.md)
+আগে: [অধ্যায় ১৬: IDOR/BOLA এবং Authorization Design](../../season-1-browser-session-token/16-idor-bola-authorization/README.md)
 
-পরে: [অধ্যায় ১৭: Authorization Code Flow এবং state](../18-authorization-code-state/README.md)
+পরে: [অধ্যায় ১৮: Authorization Code Flow এবং state](../18-authorization-code-state/README.md)
 
 ## লেখার অবস্থা
 - [ ] পূর্ণাঙ্গ Draft
