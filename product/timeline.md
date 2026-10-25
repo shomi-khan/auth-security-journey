@@ -7,7 +7,7 @@ KenaKata কীভাবে এগোয়, এই ফাইল সেটা। �
 দুটো জায়গায় শেখানোর ক্রম আর product-এর ক্রম এক নয়। Product-এর ক্রম বদলায় না।
 
 - Refresh token product-এ mobile app-এর সঙ্গে আসে। বিস্তারিত ব্যাখ্যা অধ্যায় ১৩–১৫-এ, SPA-র অধ্যায়ের পরে। SPA আসার সময় refresh token আগে থেকেই আছে। অধ্যায় ১১ বলতে পারে mobile client-এর কাছে এটা আছে। Rotation আর revocation সেখানে ব্যাখ্যা করবে না।
-- অধ্যায় ১৬–২০ OAuth, PKCE, আর OIDC শেখায়। তখন Google login আর বাইরের app-এর connection এখনো দাবি, চালু feature নয়। Google login চালু হয় অধ্যায় ২১-এ। বাইরের application যুক্ত হয় তার পরে, Season 2-এর শেষে।
+- অধ্যায় ১৭–২১ OAuth, PKCE, আর OIDC শেখায়। তখন Google login আর বাইরের app-এর connection এখনো দাবি, চালু feature নয়। Google login চালু হয় অধ্যায় ২২-এ। বাইরের application যুক্ত হয় তার পরে, Season 2-এর শেষে।
 
 ```text
 Simple E-commerce
