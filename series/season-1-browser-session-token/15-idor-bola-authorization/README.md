@@ -33,7 +33,7 @@ Sequential ID বদলানো একটি পরিচিত উদাহর
 
 একজন customer order দেখার endpoint ব্যবহার করতে পারে। এটি function-level permission। কিন্তু তার মানে এই নয় যে সে অন্য customer-এর যেকোনো order দেখতে পারবে। প্রতিটি order-এর ওপর তার অনুমতি আলাদাভাবে যাচাই করতে হবে।
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     A[Request আসে] --> B{Authentication বৈধ?}
     B -- না --> C[401 Unauthorized]
@@ -43,7 +43,7 @@ flowchart TD
     F --> G{এই resource ও action অনুমোদিত?}
     G -- না --> H[Access deny]
     G -- হ্যাঁ --> I[Operation চালানো]
-\`\`\`
+```
 
 এটি একটি ধারণাগত flow, নির্দিষ্ট HTTP response-এর সম্পূর্ণ নিয়ম নয়। 401 সাধারণত authentication প্রয়োজন বা ব্যর্থ হওয়ার সঙ্গে সম্পর্কিত। Authenticated user-এর permission না থাকলে 403 ব্যবহার করা যেতে পারে। কিছু system resource আছে কি না তা গোপন রাখতে 404-ও দিতে পারে। Response code বাছাইয়ের চেয়ে গুরুত্বপূর্ণ হলো অননুমোদিত operation যেন কোনো অবস্থাতেই না চলে এবং response policy consistent থাকে।
 
@@ -62,7 +62,7 @@ flowchart TD
 
 KenaKata এখন একাধিক organization-কে সেবা দেয়। প্রতিটি order একটি নির্দিষ্ট organization-এর অন্তর্ভুক্ত। User-এর active organization বা request-এ পাঠানো organization ID একাই trusted permission নয়। Server-কে যাচাই করতে হবে user-এর membership আছে কি না, resource ওই organization-এর কি না এবং ওই action-এর জন্য তার যথেষ্ট permission আছে কি না।
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     A[Authenticated request] --> B[Subject, action ও resource শনাক্ত]
     B --> C{User-এর organization membership আছে?}
@@ -72,7 +72,7 @@ flowchart TD
     D -- হ্যাঁ --> E{এই action-এর permission আছে?}
     E -- না --> X
     E -- হ্যাঁ --> F[Operation অনুমোদন]
-\`\`\`
+```
 
 এখানে active organization client বেছে দিতে পারে, কিন্তু সেটিকে server-এর authorization decision-এর বিকল্প করা যাবে না। User request-এ organization ID পাঠালেই সে ওই organization-এর member হয়ে যায় না।
 
@@ -112,7 +112,7 @@ Tenant-ভিত্তিক system-এ resource খোঁজার সময় qu
 - List, search, export এবং nested resource-এও একই boundary বজায় থাকে কি?
 - Resource ID বৈধ হলেও permission না থাকলে operation বন্ধ হয় কি?
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     A[Authorization test শুরু] --> B[অনুমোদিত user ও resource বেছে নাও]
     B --> C[Positive case: নিজের অনুমোদিত কাজ]
@@ -125,7 +125,7 @@ flowchart TD
     F --> G
     G -- না --> H[সম্ভাব্য authorization defect তদন্ত]
     G -- হ্যাঁ --> I[এই test case-এর প্রত্যাশা পূরণ]
-\`\`\`
+```
 
 Positive test গুরুত্বপূর্ণ, কারণ সব request reject করে দিলেই system নিরাপদ হয়ে যায় না। Test-কে নিশ্চিত করতে হবে অনুমোদিত কাজ চলে এবং অননুমোদিত কাজ বন্ধ হয়। এই diagram test-planning-এর ধারণা দেখায়, বাস্তবে test suite চালানোর দাবি নয়।
 
