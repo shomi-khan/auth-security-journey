@@ -1,6 +1,6 @@
 # Season 3 — Production Security
 
-অধ্যায় ২২–২৫। সব chapter brief প্রস্তুত; পূর্ণাঙ্গ article লেখা বাকি।
+অধ্যায় ২৩–২৬। সব chapter brief প্রস্তুত; পূর্ণাঙ্গ article লেখা বাকি।
 
 শেষ ছবি [architecture](../../product/architecture.md)-এ। সেটা শেষ অবস্থা। আগের অধ্যায় সেটাকে বর্তমান system ধরে নেবে না। কখন কী চালু হয়, সেটা [timeline](../../product/timeline.md)-এ।
 
@@ -22,10 +22,10 @@ MFA, Step-up Authentication, Machine-to-Machine Authentication, architecture ক
 
 ## Chapter list
 
-22. [MFA এবং Step-up Authentication](22-mfa-step-up/README.md)
-23. [Machine-to-Machine Authentication](23-machine-to-machine/README.md)
-24. [Context বদলালে Architecture কেন বদলায়?](24-context-and-architecture/README.md)
-25. [Capstone: পুরো KenaKata Security Architecture](25-capstone/README.md)
+23. [MFA এবং Step-up Authentication](22-mfa-step-up/README.md)
+24. [Machine-to-Machine Authentication](23-machine-to-machine/README.md)
+25. [Context বদলালে Architecture কেন বদলায়?](24-context-and-architecture/README.md)
+26. [Capstone: পুরো KenaKata Security Architecture](25-capstone/README.md)
 
 ## Season শেষে reader কী বুঝতে পারবে?
 
