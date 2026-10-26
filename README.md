@@ -1,4 +1,4 @@
-# Auth Security Journey
+# Trust Stack
 
 বাংলাভাষী Software Engineer-দের জন্য Authentication, Authorization এবং Web Security শেখার একটি গল্পভিত্তিক যাত্রা।
 
@@ -18,10 +18,6 @@ KenaKata সম্পর্কে যে তথ্য পুরো সিরি�
 
 বিশেষ করে:
 
-- Junior Software Engineer
-- Backend Developer
-- Frontend Developer
-- যারা Web Security শিখতে চান
 - যারা Authentication, OAuth, JWT দেখে confused হন
 
 তুমি programming-এর বেসিক জানো। HTTP আর REST API চেনো। Backend বা frontend-এ কিছু কাজ করেছ। Authentication, Authorization, OAuth, OIDC, JWT, Session, CSRF, CORS, XSS আলাদা আলাদা শুনেছ। একটা আরেকটার সঙ্গে কীভাবে জোড়া লাগে, সেটা এখনো পরিষ্কার নয়।
@@ -55,61 +51,6 @@ Trade-off
 ## শেখানোর গভীরতা
 
 এই সিরিজ মূল security theory, mental model, threat model, control-এর সীমা ও trade-off শেখায়। এটি কোনো নির্দিষ্ট programming language, framework বা security library-র implementation manual নয়। Tool-এর detail তখনই থাকবে, যখন মূল ধারণা বোঝাতে বা ভুল security assumption ঠেকাতে দরকার। Chapter-গুলো যেন tool-specific parameter বা implementation detail-এর rabbit hole-এ না ঢুকে যায়।
-
-## Season 1
-
-### Browser, Session এবং Token
-
-অধ্যায় ১–১৬। [Season 1](series/season-1-browser-session-token/README.md)
-
-এই season-এ শেখা হবে:
-
-- Authentication
-- Authorization
-- Password
-- Session
-- Cookie
-- CSRF
-- CORS
-- XSS
-- Token
-- JWT
-- Access Token
-- Refresh Token
-- Revocation
-- IDOR/BOLA
-
-## Season 2
-
-### OAuth, OIDC এবং Delegated Identity
-
-অধ্যায় ১৭–২২। [Season 2](series/season-2-oauth-oidc/README.md)
-
-এই season-এ শেখা হবে:
-
-- OAuth
-- Authorization Code
-- state
-- redirect URI
-- PKCE
-- OIDC
-- ID Token
-- Access Token
-- Google Login
-
-## Season 3
-
-### Production Security
-
-অধ্যায় ২৩–২৬। [Season 3](series/season-3-production-security/README.md)
-
-এই season-এ শেখা হবে:
-
-- MFA
-- Step-up Authentication
-- Machine-to-Machine Authentication
-- Architecture decision
-- Complete production architecture
 
 ## অধ্যায়সূচি
 
