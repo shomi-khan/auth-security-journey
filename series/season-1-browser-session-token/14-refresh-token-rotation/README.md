@@ -15,6 +15,12 @@ status: draft
 
 এই অধ্যায় KenaKata-র first-party mobile flow নিয়ে। OAuth-এর security standard তুলনা হিসেবে ব্যবহার করব, কিন্তু KenaKata-র flow-কে OAuth flow হিসেবে উপস্থাপন করব না।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Rotation পুরোনো refresh token বদলায়; reuse detection পুরোনো token আবার ব্যবহৃত হলে তা শনাক্ত করার চেষ্টা করে.
+- Reuse সবসময় নিশ্চিত আক্রমণ নয়, কারণ network timeout ও retry race তৈরি করতে পারে.
+- Replay protection, false positive, token-family revocation ও recovery-র trade-off।
+
 ## ১. Rotation কী বদলায়?
 
 অধ্যায় ১৩-তে দেখেছি, refresh token নতুন access token পাওয়ার credential। দীর্ঘমেয়াদি credential চুরি হলে attacker সেটি ব্যবহার করে নতুন access token চাইতে পারে। Rotation-এর ধারণা হলো, refresh সফল হলে আগের refresh token invalid করে নতুন refresh token ইস্যু করা।
@@ -137,6 +143,22 @@ RFC 9700 অনুযায়ী OAuth public client-এর refresh token replay �
 4. প্রতিটি reuse-এ token family revoke করলে security benefit কী, আর বৈধ user-এর ওপর কী প্রভাব পড়তে পারে?
 5. Grace window ব্যবহার করলে replay protection কীভাবে দুর্বল হতে পারে?
 6. OAuth public client-এর জন্য RFC 9700-এর নির্দেশনা আর KenaKata-র first-party design decision কেন আলাদা করে বলতে হবে?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Rotation সফল refresh-এর সময় পুরোনো token-এর বদলে নতুন token দেয়। Reuse detection চেষ্টা করে আগে invalid করা token আবার ব্যবহার হয়েছে কি না বুঝতে।
+
+2. বৈধ client server-এর response হারিয়ে retry করতে পারে। তাই reuse একটি গুরুত্বপূর্ণ signal, কিন্তু context ছাড়া নিশ্চিত প্রমাণ নয়।
+
+3. Server R1 consume করে R2 তৈরি করেছে, কিন্তু response client পায়নি। Client R1 দিয়ে retry করলে server সেটিকে reuse হিসেবে দেখতে পারে, যদিও client-এর উদ্দেশ্য বৈধ ছিল।
+
+4. Family revoke করলে stolen token-এর পরবর্তী ব্যবহার বন্ধ হতে পারে, কিন্তু বৈধ user-কে আবার login করতে হতে পারে। Retry/grace policy usability বাড়াতে পারে, কিন্তু replay window-ও বাড়াতে পারে।
+
+5. OAuth public client-এর normative requirement আর KenaKata-র first-party design choice একই জিনিস নয়। Standard থেকে ধারণা নেওয়া যায়, তবে protocol scope সঠিকভাবে উল্লেখ করতে হবে.
+
+</details>
 
 ## আরও পড়ো
 
