@@ -18,7 +18,7 @@
 
 | অংশ | অবস্থা |
 | --- | --- |
-| অধ্যায় ১–১২ | Draft article আছে; review ও refinement চলমান |
+| অধ্যায় ১–১৬ | পূর্ণাঙ্গ draft আছে; cross-chapter consistency ও clarity review চলছে |
 | অধ্যায় ৭: CORS | Technical ও security review সম্পন্ন |
 | অধ্যায় ৯: Token | Review notes আছে; article-টি draft |
 | অধ্যায় ১৩–২৬ | Chapter plan/brief পর্যায়ে; পূর্ণাঙ্গ article নয় |
@@ -69,10 +69,10 @@ Trade-off ও সীমাবদ্ধতা
 | 10 | [JWT আসলে কী?](series/season-1-browser-session-token/10-jwt/README.md) | Draft |
 | 11 | [SPA-তে Token কোথায় রাখব?](series/season-1-browser-session-token/11-spa-token-storage/README.md) | Draft |
 | 12 | [Token Expiration এবং Replay Window](series/season-1-browser-session-token/12-token-expiration-replay/README.md) | Draft |
-| 13 | [Refresh Token কেন?](series/season-1-browser-session-token/13-refresh-token/README.md) | Planned |
-| 14 | [Refresh Token Rotation এবং Reuse Detection](series/season-1-browser-session-token/14-refresh-token-rotation/README.md) | Planned |
-| 15 | [Logout, Revocation এবং Session Recovery](series/season-1-browser-session-token/15-logout-revocation/README.md) | Planned |
-| 16 | [IDOR/BOLA এবং Authorization Design](series/season-1-browser-session-token/16-idor-bola-authorization/README.md) | Planned |
+| 13 | [Refresh Token কেন?](series/season-1-browser-session-token/13-refresh-token/README.md) | Draft |
+| 14 | [Refresh Token Rotation এবং Reuse Detection](series/season-1-browser-session-token/14-refresh-token-rotation/README.md) | Draft |
+| 15 | [Logout, Revocation এবং Session Recovery](series/season-1-browser-session-token/15-logout-revocation/README.md) | Draft |
+| 16 | [IDOR/BOLA এবং Authorization Design](series/season-1-browser-session-token/16-idor-bola-authorization/README.md) | Draft |
 
 ### Season 2: OAuth, OIDC এবং Delegated Identity
 
