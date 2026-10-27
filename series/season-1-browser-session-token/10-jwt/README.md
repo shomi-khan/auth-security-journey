@@ -1,3 +1,10 @@
+---
+chapter: 10
+season: 1
+title: "JWT আসলে কী?"
+status: draft
+---
+
 # JWT আসলে কী?
 
 রাফির mobile app এখন KenaKata API-তে access token পাঠায়। আরিফ token যাচাই করার ব্যবস্থা করছে। নীরা একটা সহজ প্রশ্ন করল:
