@@ -119,7 +119,7 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 
 অধ্যায় ১–১৬-এর পূর্ণাঙ্গ draft এখন repository-তে আছে। Chapter 7 CORS যোগ হওয়ার পর পুরোনো chapter reference-গুলোর নম্বর সংশোধন করা দরকার হয়েছিল; এই review-তে সেই cross-reference-গুলোও মিলিয়ে দেখা হচ্ছে। অধ্যায় ১৭–২৬ এখনো planning পর্যায়ে, তাই তাদের README-তে brief বা outline থাকতে পারে, পূর্ণাঙ্গ article নয়।
 
-| অধ্যায় | পরিকল্পিত শিরোনাম | Brief-এর মূল ফোকাস |
+| অধ্যায় | পরিকল্পিত শিরোনাম | মূল ফোকাস |
 | --- | --- | --- |
 | ৭ | CORS: Browser কোন Response পড়তে পারবে? | Origin, same-origin policy, preflight, credentials এবং CORS-এর সীমা |
 | ১২ | Token Expiration এবং Replay Window | Token lifetime, replay window ও layered control |
