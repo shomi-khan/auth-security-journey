@@ -498,9 +498,3 @@ flowchart TD
 - [OWASP API Security Top 10 2023](https://owasp.org/API-Security/editions/2023/en/0x11-t10/): API1:2023 BOLA, API5:2023 BFLA
 - Jerome H. Saltzer, Michael D. Schroeder, *The Protection of Information in Computer Systems*, Proceedings of the IEEE, 63(9), 1975: fail-safe defaults, complete mediation, least privilege, separation of privilege, psychological acceptability
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [ ] Technical review
-- [ ] Security review
-- [ ] Published
