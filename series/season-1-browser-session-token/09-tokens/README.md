@@ -151,13 +151,15 @@ flowchart TD
 <details>
 <summary>উত্তর মিলিয়ে দেখো</summary>
 
-1. Password login-এর সময় পরিচয় যাচাইয়ের জন্য; প্রতিটি request-এ পাঠালে exposure surface বাড়ে। Access token হলো পরের request-এর জন্য ব্যবহৃত sensitive credential, password-এর নিরাপদ বা ঝুঁকিমুক্ত বিকল্প নয়।
+1. Password login-এর সময় পরিচয় যাচাইয়ের জন্য; প্রতিটি request-এ পাঠালে exposure surface বাড়ে। Access token পরের request-এর credential, তবে এটি password-এর নিরাপদ বা ঝুঁকিমুক্ত বিকল্প নয়।
 
 2. Session cookie বা token credential বহন করতে পারে, কিন্তু session-এর state server-side-এ থাকতে পারে, আর token self-contained বা reference-based হতে পারে। নাম দেখে নয়, validation ও lifecycle দেখে পার্থক্য বুঝতে হবে।
 
-3. Token বৈধ হওয়া মানে শুধু credential-টি গ্রহণযোগ্য। নির্দিষ্ট order দেখা বা বদলানোর অনুমতি আলাদা authorization decision।
+3. Token বৈধ হওয়া মানে শুধু credential-টি গ্রহণযোগ্য। নির্দিষ্ট order দেখা বা বদলানোর অনুমতি আলাদা authorization decision; token ভুল audience-এর জন্য হলেও reject করতে হবে।
 
-4. Bearer token যার হাতে থাকে, সে token-টি ব্যবহার করার চেষ্টা করতে পারে। তাই storage, logging, transport, expiry ও revocation গুরুত্বপূর্ণ।
+4. URL/query string-এ token থাকলে browser history, server বা proxy log, monitoring/analytics এবং কিছু পরিস্থিতিতে referrer-এ প্রকাশ পেতে পারে। URL-এ bearer token রাখা উচিত নয়।
+
+5. Bearer token যার হাতে থাকে, সে সেটি ব্যবহার করার চেষ্টা করতে পারে; কিন্তু token-এর scope/audience, server-side validation এবং resource/action-এর authorization তার ক্ষমতা সীমিত করবে.
 
 </details>
 
@@ -172,9 +174,3 @@ Access token-এর কথা বলেছি, কিন্তু token-এর f
 - [RFC 6750: The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750): Bearer token, `Authorization` header, token disclosure ও replay risk। এই RFC OAuth bearer-token usage নিয়ে; এখানে শুধু bearer-token request model-এর ধারণা নেওয়া হয়েছে, KenaKata-র first-party login-কে OAuth flow বলা হয়নি।
 - [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749): OAuth context-এ access token-এর সংজ্ঞা। OAuth-specific protocol flow-এর বিস্তারিত অধ্যায় ১৭–২১-এ আসবে; Google login-এর ব্যবহার অধ্যায় ২২-এ দেখব।
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (source-based conceptual review; no implementation/browser tests)
-- [x] Security Review (source-based threat-model review; not a production audit)
-- [ ] Published
