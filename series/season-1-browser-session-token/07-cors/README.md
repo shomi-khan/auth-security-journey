@@ -13,6 +13,12 @@ status: draft
 
 এখানে প্রথমে একটা গুরুত্বপূর্ণ পার্থক্য মনে রাখতে হবে। **Browser request পাঠাতে পারা, server request গ্রহণ করা, আর JavaScript response পড়তে পারা এক জিনিস নয়।** CORS মূলত শেষের প্রশ্নটির উত্তর দিতে সাহায্য করে।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Origin-এর তিনটি অংশ এবং origin ও site-এর পার্থক্য।
+- Preflight কী যাচাই করে এবং simple request কেন preflight ছাড়াই server-এ পৌঁছাতে পারে।
+- CORS কেন authentication, authorization বা সম্পূর্ণ CSRF defense নয়।
+
 ## ১. Origin কী, আর কেন আলাদা?
 
 একটি web origin গঠিত হয় তিনটি অংশ দিয়ে:
@@ -159,6 +165,20 @@ Browser-এর বাইরে থাকা client-এর request-এ `Origin` h
 2. Preflight সফল হলে কেন API-তে user-এর permission আবার যাচাই করতে হবে?
 3. `Access-Control-Allow-Origin: *` এবং credentialed response একসঙ্গে কেন গ্রহণযোগ্য নয়?
 4. কোনো non-browser client CORS policy মানছে কি না, সেটি কি API authorization-এর ভিত্তি হতে পারে?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Simple request server-এ পৌঁছে state বদলাতে পারে, যদিও browser পরে JavaScript-কে response পড়তে না দেয়। তাই CORS error মানেই operation rollback নয়।
+
+2. Preflight browser-এর cross-origin request policy যাচাই করে; user কে, তার permission কী, বা resource কার, তা যাচাই করে না। আসল request-এ server-side authorization দরকার।
+
+3. Credentialed response নির্দিষ্ট trusted origin-এর সঙ্গে যুক্ত হতে হয়। Wildcard origin দিয়ে কোন origin credential-সহ অনুমোদিত, তা নির্দিষ্ট করা যায় না।
+
+4. না। CORS browser-enforced response-sharing policy; non-browser client সেটি মানতে বাধ্য নয়। API-র authorization সব client-এর জন্য server-এ enforce করতে হবে।
+
+</details>
 
 ## পরের অধ্যায়
 

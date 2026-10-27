@@ -59,6 +59,12 @@ Cookie: __Host-id=<browser-এর পাঠানো session cookie>
 
 ---
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Browser-এর স্বয়ংক্রিয় credential পাঠানো কীভাবে CSRF-এর সুযোগ তৈরি করে।
+- CSRF token, Origin/Fetch Metadata, SameSite এবং re-authentication কীভাবে স্তর হিসেবে কাজ করে।
+- CORS, authentication ও CSRF defense কেন একে অন্যের বিকল্প নয়।
+
 ## ১. ঘটনাটা ছবিতে
 
 আক্রমণকারী যদি cookie না জানে, তাহলে request-এ cookie গেল কীভাবে? ছবিতে দেখো কে কী করল, আর কে কী কখনো দেখল না।

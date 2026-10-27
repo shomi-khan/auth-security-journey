@@ -17,6 +17,12 @@ Token-এর signature যাচাই সফল হওয়া মানে trust
 
 এই অধ্যায়ে KenaKata-র বর্তমান first-party mobile/API access-token model নিয়ে আলোচনা করছি। Refresh-token-এর ধারণা ও mobile client-এর lifecycle অধ্যায় ১৩–১৫-তে আসবে। OAuth authorization flow এবং তার protocol-specific নিয়ম অধ্যায় ১৭–২১-তে শেখানো হবে; সেগুলোকে KenaKata-র বর্তমান first-party login-এর implementation হিসেবে ধরে নিও না।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Token expiration ঝুঁকির সময়সীমা কমায়, কিন্তু replay-কে নিজে থেকে অসম্ভব করে না।
+- Access-token lifetime, refresh-token lifetime এবং session lifetime এক ঘড়ি নয়।
+- Revocation, audience/scope restriction ও sender-constraining কখন অতিরিক্ত কাজে লাগে.
+
 ## ১. Expiration কোন সমস্যার সমাধান করে?
 
 Access token হলো API-তে access চাওয়ার credential। Bearer token-এর ক্ষেত্রে যার কাছে token আছে, সে token উপস্থাপন করতে পারে। Server token-টি বৈধ বলে গ্রহণ করলে request-টি সংশ্লিষ্ট access পেতে পারে, তবে endpoint-এর authorization check-ও পাস করতে হবে।
@@ -48,6 +54,24 @@ Token log-এ চলে গেলে, compromised device থেকে কপি 
 
 প্রতিটি request-এ central state check করলে revocation দ্রুত হতে পারে, কিন্তু latency, availability এবং consistency-এর trade-off আসে। কোন পদ্ধতি ঠিক, তা threat model ও product requirement-এর ওপর নির্ভর করে।
 
+## Lifetime ও replay window এক নজরে
+
+নিচের চিত্রে token-এর মেয়াদ এবং token চুরি হয়ে গেলে replay-এর সুযোগ আলাদা করে দেখানো হয়েছে। Expiry একটি নির্দিষ্ট সময়ের পর token গ্রহণ বন্ধ করতে পারে; মেয়াদ শেষ হওয়ার আগের replay ঠেকাতে validation, revocation বা sender-constraining-এর মতো অতিরিক্ত control লাগতে পারে।
+
+```mermaid
+flowchart TD
+    A[Access token issue] --> B[Token active এবং policy অনুযায়ী গ্রহণযোগ্য]
+    B --> C{Attacker token পেয়ে গেছে?}
+    C -->|না| D[স্বাভাবিক request চলতে পারে]
+    C -->|হ্যাঁ| E[Expiry-এর আগে replay চেষ্টা হতে পারে]
+    E --> F{অন্য control replay ঠেকায়?}
+    F -->|হ্যাঁ| G[Request reject]
+    F -->|না| H[Token-এর scope অনুযায়ী অপব্যবহার হতে পারে]
+    B --> I[Expiry time পেরোয়]
+    I --> J[সঠিক validation হলে token reject]
+```
+
+**চিত্রের মূল কথা:** Expiry হলো সময়ের সীমা; replay protection হলো কে token ব্যবহার করছে বা token ইতিমধ্যে ব্যবহার হয়েছে কি না, সেই ঝুঁকি সামলানোর আলাদা প্রশ্ন।
 ## ৩. JWT-এর exp কী বলে, কী বলে না?
 
 JWT-তে exp হলো expiration time claim। RFC 7519 অনুযায়ী, claim উপস্থিত থাকলে বর্তমান সময় exp-এর সমান বা তার পরে হলে token গ্রহণ করা যাবে না। সময়টি NumericDate হিসেবে প্রকাশিত হয়।

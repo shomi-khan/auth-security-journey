@@ -21,6 +21,12 @@ status: draft
 
 ---
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Password hash করা আর password encrypt করা এক কাজ নয়।
+- Salt, ধীর password-hashing algorithm ও rate limiting আলাদা আলাদা ঝুঁকি কমায়।
+- Database leak, online guessing এবং credential stuffing-এর threat model এক নয়।
+
 ## ১. তিন সপ্তাহ আগে: আধ ঘণ্টার login
 
 অধ্যায় ১-এ আরিফ `authenticate`-এর ভেতরের কাজটা ফাঁকা রেখেছিল। অধ্যায় ২-এ আমরা ধরে নিয়েছিলাম সেটা নির্ভুল। কিন্তু কোনো একসময় password যাচাইয়ের নিয়ম ঠিক করতে হয়েছে, আর আরিফ সেটা করেছে যেভাবে ব্যস্ত মানুষ করে: সবচেয়ে সোজা পথে।

@@ -19,6 +19,12 @@ status: draft
 
 ---
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Authentication বলে কে request করছে; authorization বলে সে কী করতে পারে।
+- Role বা endpoint access থাকলেই নির্দিষ্ট object ব্যবহারের অনুমতি পাওয়া যায় না।
+- `401`, `403` ও `404`-এর ব্যবহার এবং প্রতিটি request-এ server-side permission check কেন জরুরি।
+
 ## ১. একটা চুক্তি: ধরে নিলাম authentication নির্ভুল
 
 অধ্যায় ১-এ আমরা `authenticate` ফাংশনটা ফাঁকা রেখে এসেছি। ভেতরে কী হবে, সেটা অধ্যায় ৩ আর ৪-এর কাজ। এই অধ্যায়ে সেই ফাঁক ভরব না। তার বদলে একটা thought experiment করব।

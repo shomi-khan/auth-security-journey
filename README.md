@@ -105,6 +105,7 @@ Trade-off ও সীমাবদ্ধতা
 | [`notes/misconceptions.md`](notes/misconceptions.md) | সিরিজে যাচাই ও ভাঙার জন্য রাখা প্রচলিত ভুল ধারণা |
 | [`notes/decision-log.md`](notes/decision-log.md) | গুরুত্বপূর্ণ editorial ও product সিদ্ধান্ত |
 | [`notes/editorial-review-chapters-01-16.md`](notes/editorial-review-chapters-01-16.md) | অধ্যায় ১–১৬-এর cross-chapter consistency review ও তার সীমা |
+| [`notes/reader-first-editorial-guide.md`](notes/reader-first-editorial-guide.md) | প্রাঞ্জল লেখা, diagram, learning goal ও concept-check-এর editorial standard |
 | [`docs/code-example-policy.md`](docs/code-example-policy.md) | Code ও diagram ব্যবহারের নীতি |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | অধ্যায় লেখার ও review করার workflow |
 

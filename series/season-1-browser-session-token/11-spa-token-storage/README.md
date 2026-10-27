@@ -15,6 +15,12 @@ status: draft
 
 > এই অধ্যায়ে KenaKata-র SPA একটি first-party browser client; OAuth flow এখানে এখনো চালু হয়নি। RFC 10017 মূলত OAuth-ভিত্তিক browser client নিয়ে। এর §6.1-এর BFF pattern-কে এখানে architecture-এর তুলনামূলক উদাহরণ হিসেবে ব্যবহার করছি, আর §7.1-এ single-domain, non-OAuth application নিয়ে আলাদা আলোচনা আছে। তাই RFC-তে বর্ণিত OAuth BFF flow-কে KenaKata-র বর্তমান login-এর implementation বা compliance দাবি হিসেবে পড়বে না।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- `localStorage`, `sessionStorage`, memory, HttpOnly cookie ও BFF-এর trade-off।
+- XSS ও CSRF আলাদা threat, তাই এক storage choice সব ঝুঁকি মেটায় না।
+- Storage নির্বাচন করার আগে client architecture, attacker capability ও recovery policy কেন ঠিক করতে হয়।
+
 ## ১. আগে threat model ঠিক করি
 
 Storage তুলনা করার আগে আরিফ তিনটি প্রশ্ন লিখল:
@@ -226,6 +232,20 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 3. SPA যদি token নিজে Authorization header-এ যোগ করে, আর cookie যদি browser নিজে পাঠায়, CSRF threat model-এ পার্থক্য কী?
 4. BFF token browser থেকে সরিয়ে রাখে। এর পরেও কোন দুইটি security concern আলাদা করে সামলাতে হবে?
 5. Browser বন্ধ হলে token মুছে যাওয়া আর server-side token revoke হওয়া কেন একই ঘটনা নয়?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. `localStorage` দীর্ঘ সময় browser-এ থাকে এবং JavaScript পড়তে পারে; `sessionStorage` tab/session-সংশ্লিষ্ট; memory refresh/reload-এ হারাতে পারে; HttpOnly cookie JavaScript থেকে value আড়াল করে; BFF token browser থেকে server-side-এ সরিয়ে রাখে। প্রতিটির বাস্তব সীমা আছে।
+
+2. JavaScript-readable storage-এ token থাকলে XSS token value চুরি করতে পারে। Cookie browser নিজে request-এ যোগ করলে CSRF threat আলাদাভাবে বিবেচনা করতে হয়।
+
+3. কোনো storage একা XSS ও CSRF দুটোই সমাধান করে না। Architecture, browser behavior, token scope/lifetime এবং server-side controls একসঙ্গে বিচার করতে হয়।
+
+4. BFF token exposure কমাতে পারে, কিন্তু browser-এ XSS থাকলে attacker user-এর browser দিয়ে authenticated action করাতে পারে। তাই BFF XSS prevention-এর বিকল্প নয়.
+
+</details>
 
 ## তথ্যসূত্র
 

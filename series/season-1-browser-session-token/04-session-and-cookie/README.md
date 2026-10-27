@@ -23,6 +23,12 @@ status: draft
 
 ---
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Cookie browser-এ কী বহন করে এবং server-side session record কী ধরে রাখে।
+- Opaque session ID, signed cookie ও client-side state-এর security trade-off।
+- `Secure`, `HttpOnly`, `SameSite` ও `__Host-` কী কমায়, আর কী আটকায় না।
+
 ## ১. কী চাই, আর কী চাই না
 
 অধ্যায় ১-এ আমরা দুটো কাজ আলাদা করেছিলাম: identity **প্রমাণ করা** আর প্রমাণিত identity **ধরে রাখা**। প্রথমটা আমরা অধ্যায় ৩-এ ঠিকমতো বানিয়েছি, ভারী আর ধীর, কারণ সেটা হাতে-গোনা বার চলে। এবার দ্বিতীয় কাজটা।

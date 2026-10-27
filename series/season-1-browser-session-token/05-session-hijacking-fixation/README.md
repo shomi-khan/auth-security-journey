@@ -17,6 +17,12 @@ status: draft
 
 ---
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Session hijacking ও session fixation-এর পার্থক্য।
+- Idle timeout, absolute timeout, revocation ও detection-এর আলাদা ভূমিকা।
+- Login-এর সময় session ID বদলানো কেন fixation প্রতিরোধের গুরুত্বপূর্ণ অংশ।
+
 ## ১. Log যা বলল, আর যা বলল না
 
 আরিফ `/manage/orders`-এ যাওয়া সব request ঘেঁটে একটা সারি আলাদা করল। (IP দুটো নমুনা, ডকুমেন্টেশনের জন্য আলাদা করে রাখা range থেকে। সময় UTC।)
