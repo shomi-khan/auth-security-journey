@@ -555,9 +555,3 @@ CSRF-এ কোনো credential চুরি হয় না, তাই অধ
 - [Go vulnerability report GO-2025-3955](https://pkg.go.dev/vuln/GO-2025-3955): Go 1.25.0-এর `AddInsecureBypassPattern`-এর নির্দিষ্ট bypass issue; Go 1.25.1-এ সংশোধিত।
 - [OWASP: Clickjacking Defense Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html): CSRF-এর পাশের কিন্তু আলাদা framing/UI-redress threat.
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [ ] Technical Review
-- [ ] Security Review
-- [ ] Published
