@@ -17,6 +17,12 @@ Token-এর signature যাচাই সফল হওয়া মানে trust
 
 এই অধ্যায়ে KenaKata-র বর্তমান first-party mobile/API access-token model নিয়ে আলোচনা করছি। Refresh-token-এর ধারণা ও mobile client-এর lifecycle অধ্যায় ১৩–১৫-তে আসবে। OAuth authorization flow এবং তার protocol-specific নিয়ম অধ্যায় ১৭–২১-তে শেখানো হবে; সেগুলোকে KenaKata-র বর্তমান first-party login-এর implementation হিসেবে ধরে নিও না।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Token expiration ঝুঁকির সময়সীমা কমায়, কিন্তু replay-কে নিজে থেকে অসম্ভব করে না।
+- Access-token lifetime, refresh-token lifetime এবং session lifetime এক ঘড়ি নয়।
+- Revocation, audience/scope restriction ও sender-constraining কখন অতিরিক্ত কাজে লাগে.
+
 ## ১. Expiration কোন সমস্যার সমাধান করে?
 
 Access token হলো API-তে access চাওয়ার credential। Bearer token-এর ক্ষেত্রে যার কাছে token আছে, সে token উপস্থাপন করতে পারে। Server token-টি বৈধ বলে গ্রহণ করলে request-টি সংশ্লিষ্ট access পেতে পারে, তবে endpoint-এর authorization check-ও পাস করতে হবে।
