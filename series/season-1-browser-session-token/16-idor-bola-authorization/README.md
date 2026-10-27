@@ -13,6 +13,12 @@ status: draft
 
 পরে KenaKata এক দোকান থেকে বহু organization-কে সেবা দেওয়া SaaS-এ পরিণত হয়। এখন order নির্দিষ্ট organization-এরও অন্তর্ভুক্ত। User একটি organization-এর member হতে পারে, অন্যটির নয়। তাই authorization-এ আরও একটি প্রশ্ন যোগ হয়: এই resource কোন tenant-এর, আর এই user সেই tenant-এ কী করতে পারে?
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Valid login ও valid token থাকা সত্ত্বেও IDOR/BOLA কীভাবে ঘটে।
+- Function-level permission ও object-level permission কেন আলাদা check।
+- Multi-tenant system-এ subject, action, resource ও tenant boundary মিলিয়ে authorization test করতে হয়.
+
 ## ১. IDOR এবং BOLA কী?
 
 **IDOR (Insecure Direct Object Reference)** হলো এমন vulnerability, যেখানে client কোনো object-এর reference পাঠায়, কিন্তু server যাচাই করে না যে request করা user ওই object-এ access বা পরিবর্তনের অনুমতি রাখে কি না।
@@ -146,6 +152,26 @@ Positive test গুরুত্বপূর্ণ, কারণ সব request 
 5. List endpoint ও single-resource endpoint-এ একই authorization boundary বজায় রাখা কেন জরুরি?
 6. Query scoping কীভাবে সাহায্য করে, আর কেন এটি সব business permission-এর বিকল্প নয়?
 7. Negative test-এ cross-user, cross-organization ও role-based কোন কোন case রাখা উচিত?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Authentication বলে কে request করছে; object-level authorization যাচাই করে সেই user এই নির্দিষ্ট resource-এর ওপর এই action করতে পারে কি না। দ্বিতীয় check না থাকলে valid user অন্যের data দেখতে পারে।
+
+2. UUID অনুমান করা কঠিন হতে পারে, কিন্তু ID ফাঁস বা জানা থাকলে permission check ছাড়া তা কোনো সুরক্ষা দেয় না। Identifier হলো reference, authorization নয়।
+
+3. Function-level authorization endpoint বা কাজ ব্যবহারের অনুমতি দেখে; object-level authorization নির্দিষ্ট record/resource-এ access দেখে।
+
+4. না। Admin role-ও সাধারণত নির্দিষ্ট organization/tenant-এর boundary-র মধ্যে প্রযোজ্য। অন্য tenant-এর resource-এর জন্য আলাদা membership ও policy check দরকার।
+
+5. List endpoint-এ unauthorized resource বাদ পড়তে হবে, আর single-resource endpoint-এ একই boundary enforce করতে হবে। শুধু detail endpoint রক্ষা করলে list/search/export পথ দিয়ে data ফাঁস হতে পারে।
+
+6. Query scoping শুরুতেই অনুমোদিত tenant/resource-এর মধ্যে query সীমিত করে ঝুঁকি কমায়। কিন্তু action-specific business rule, ownership, sharing বা workflow permission আলাদাভাবে লাগতে পারে।
+
+7. নিজের user/resource-এর positive test-এর পাশাপাশি অন্য user-এর ID, অন্য tenant-এর ID, role mismatch, list/detail/export/update/delete এবং missing membership-এর negative test রাখো.
+
+</details>
 
 ## আরও পড়ো
 
