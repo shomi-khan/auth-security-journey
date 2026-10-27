@@ -13,6 +13,12 @@ status: draft
 
 **প্রশ্নটা তাই “cookie খারাপ, token ভালো” নয়। প্রশ্ন হলো: আলাদা client থেকে API-তে credential কীভাবে পাঠাব?**
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Password, session cookie ও access token-এর কাজ কীভাবে আলাদা।
+- Token গ্রহণযোগ্য কি না যাচাই করা এবং নির্দিষ্ট resource-এ permission যাচাই করা কেন আলাদা ধাপ।
+- Token হলো bearer credential: যার হাতে থাকে, সে ব্যবহার করতে পারে এমন ঝুঁকি কেন গুরুত্বপূর্ণ।
+
 ## ১. Password প্রতিটি request-এ পাঠাতে হবে?
 
 না। Password হলো login-এর সময় user-এর পরিচয় যাচাই করার credential। সেটি প্রতিটি product বা order request-এ পাঠানোর দরকার নেই।
@@ -140,6 +146,20 @@ flowchart TD
 3. Request-এ valid token থাকলেও server কখন operation reject করতে পারে?
 4. Access token যদি URL-এর query string-এ থাকে, কোথায় কোথায় সেটি ফাঁস হতে পারে?
 5. Token চুরি হলে attacker-এর ক্ষমতা কেন token-এর অনুমোদিত সীমা এবং server-side authorization-এর ওপরও নির্ভর করে?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Password login-এর সময় পরিচয় যাচাইয়ের জন্য; প্রতিটি request-এ পাঠালে exposure surface বাড়ে। Access token হলো পরের request-এর জন্য ব্যবহৃত sensitive credential, password-এর নিরাপদ বা ঝুঁকিমুক্ত বিকল্প নয়।
+
+2. Session cookie বা token credential বহন করতে পারে, কিন্তু session-এর state server-side-এ থাকতে পারে, আর token self-contained বা reference-based হতে পারে। নাম দেখে নয়, validation ও lifecycle দেখে পার্থক্য বুঝতে হবে।
+
+3. Token বৈধ হওয়া মানে শুধু credential-টি গ্রহণযোগ্য। নির্দিষ্ট order দেখা বা বদলানোর অনুমতি আলাদা authorization decision।
+
+4. Bearer token যার হাতে থাকে, সে token-টি ব্যবহার করার চেষ্টা করতে পারে। তাই storage, logging, transport, expiry ও revocation গুরুত্বপূর্ণ।
+
+</details>
 
 ## পরের অধ্যায়
 
