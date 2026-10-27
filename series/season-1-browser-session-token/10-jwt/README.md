@@ -13,6 +13,12 @@ status: draft
 
 এখানেই JWT নিয়ে সবচেয়ে বিপজ্জনক ভুল ধারণাগুলো শুরু হয়। JWT হলো token লেখার একটি format, নিজে থেকে নিরাপত্তার নিশ্চয়তা নয়।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- JWT-এর header, payload ও signature/MAC-এর ভূমিকা।
+- Signed JWT সাধারণত encrypted নয়, তাই payload-এ রাখা তথ্য গোপন ধরে নেওয়া যাবে না।
+- Signature যাচাইয়ের পাশাপাশি algorithm policy, issuer, audience, expiry ও token purpose কেন যাচাই করতে হয়।
+
 ## ১. Token আর JWT কি একই জিনিস?
 
 না। **Access token হলো token কী কাজে ব্যবহৃত হচ্ছে তার ধারণা; JWT হলো token-এর একটি format।** Access token JWT হতে পারে, আবার এমন opaque value-ও হতে পারে যার অর্থ client নিজে পড়ে বুঝতে পারে না। সব JWT-ও access token নয়। পরে OAuth/OIDC এলে একই format অন্য কাজেও দেখা যাবে।
@@ -144,6 +150,20 @@ Token B-কে বিশ্বাস করা যাবে না। Payload de
 ৩. JWT আর access token একই ধারণা নয় কেন?  
 ৪. Signed JWT-এর payload কি গোপন? গোপনীয়তা দরকার হলে কোন আলাদা বৈশিষ্ট্য প্রয়োজন হতে পারে?  
 ৫. Token-এ `role: Owner` লেখা থাকলে কেন API-র authorization decision বাদ দেওয়া যাবে না?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Header token-এর metadata, payload claims বহন করে, আর signature/MAC নির্দিষ্ট key ও algorithm-এর অধীনে integrity/authenticity যাচাইয়ে সাহায্য করে।
+
+2. Base64URL encoding হলো representation, encryption নয়। তাই payload সাধারণত পড়া যায়; secret বা অপ্রয়োজনীয় ব্যক্তিগত তথ্য সেখানে রাখা উচিত নয়।
+
+3. Signature ঠিক থাকলেও token ভুল issuer থেকে আসতে পারে, এই API-র জন্য নাও হতে পারে, expire হয়ে থাকতে পারে, বা ভুল purpose-এর token হতে পারে। তাই policy অনুযায়ী claims-ও যাচাই করতে হয়।
+
+4. Token-এর header-এ লেখা algorithm-কে server-এর policy বানানো যাবে না। Server আগে থেকে অনুমোদিত algorithm ও trusted key নির্ধারণ করবে।
+
+</details>
 
 ## আরও পড়ার জন্য
 
