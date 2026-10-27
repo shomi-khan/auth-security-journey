@@ -396,7 +396,7 @@ flowchart TD
 
 ### `__Host-` prefix: browser-কে দিয়ে শর্ত মানানো
 
-নামের শুরুতে `__Host-` থাকলে browser শুধু সেই cookie গ্রহণ করে যার `Secure` আছে, `Domain` নেই, আর `Path=/`। অর্থাৎ cookie শুধু ঠিক এই host-এর, সহোদর subdomain বা insecure পথ বদলাতে পারবে না। OWASP session ID-র জন্য এটা সুপারিশ করে। সীমা দুটো। এক, port আলাদা করা হয় না (RFC 10025 §8.5 অনুযায়ী একই host-এর সব port cookie ভাগ করে, আর draft বলে `__Host-` এই একটা ফাঁকই রেখে যায়)। দুই, যে browser prefix বোঝে না, সে cookie-টা তবু গ্রহণ করবে, কোনো শর্ত ছাড়াই (MDN-এর সতর্কতা)।
+নামের শুরুতে `__Host-` থাকলে browser শুধু সেই cookie গ্রহণ করে যার `Secure` আছে, `Domain` নেই, আর `Path=/`। অর্থাৎ compliant browser-এ cookie-টি নির্দিষ্ট host-এ সীমাবদ্ধ থাকে এবং sibling subdomain বা insecure-origin cookie injection-এর বেশ কিছু পথ বন্ধ হয়। OWASP session ID-র জন্য এটি সুপারিশ করে। তবে এটি device-এর সঙ্গে cookie-কে bind করে না, replay/transplant-ও আটকায় না; পুরোনো browser prefix-টি enforce নাও করতে পারে। আরও একটি সীমা হলো port isolation নেই: একই host-এর বিভিন্ন port cookie ভাগ করে (RFC 10025 §8.5), তাই `__Host-` এই ফাঁক বন্ধ করে না।
 
 লোকাল development-এ MDN বলে `localhost`-এ `Secure`-এর https শর্ত শিথিল হয়। তবে `__Host-` prefix সব browser-এ `localhost`-এ একই আচরণ করবে, এমন ধরে নিয়ো না, নিজে পরীক্ষা করো।
 
@@ -661,7 +661,6 @@ flowchart LR
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110): §১১.৬.১ (`WWW-Authenticate`) ও §১৫.৫.২ (`401 Unauthorized`) মূল RFC Editor-এর পাঠ থেকে পড়ে মেলানো হয়েছে। 401 response-এ challenge থাকা দরকার; cookie-session উদাহরণে এই বিষয়টি এখনো একটি নথিভুক্ত standards caveat, কারণ প্রচলিত cookie login-এর জন্য উপযুক্ত challenge scheme নির্বাচন করা হয়নি।
 - IANA HTTP Authentication Scheme Registry: initial registration-এর draft (draft-ietf-httpbis-authscheme-registrations) থেকে দেখা হয়েছে যে Basic, Bearer, Digest, Negotiate নথিভুক্ত। আজকের পুরো registry এখানে মেলানো হয়নি।
 - [Wikipedia: HTTP cookie](https://en.wikipedia.org/wiki/HTTP_cookie): শুধু ১৯৯৪-এর ইতিহাসের জন্য (Montulli, MCI, shopping cart)। এটা একটা secondary source, কোনো security দাবির ভিত্তি নয়।
-
 
 ## লেখার অবস্থা
 
