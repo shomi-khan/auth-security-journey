@@ -178,9 +178,9 @@ Diagram-টি failure handling-এর উচ্চস্তরের মডে�
 <details>
 <summary>উত্তর মিলিয়ে দেখো</summary>
 
-1. Access token resource API-তে পাঠিয়ে নির্দিষ্ট সময়ের জন্য access চাওয়া হয়। Refresh token token-issuing component-এর কাছে নতুন access token চাওয়ার জন্য; সেটিকে সাধারণ resource API-তে পাঠানো উচিত নয়।
+1. Access token-এর lifetime বাড়ালে বারবার refresh বা re-authentication কমতে পারে, কিন্তু token চুরি হলে তার অপব্যবহারের সময়ও বাড়তে পারে।
 
-2. Access token-এর lifetime বাড়ালে re-authentication কমে, কিন্তু token চুরি হলে অপব্যবহারের সময়ও বাড়তে পারে। Refresh flow usability ও সীমিত access-token lifetime-এর মধ্যে ভারসাম্য রাখে।
+2. Access token protected resource API-তে ব্যবহার হয়; refresh token token-issuing component-এর কাছে নতুন access token চাওয়ার জন্য। তাই refresh token সাধারণ resource API-তে পাঠানো উচিত।
 
 3. TLS transit-এ সুরক্ষা দেয়; device-এ token সংরক্ষণের সময়, backup, malware, logs বা compromised device থেকে তা নিজে রক্ষা করে না।
 
@@ -207,11 +207,3 @@ Diagram-টি failure handling-এর উচ্চস্তরের মডে�
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী KenaKata-র mobile app-এ refresh token আগে থেকেই আছে। এই অধ্যায় সেই first-party lifecycle-এর ধারণা শেখায়, OAuth flow নয়।
 
-## লেখার অবস্থা
-
-- [x] পূর্ণাঙ্গ Draft
-- [x] Technical Review (source-based conceptual review)
-- [x] Security Review (source-based threat-model review)
-- [ ] Published
-
-রিভিউয়ের সীমা: মূল security claim ও scope authoritative source-এর সঙ্গে মিলিয়ে দেখা হয়েছে। এটি production implementation audit নয়; কোনো application test suite চালানো হয়নি।
