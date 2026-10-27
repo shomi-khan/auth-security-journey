@@ -17,6 +17,12 @@ status: draft
 
 এই অধ্যায়ে KenaKata-র **first-party mobile app** নিয়ে কথা বলব। এখানে OAuth Authorization Code Flow শেখানো হচ্ছে না। OAuth standard-এর কিছু ধারণা তুলনা করার জন্য reference হিসেবে আসবে, KenaKata-র বর্তমান flow-কে OAuth flow বলার জন্য নয়।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Access token ও refresh token কেন আলাদা কাজ করে।
+- Refresh token-কে protected resource API-তে না পাঠানোর কারণ।
+- Device storage, TLS, expiry, revocation ও refresh failure-এর user experience কীভাবে একসঙ্গে ভাবতে হয়।
+
 ## ১. Access token আর refresh token-এর কাজ এক নয়
 
 Access token হলো protected resource-এ access চাওয়ার credential। KenaKata-র mobile app order API-তে order দেখতে চাইলে access token উপস্থাপন করে। API token গ্রহণযোগ্য কি না যাচাই করে, তারপর আলাদাভাবে দেখে user ওই order দেখার অনুমতি রাখে কি না।
@@ -167,6 +173,22 @@ Diagram-টি failure handling-এর উচ্চস্তরের মডে�
 3. TLS ব্যবহার করলেও device-এর storage-এ refresh token রক্ষা করার আলাদা ব্যবস্থা কেন দরকার?
 4. Network timeout হলে refresh token invalid বলে সঙ্গে সঙ্গে সিদ্ধান্ত নেওয়া ঠিক হবে কি?
 5. Refresh token revoke করলে আগে issue করা access token সব system-এ সঙ্গে সঙ্গে invalid হবে কি?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Access token resource API-তে পাঠিয়ে নির্দিষ্ট সময়ের জন্য access চাওয়া হয়। Refresh token token-issuing component-এর কাছে নতুন access token চাওয়ার জন্য; সেটিকে সাধারণ resource API-তে পাঠানো উচিত নয়।
+
+2. Access token-এর lifetime বাড়ালে re-authentication কমে, কিন্তু token চুরি হলে অপব্যবহারের সময়ও বাড়তে পারে। Refresh flow usability ও সীমিত access-token lifetime-এর মধ্যে ভারসাম্য রাখে।
+
+3. TLS transit-এ সুরক্ষা দেয়; device-এ token সংরক্ষণের সময়, backup, malware, logs বা compromised device থেকে তা নিজে রক্ষা করে না।
+
+4. না। Timeout মানে client response পায়নি, কিন্তু server operation সম্পন্ন করে থাকতে পারে। Retry policy ও token state না বুঝে পুরোনো token invalid বলে ধরে নিলে race তৈরি হতে পারে।
+
+5. না। Access token কীভাবে validate ও revoke হয়, সেটির policy আলাদা; refresh token revoke হলেই সব issued access token স্বয়ংক্রিয়ভাবে বন্ধ হয় না.
+
+</details>
 
 ## আরও পড়ো
 
