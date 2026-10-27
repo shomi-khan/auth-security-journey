@@ -15,6 +15,12 @@ status: draft
 
 এই অধ্যায় KenaKata-র first-party mobile flow নিয়ে। OAuth standard-এর কিছু ধারণা তুলনার জন্য ব্যবহার করা হবে, কিন্তু KenaKata-র flow-কে OAuth token revocation protocol হিসেবে উপস্থাপন করা হবে না।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Client-side logout, server-side revocation ও expiry আলাদা ঘটনা।
+- Refresh token revoke করলেই আগে issue করা access token সব architecture-এ সঙ্গে সঙ্গে বন্ধ হয় না।
+- Single-device logout, all-device logout ও account-compromise recovery-র scope কীভাবে আলাদা করতে হয়।
+
 ## ১. Logout করলে আসলে কী শেষ হয়?
 
 Logout-এ অন্তত তিনটি আলাদা স্তর থাকতে পারে:
@@ -137,6 +143,26 @@ User notification-ও বাস্তব ফলাফলের সঙ্গে �
 5. একটি device logout আর সব device logout-এর মধ্যে কী পার্থক্য?
 6. Network failure হলে app কীভাবে user-কে logout-এর ফল সম্পর্কে সত্য তথ্য দিতে পারে?
 7. Account compromise-এর সময় password reset-এর বাইরে আর কী কী credential/session বিবেচনা করা দরকার?
+
+
+<details>
+<summary>উত্তর মিলিয়ে দেখো</summary>
+
+1. Client-side logout device-এর local credential/UI state পরিষ্কার করে। Server-side revocation server-কে নির্দিষ্ট session বা credential আর গ্রহণ না করতে বলে। একটির সফলতা অন্যটির প্রমাণ নয়।
+
+2. Refresh token ভবিষ্যতে নতুন access token নেওয়ার পথ বন্ধ করতে পারে, কিন্তু আগে issue করা access token expiry পর্যন্ত গৃহীত হতে পারে যদি resource API revocation state না দেখে।
+
+3. Architecture অনুযায়ী denylist, introspection/reference token, session version, short lifetime বা অন্য server-side validation mechanism দরকার হতে পারে। কোনটি উপযুক্ত তা latency ও security requirement-এর ওপর নির্ভর করে।
+
+4. Cache latency কমায়, কিন্তু stale revocation state পুরোনো token-কে কিছু সময় গ্রহণযোগ্য রাখতে পারে। Cache TTL ও invalidation policy তাই security decision-এর অংশ।
+
+5. Single-device logout নির্দিষ্ট session/credential scope বন্ধ করে; all-device logout-এর জন্য account-এর সঙ্গে যুক্ত সব প্রাসঙ্গিক session/credential শনাক্ত ও revoke করার ব্যবস্থা দরকার।
+
+6. Network failure হলে app local credential মুছে দিতে পারে, কিন্তু server-side revocation নিশ্চিত না হলে সেটি নিশ্চিত হয়েছে বলে বলা যাবে না। UI-তে এই পার্থক্য সত্যভাবে জানাতে হবে।
+
+7. Password reset-এর পাশাপাশি active sessions, refresh-token families, recovery channels, API keys বা অন্য persistent credential-ও threat model অনুযায়ী বিবেচনা করতে হবে.
+
+</details>
 
 ## আরও পড়ো
 
