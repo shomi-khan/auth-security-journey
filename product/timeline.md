@@ -115,7 +115,7 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 
 
 
-## Chapter plan status (২০২৬-১০-২৫)
+## Chapter plan status (২০২৬-১০-২৭)
 
 অধ্যায় ১–৬-এর content এই পরিবর্তনে rewrite করা হয়নি। CORS-এর নতুন অধ্যায় ৭ যোগ হওয়ায় পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়েছে। পুরোনো অধ্যায় ১১-এর draft এখন অধ্যায় ১২; অধ্যায় ১৩–২৬-এর README-তে পূর্ণাঙ্গ content লেখার আগে ব্যবহারযোগ্য brief থাকবে।
 
