@@ -16,15 +16,13 @@
 
 ### বর্তমান অগ্রগতি
 
-| অংশ | অবস্থা |
-| --- | --- |
-| অধ্যায় ১–১৬ | পূর্ণাঙ্গ draft আছে; cross-chapter consistency ও clarity review চলছে |
-| অধ্যায় ৭: CORS | Technical ও security review সম্পন্ন |
-| অধ্যায় ৯–১৬ | Draft article আছে; chapter-এ থাকা review notes ও scope আলাদাভাবে দেখো |
-| অধ্যায় ১৩–১৬ | পূর্ণাঙ্গ draft আছে; Published নয় |
-| অধ্যায় ১৭–২৬ | Chapter plan/brief পর্যায়ে; পূর্ণাঙ্গ article নয় |
+| Season | অধ্যায় | অবস্থা |
+| --- | --- | --- |
+| Season 1: Browser, Session এবং Token | ১–১৬ | Draft |
+| Season 2: OAuth, OIDC এবং Delegated Identity | ১৭–২২ | Planned |
+| Season 3: Production Security | ২৩–২৬ | Planned |
 
-**Status-এর অর্থ:** কোনো অধ্যায়ের draft বা brief থাকা মানেই সেটি published নয়। Review সম্পন্ন হওয়াও publication status-এর সমান নয়।
+**Status-এর অর্থ:** Draft মানে অধ্যায়ের লেখা আছে, কিন্তু প্রকাশের জন্য প্রস্তুত বলে ঘোষণা করা হয়নি। Planned মানে পূর্ণাঙ্গ chapter এখনো লেখা হয়নি।
 
 ## কার জন্য?
 
@@ -64,9 +62,9 @@ Trade-off ও সীমাবদ্ধতা
 | 4 | [Session এবং Cookie](series/season-1-browser-session-token/04-session-and-cookie/README.md) | Draft |
 | 5 | [Session Hijacking এবং Session Fixation](series/season-1-browser-session-token/05-session-hijacking-fixation/README.md) | Draft |
 | 6 | [CSRF](series/season-1-browser-session-token/06-csrf/README.md) | Draft |
-| 7 | [CORS: Browser কোন Response পড়তে পারবে?](series/season-1-browser-session-token/07-cors/README.md) | Technical ও security review সম্পন্ন |
+| 7 | [CORS: Browser কোন Response পড়তে পারবে?](series/season-1-browser-session-token/07-cors/README.md) | Draft |
 | 8 | [XSS এবং HttpOnly-এর সীমাবদ্ধতা](series/season-1-browser-session-token/08-xss-and-httponly/README.md) | Draft |
-| 9 | [Token কেন দরকার?](series/season-1-browser-session-token/09-tokens/README.md) | Draft; review notes আছে |
+| 9 | [Token কেন দরকার?](series/season-1-browser-session-token/09-tokens/README.md) | Draft |
 | 10 | [JWT আসলে কী?](series/season-1-browser-session-token/10-jwt/README.md) | Draft |
 | 11 | [SPA-তে Token কোথায় রাখব?](series/season-1-browser-session-token/11-spa-token-storage/README.md) | Draft |
 | 12 | [Token Expiration এবং Replay Window](series/season-1-browser-session-token/12-token-expiration-replay/README.md) | Draft |
@@ -100,23 +98,20 @@ Trade-off ও সীমাবদ্ধতা
 | জায়গা | কী আছে |
 | --- | --- |
 | [`product/`](product/README.md) | KenaKata-র canonical product details, characters, timeline ও architecture |
-| [`references/`](references/README.md) | RFC, specification এবং security reference-এর তালিকা |
-| [`notes/glossary.md`](notes/glossary.md) | Security terminology-র glossary |
-| [`notes/misconceptions.md`](notes/misconceptions.md) | সিরিজে যাচাই ও ভাঙার জন্য রাখা প্রচলিত ভুল ধারণা |
-| [`notes/decision-log.md`](notes/decision-log.md) | গুরুত্বপূর্ণ editorial ও product সিদ্ধান্ত |
-| [`notes/editorial-review-chapters-01-16.md`](notes/editorial-review-chapters-01-16.md) | অধ্যায় ১–১৬-এর cross-chapter consistency review ও তার সীমা |
-| [`notes/reader-first-editorial-guide.md`](notes/reader-first-editorial-guide.md) | প্রাঞ্জল লেখা, diagram, learning goal ও concept-check-এর editorial standard |
+| [`references/`](references/README.md) | RFC, specification এবং security reference |
+| [`notes/glossary.md`](notes/glossary.md) | Security terminology-র সংক্ষিপ্ত glossary |
+| [`notes/misconceptions.md`](notes/misconceptions.md) | সিরিজে ভেঙে দেখা প্রচলিত ভুল ধারণা |
 | [`docs/code-example-policy.md`](docs/code-example-policy.md) | Code ও diagram ব্যবহারের নীতি |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | অধ্যায় লেখার ও review করার workflow |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Chapter লেখার সংক্ষিপ্ত নির্দেশনা |
 
-KenaKata-র গল্পে কোনো feature কখন যুক্ত হয়েছে, তা যাচাই করতে [product timeline](product/timeline.md) দেখো। সিরিজের শেষ architecture-কে প্রথম অধ্যায় থেকেই চালু ধরে নেওয়া যাবে না।
+KenaKata-র কোনো feature কখন যুক্ত হয়েছে, তা যাচাই করতে [product timeline](product/timeline.md) দেখো। শেষ architecture-কে প্রথম অধ্যায় থেকেই চালু ধরে নেওয়া যাবে না।
 
-## লেখার ও review-এর নীতি
+## লেখার নীতি
 
-- Security-সংক্রান্ত গুরুত্বপূর্ণ দাবির ক্ষেত্রে সংশ্লিষ্ট বর্তমান RFC, specification বা authoritative guidance যাচাই করতে হবে।
-- Browser behavior বা configuration-এর উদাহরণকে বাস্তবে পরীক্ষা না করে test result হিসেবে উপস্থাপন করা যাবে না।
-- Trade-off ও control-এর সীমাবদ্ধতা ব্যাখ্যা করতে হবে; কোনো technology-কে নিজে থেকেই নিরাপদ ধরে নেওয়া যাবে না।
-- নতুন অধ্যায় লেখার আগে KenaKata-র canonical documents এবং [contribution guide](CONTRIBUTING.md) পড়তে হবে।
+- Security-সংক্রান্ত গুরুত্বপূর্ণ দাবির ক্ষেত্রে বর্তমান RFC, specification বা authoritative guidance যাচাই করো।
+- Browser behavior বা configuration বাস্তবে পরীক্ষা না করলে test result হিসেবে উপস্থাপন কোরো না।
+- প্রতিটি control-এর সীমাবদ্ধতা ও trade-off ব্যাখ্যা করো; কোনো technology-কে নিজে থেকেই নিরাপদ ধরে নিও না।
+- নতুন chapter লেখার আগে KenaKata-র canonical documents এবং [contribution guide](CONTRIBUTING.md) পড়ো।
 
 ## License
 
