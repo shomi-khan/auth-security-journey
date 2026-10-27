@@ -551,7 +551,7 @@ flowchart LR
 - **server বা store-এ ঢোকা আক্রমণকারী।** আসল ID request চলার সময় memory-তে আছে, আর store-এ লিখতে পারলে নিজের session বানাতে পারে।
 - **idle আর absolute আলাদা timeout, session-এর মধ্যে সুরক্ষা বাড়ানো।** অধ্যায় ৫।
 - **logout-এর পুরো মানে।** আজ শুধু বাতিলের হাতল। পুরো প্রশ্ন অধ্যায় ১৫।
-- **browser নয় এমন client।** অধ্যায় ৮।
+- **browser নয় এমন client।** অধ্যায় ৯।
 
 ---
 
