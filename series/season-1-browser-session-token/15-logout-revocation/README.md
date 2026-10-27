@@ -181,11 +181,3 @@ OAuth standards-এ থাকা protocol-specific নিয়মকে KenaKata-�
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী mobile app-এ access token ও refresh token আগে থেকেই আছে। এই অধ্যায় first-party mobile flow-তে logout, revocation ও recovery-র ধারণা ব্যাখ্যা করে, OAuth token revocation endpoint-এর tutorial নয়।
 
-## লেখার অবস্থা
-
-- [x] পূর্ণাঙ্গ Draft
-- [x] Technical Review (source-based conceptual review)
-- [x] Security Review (source-based threat-model review)
-- [ ] Published
-
-রিভিউয়ের সীমা: RFC 7009, RFC 7662, RFC 7519 এবং OWASP session guidance-এর সঙ্গে মূল ধারণা ও security claim মিলিয়ে দেখা হয়েছে। এটি production implementation audit নয়; কোনো application test suite চালানো হয়নি।
