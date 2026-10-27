@@ -87,13 +87,13 @@ flowchart TD
     S1 --> D1["২৫৬ bit random (অধ্যায় ৪)"]
     S2 --> D2["HTTPS, Secure, HSTS"]
     S3 --> D3["store-এ hash, log-এ raw ID নয়"]
-    S4 --> D4["HttpOnly আংশিক, বাকিটা অধ্যায় ৭"]
+    S4 --> D4["HttpOnly আংশিক, বাকিটা অধ্যায় ৮"]
     S5 --> D5["server ঠেকাতে পারে না"]
     D4 --> R["তাই: মেয়াদ, detection, revoke, ক্ষমতা সীমিত"]
     D5 --> R
 ```
 
-প্রথম তিনটা পথের জন্য আমরা অধ্যায় ৪-এ বাধা বানিয়েছি। চতুর্থটা আংশিক: `HttpOnly` script-কে cookie **পড়তে** দেয় না, কিন্তু সেই script-ই browser দিয়ে request পাঠাতে পারে। সেটা অধ্যায় ৭। পঞ্চমটা, device থেকে চুরি, server-এর হাতের বাইরে। শেষ ধাপে দুটো পথই একই জায়গায় এসে ঠেকে: ঠেকাতে না পারলে ক্ষতি ছোট করো।
+প্রথম তিনটা পথের জন্য আমরা অধ্যায় ৪-এ বাধা বানিয়েছি। চতুর্থটা আংশিক: `HttpOnly` script-কে cookie **পড়তে** দেয় না, কিন্তু সেই script-ই browser দিয়ে request পাঠাতে পারে। সেটা অধ্যায় ৮। পঞ্চমটা, device থেকে চুরি, server-এর হাতের বাইরে। শেষ ধাপে দুটো পথই একই জায়গায় এসে ঠেকে: ঠেকাতে না পারলে ক্ষতি ছোট করো।
 
 প্রতিটা পথের হিসাব একটু বিস্তারিত:
 
@@ -105,7 +105,7 @@ flowchart TD
 | Log বা trace ফাঁস | log-এ ID-র hash, raw নয় | অন্য কোনো পথে পাওয়া ID |
 | Store-এর dump | store-এ hash (অধ্যায় ৪) | store-এ লেখার ক্ষমতা |
 | ভাইবোন subdomain বা HTTP পথে বসানো/বদলানো cookie | `__Host-` prefix (অধ্যায় ৪) | একই browser-এ বসা কেউ |
-| পাতার script | `HttpOnly` পড়া আটকায় | script-এর পাঠানো request (অধ্যায় ৭) |
+| পাতার script | `HttpOnly` পড়া আটকায় | script-এর পাঠানো request (অধ্যায় ৮) |
 | Device-এ malware, shared কম্পিউটার | **কিছুই না** (server-এর দিক থেকে) | |
 
 শেষ সারির দিকে তাকাও। Cookie jar browser-এর ভেতরের জিনিস। বর্তমান cookie standard RFC 10025-এর Security Considerations স্পষ্ট করে: cookie-র content sign বা encrypt করলেও cookie-কে অন্য user agent-এ transplant করা বা পরে replay করা আটকায় না। সার্ভারে এমন কোনো control নেই, যা client-এর মেশিনে বসা সব আক্রমণকারীকে নিজে থেকে থামাতে পারে।
@@ -123,7 +123,7 @@ Infostealer malware-এর মতো আক্রমণ browser-এর session d
 1. **জানালা ছোট করো:** মেয়াদ। (§৫)
 2. **বন্ধ করার উপায় রাখো:** revocation। (§৬)
 3. **চোখ রাখো:** detection। (§৭)
-4. **ক্ষমতা সীমিত রাখো:** least privilege (অধ্যায় ২, যা আজ কাজে লেগেছে), আর সংবেদনশীল কাজে আরেক ধাপ (অধ্যায় ২২)।
+4. **ক্ষমতা সীমিত রাখো:** least privilege (অধ্যায় ২, যা আজ কাজে লেগেছে), আর সংবেদনশীল কাজে আরেক ধাপ (অধ্যায় ২৩)।
 
 আজ রাতে আরিফের প্রথম কাজ ছিল সবচেয়ে সোজাটা: শুভর user account-এর সঙ্গে যুক্ত সব session বাতিল করা। তারপর শুভকে নতুন passphrase নিতে বলা হলো। Device compromise-এর সন্দেহ থাকলে একই malware বা অন্য malicious software keystroke-ও পড়ে থাকতে পারে। Cookie চুরি হয়েছে মানেই password-ও চুরি হয়েছে, এমন প্রমাণ নেই; তবে incident response-এ device compromise-এর সম্ভাবনা থাকলে password বদলানো যুক্তিসঙ্গত সতর্কতা। (অধ্যায় ৩-এর সেই ক্রম: আগে পুরোনো secret অকার্যকর, তারপর নতুন।) তারপর সে অন্য সব user-এর log খুঁজে দেখল, কোনো session-এর ID দুটো আলাদা network থেকে এসেছে কি না। আর কোনোটা পাওয়া গেল না, কিন্তু "পাওয়া গেল না" মানে "ঘটেনি" নয়। সে শুধু সেই নিঃশব্দ ধরনের আক্রমণগুলোর কথা ভাবল, যেগুলোর কোনো log-ই হয় না।
 
@@ -153,7 +153,7 @@ OWASP আরেকটা বিকল্পও বলে, **renewal timeout**: �
 | NIST SP 800-63B-4, AAL2 | ১ ঘণ্টার বেশি নয় (SHOULD) | ২৪ ঘণ্টার বেশি নয় (SHOULD) |
 | NIST, AAL3 | ১৫ মিনিটের বেশি নয় (SHOULD) | ১২ ঘণ্টার বেশি নয় (SHALL) |
 
-NIST-এর overall reauthentication timeout-কে application-এর absolute timeout-এর সঙ্গে পুরোপুরি এক করে দেখা যাবে না: সফল reauthentication NIST-এর overall clock-ও reset করতে পারে। KenaKata AAL ধরে চলে না, তবু সংখ্যাগুলো দিক দেখায়। আরিফ ভেবেছিল এভাবে: দোকানের কর্মী সারাদিন অ্যাপ ব্যবহার করে, তাই absolute ৮ ঘণ্টা থাকুক। কিন্তু অ্যাপে ক্রেতাদের নাম-ঠিকানা আছে, আর দোকানের কম্পিউটার shared। তাই idle নিচের দিকে, **৩০ মিনিট**। (এটা এই দৃশ্যের পছন্দ, চিরন্তন সংখ্যা নয়।) আরও কড়া করার বদলে সংবেদনশীল কাজে আলাদা ধাপ চাওয়া ভালো, সেটা অধ্যায় ২২।
+NIST-এর overall reauthentication timeout-কে application-এর absolute timeout-এর সঙ্গে পুরোপুরি এক করে দেখা যাবে না: সফল reauthentication NIST-এর overall clock-ও reset করতে পারে। KenaKata AAL ধরে চলে না, তবু সংখ্যাগুলো দিক দেখায়। আরিফ ভেবেছিল এভাবে: দোকানের কর্মী সারাদিন অ্যাপ ব্যবহার করে, তাই absolute ৮ ঘণ্টা থাকুক। কিন্তু অ্যাপে ক্রেতাদের নাম-ঠিকানা আছে, আর দোকানের কম্পিউটার shared। তাই idle নিচের দিকে, **৩০ মিনিট**। (এটা এই দৃশ্যের পছন্দ, চিরন্তন সংখ্যা নয়।) আরও কড়া করার বদলে সংবেদনশীল কাজে আলাদা ধাপ চাওয়া ভালো, সেটা অধ্যায় ২৩।
 
 Diagram-এ KenaKata-র তিনটি server-side ঘড়ি আলাদা রাখা হয়েছে:
 
@@ -289,7 +289,7 @@ A-তে false positive-এর কারণে বৈধ user বারবার
 
 এখানে সেই পুরোনো পাঠ ফিরে আসে, যেটা §১-এর প্রথম টেবিলেই ছিল: **সংকেত আর প্রমাণ আলাদা।** খুব সংবেদনশীল alarm বারবার ভুল বাজালে মানুষ alarm-ই উপেক্ষা করতে শেখে (cry wolf)। খুব ঢিলা alarm কিছুই ধরে না। কোন দিকে ঝুঁকবে, সেটা ব্যবসার সিদ্ধান্ত।
 
-তাই আরিফ এই সংকেতকে তালা বানায়নি, কেবল **risk-based switch**। KenaKata-র নির্বাচিত policy-তে এই নির্দিষ্ট context mismatch হলে session revoke করে পুনরায় login চাওয়া হয়, কারণ কর্মীরা সাধারণত দোকানের Wi-Fi ব্যবহার করে এবং আবার login করার খরচ তুলনামূলক কম। এটি সর্বজনীন নিয়ম নয়: বড় user-সংখ্যার, মোবাইল-নির্ভর অ্যাপে একই নীতি false positive বাড়াতে পারে। OWASP-র Cookie Theft পাতার পরামর্শ: সন্দেহ হলে সবচেয়ে নির্ভরযোগ্য উপায় আবার authenticate করানো, আর সংবেদনশীল endpoint-এ কড়া নজর রাখা। CAPTCHA এখানে যথেষ্ট নয়, কারণ সেটা প্রমাণ করে না যে অনুরোধকারী আসল user। সেই ধাপ (সংবেদনশীল কাজে আবার প্রমাণ) অধ্যায় ২২-এর বিষয়।
+তাই আরিফ এই সংকেতকে তালা বানায়নি, কেবল **risk-based switch**। KenaKata-র নির্বাচিত policy-তে এই নির্দিষ্ট context mismatch হলে session revoke করে পুনরায় login চাওয়া হয়, কারণ কর্মীরা সাধারণত দোকানের Wi-Fi ব্যবহার করে এবং আবার login করার খরচ তুলনামূলক কম। এটি সর্বজনীন নিয়ম নয়: বড় user-সংখ্যার, মোবাইল-নির্ভর অ্যাপে একই নীতি false positive বাড়াতে পারে। OWASP-র Cookie Theft পাতার পরামর্শ: সন্দেহ হলে সবচেয়ে নির্ভরযোগ্য উপায় আবার authenticate করানো, আর সংবেদনশীল endpoint-এ কড়া নজর রাখা। CAPTCHA এখানে যথেষ্ট নয়, কারণ সেটা প্রমাণ করে না যে অনুরোধকারী আসল user। সেই ধাপ (সংবেদনশীল কাজে আবার প্রমাণ) অধ্যায় ২৩-এর বিষয়।
 
 দুটো ছোট সতর্কতা:
 
@@ -359,7 +359,7 @@ sequenceDiagram
 | ভাইবোন subdomain থেকে `Set-Cookie` | `__Host-` prefix, `Domain` নেই | না |
 | নেটওয়ার্কের মাঝখান থেকে HTTP পথে cookie বসানো | `Secure`, `__Host-`, HSTS | না |
 | আক্রমণকারী নিজের বানানো ID পাঠাল | server অচেনা ID নেয় না (strict mode, পরীক্ষা নিচে) | না |
-| পাতায় চলা script বা HTTP response-এ header ঢোকানো | (XSS আর response splitting-এর প্রতিরোধ, অধ্যায় ৭) | যদি অন্য ফাঁক থাকে |
+| পাতায় চলা script বা HTTP response-এ header ঢোকানো | (XSS-এর প্রতিরোধ অধ্যায় ৮-এ; response splitting আলাদা vulnerability) | যদি অন্য ফাঁক থাকে |
 | **একই browser-এ আগে-পরে বসা** (shared কম্পিউটার) | **কিছুই না** | **হ্যাঁ** |
 
 শেষ সারিটা আরিফের মাথা ঠান্ডা করে দিল। অধ্যায় ১-এ বলা সেই shared কম্পিউটার, যেখানে browser খোলা থাকে সারাদিন। (OWASP-র "initial login timeout" অংশ ঠিক এই পরিস্থিতি বর্ণনা করে: আগে ব্যবহৃত বা হাতে বসানো একটা session ID পরের user-এর হাতে পড়ে।) কেউ মিনিটখানেক ওই কম্পিউটারে বসে `/login` খুলল, Developer Tools-এর Application ট্যাব থেকে `__Host-id`-এর মানটা টুকে নিল (`HttpOnly` কাউকে তার **নিজের** browser-এর ভেতর দেখা থেকে আটকায় না), login পাতা খোলা রেখে উঠে গেল। কিছু ভাঙেনি, কোনো log-এ অস্বাভাবিক কিছু নেই, password লাগেনি।
@@ -444,7 +444,7 @@ sequenceDiagram
 
 **তিন: absolute ঘড়ি login থেকে।** Absolute timeout login সফল হওয়ার সময় থেকে গণনা শুরু হবে. যদি anonymous session-এর শুরু থেকেই absolute clock গণনা করা হয়, আক্রমণকারী আগে session বানিয়ে রেখে victim-এর authenticated session-এর কার্যকর সময় কমিয়ে দিতে পারে.
 
-**চার: "login" একটাই ঘটনা নয়।** OWASP বলে, authentication-এর মুহূর্ত সবচেয়ে সাধারণ, কিন্তু যেকোনো privilege বদলের সময় ID নতুন করতে হবে: password বদল, ক্ষমতা বদল, সাধারণ user থেকে admin। KenaKata-য় password বদল, ভবিষ্যতের Google login (অধ্যায় ২১) এবং MFA completion (অধ্যায় ২২)-এর মতো প্রতিটি authentication বা privilege-change flow-তে ID rotation দরকার. যেকোনো নতুন পথ যোগ করার সময় প্রশ্ন একটাই: **এখানে কি ID বদলাচ্ছে?**
+**চার: "login" একটাই ঘটনা নয়।** OWASP বলে, authentication-এর মুহূর্ত সবচেয়ে সাধারণ, কিন্তু যেকোনো privilege বদলের সময় ID নতুন করতে হবে: password বদল, ক্ষমতা বদল, সাধারণ user থেকে admin। KenaKata-য় password বদল, ভবিষ্যতের Google login (অধ্যায় ২২) এবং MFA completion (অধ্যায় ২৩)-এর মতো প্রতিটি authentication বা privilege-change flow-তে ID rotation দরকার. যেকোনো নতুন পথ যোগ করার সময় প্রশ্ন একটাই: **এখানে কি ID বদলাচ্ছে?**
 
 OWASP একটা সম্পূরক বুদ্ধিও দেয়: login-এর আগে আর পরে আলাদা নামের cookie ব্যবহার করা, যাতে anonymous আর authenticated অবস্থা কখনো গুলিয়ে না যায়। আলাদা cookie name না নিলে প্রতিটি protected request-এ server-কে যাচাই করতে হবে যে session authenticated; anonymous session-কে authenticated হিসেবে গ্রহণ করা যাবে না.
 
@@ -527,9 +527,9 @@ stateDiagram-v2
 - **চলমান আক্রান্ত device।** Rotate, timeout, DBSC, কোনোটাই সেই আক্রমণকারীকে থামায় না, যে এখনো victim-এর মেশিনেই বসা।
 - **Fixation-এর সব রাস্তা বন্ধ নয়।** নতুন কোনো login বা privilege-change path যোগ করলে সেখানে ID rotation ও পুরোনো ID invalidation আছে কি না আলাদাভাবে যাচাই করতে হবে.
 - **CSRF।** Session ID চুরি আর fixation, দুটোতেই আক্রমণকারী ID **জানে**। কিন্তু একটা তৃতীয় আক্রমণে সে ID জানে না, তবু victim-এর browser দিয়ে request করিয়ে নেয়। অধ্যায় ৬।
-- **XSS।** পাতায় চলা script session ID পড়তে না পারলেও (`HttpOnly`) request করাতে পারে। অধ্যায় ৭।
+- **XSS।** পাতায় চলা script session ID পড়তে না পারলেও (`HttpOnly`) request করাতে পারে। অধ্যায় ৮।
 - **Authorization।** শুভর session দিয়ে আক্রমণকারী যা করল, সেটা শুভর ক্ষমতার ভেতরেই। সেই ক্ষমতা কতটা, সেটা অধ্যায় ২ আর ১৫।
-- **Cookie-র বাইরের client।** Mobile app এলে session-cookie-র এই পুরো গল্প একটু আলাদা হবে। অধ্যায় ৮।
+- **Cookie-র বাইরের client।** Mobile app এলে session-cookie-র এই পুরো গল্প একটু আলাদা হবে। অধ্যায় ৯।
 - **ক্রেতার ফোন-কল।** আমরা জানি না, সেটা এই ঘটনার ফল ছিল কি না।
 
 ---
@@ -550,7 +550,7 @@ stateDiagram-v2
 
 **"User-Agent আর IP বাঁধলে hijacking শেষ।"** OWASP-র মতেই এগুলো শনাক্তের সুবিধা, প্রতিরক্ষা নয়। নকল করা যায়, ভাগ করা যায়।
 
-**"MFA থাকলে cookie চুরি অর্থহীন।"** MFA login-এর সময় কাজ করে। Session চালু হয়ে গেলে ID-ই সেই credential। (MFA-র আসল কাজ অধ্যায় ২২-এ।)
+**"MFA থাকলে cookie চুরি অর্থহীন।"** MFA login-এর সময় কাজ করে। Session চালু হয়ে গেলে ID-ই সেই credential। (MFA-র আসল কাজ অধ্যায় ২৩-এ।)
 
 **"DBSC এলে cookie চুরি শেষ।"** OWASP-র ভাষায় এটা নবায়নে সীমাবদ্ধ, আর চলমান আক্রান্ত device-এ নয়। আর সব browser-এ নেই।
 
@@ -568,11 +568,11 @@ stateDiagram-v2
 | কে ব্যবহার করে? | Browser পাঠায়, server খোঁজে আর মেয়াদ প্রয়োগ করে |
 | কীভাবে abuse হয়? | Hijacking: চুরি। Fixation: login-এর আগে বসানো। শেষ ভরসা: পরিচয়ের বদলে ID-র ওপর আস্থা |
 | চুরি হলে ক্ষতি? | ওই user-এর ক্ষমতা, মেয়াদ বা বাতিল পর্যন্ত (অধ্যায় ২)। শুভর ঘটনায়: অর্ডার-তালিকা দেখা, refund `403` |
-| মেয়াদ কত? | Anonymous ৩০ মিনিট, idle ৩০ মিনিট, absolute ৮ ঘণ্টা (এই দৃশ্যের পছন্দ)। OWASP: idle ২–৩০ মিনিট, absolute অ্যাপ অনুযায়ী। NIST AAL2: ২৪ ঘণ্টা আর ১ ঘণ্টা |
+| মেয়াদ কত? | Anonymous ৩০ মিনিট, idle ৩০ মিনিট, absolute ৮ ঘণ্টা (এই দৃশ্যের পছন্দ)। OWASP: idle ২–৩০ মিনিট, absolute অ্যাপ অনুযায়ী। NIST AAL2: idle ১ ঘণ্টা, overall ২৪ ঘণ্টা |
 | বাতিল হয় কীভাবে? | Row মুছে: logout, সব device, password বদলে বাকি সব, ছাড়ানো, সন্দেহ, মেয়াদ |
-| বিকল্প? | Renewal timeout (§৫), pre/post-login আলাদা cookie, DBSC (§৮), সই-করা cookie (অধ্যায় ৪-এর ব্যর্থতা), token (অধ্যায় ৮) |
+| বিকল্প? | Renewal timeout (§৫), pre/post-login আলাদা cookie, DBSC (§৮), সই-করা cookie (অধ্যায় ৪-এর ব্যর্থতা), token (অধ্যায় ৯) |
 | কখন লাগে? | Cookie-ভিত্তিক session থাকলে, মানে সবসময় এই অধ্যায়ের নিয়ম |
-| কখন লাগে না? | Session-ই নেই এমন নকশায় (যেমন সম্পূর্ণ stateless token), যেখানে এই প্রশ্নগুলো অন্য চেহারায় ফেরে (অধ্যায় ৮ থেকে) |
+| কখন লাগে না? | Session-ই নেই এমন নকশায় (যেমন সম্পূর্ণ stateless token), যেখানে এই প্রশ্নগুলো অন্য চেহারায় ফেরে (অধ্যায় ৯ থেকে) |
 | Production trade-off? | ঘর্ষণ, write-per-read, false positive, privacy, anonymous session-এর পৃষ্ঠ (§১৩) |
 
 ---
