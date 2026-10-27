@@ -327,9 +327,3 @@ Input validation business rule যাচাই করে। নিরাপদ o
 - [MDN: HTTP cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies): HttpOnly, Secure ও SameSite cookie attribute-এর ভূমিকা।
 - [MDN: Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP): CSP delivery, nonce/hash, strict CSP এবং policy deployment।
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (source-based conceptual review; implementation audit নয়)
-- [x] Security Review (threat model, control boundaries ও failure paths পর্যালোচিত; production certification নয়)
-- [ ] Published

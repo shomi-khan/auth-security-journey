@@ -237,13 +237,15 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 <details>
 <summary>উত্তর মিলিয়ে দেখো</summary>
 
-1. `localStorage` দীর্ঘ সময় browser-এ থাকে এবং JavaScript পড়তে পারে; `sessionStorage` tab/session-সংশ্লিষ্ট; memory refresh/reload-এ হারাতে পারে; HttpOnly cookie JavaScript থেকে value আড়াল করে; BFF token browser থেকে server-side-এ সরিয়ে রাখে। প্রতিটির বাস্তব সীমা আছে।
+1. `sessionStorage` একই origin-এর JavaScript থেকে পড়া যায়। তাই XSS হলে attacker token চুরি বা চলমান page-এর ক্ষমতা ব্যবহার করতে পারে; tab/session scope একে XSS-safe করে না।
 
-2. JavaScript-readable storage-এ token থাকলে XSS token value চুরি করতে পারে। Cookie browser নিজে request-এ যোগ করলে CSRF threat আলাদাভাবে বিবেচনা করতে হয়।
+2. `HttpOnly` cookie value সরাসরি JavaScript থেকে আড়াল করে, কিন্তু XSS script page-এর accessible data পড়তে, authenticated request পাঠাতে বা user-এর browser দিয়ে action নিতে পারে।
 
-3. কোনো storage একা XSS ও CSRF দুটোই সমাধান করে না। Architecture, browser behavior, token scope/lifetime এবং server-side controls একসঙ্গে বিচার করতে হয়।
+3. JavaScript যখন `Authorization` header-এ token যোগ করে, browser সাধারণত সেটি নিজে থেকে cross-site request-এ যোগ করে না; তাই classic cookie-based CSRF-এর ঝুঁকি আলাদা। Cookie browser নিজে পাঠাতে পারে, তাই CSRF defense, SameSite এবং request-origin policy গুরুত্বপূর্ণ। তবে XSS থাকলে JavaScript-readable token চুরি বা action নেওয়ার ঝুঁকি থাকে।
 
-4. BFF token exposure কমাতে পারে, কিন্তু browser-এ XSS থাকলে attacker user-এর browser দিয়ে authenticated action করাতে পারে। তাই BFF XSS prevention-এর বিকল্প নয়.
+4. BFF token server-side-এ রাখে, কিন্তু browser-এর XSS এখনও authenticated action ঘটাতে পারে। আর session cookie স্বয়ংক্রিয়ভাবে request-এ গেলে BFF endpoint-এ CSRF defense-ও দরকার।
+
+5. Browser বন্ধ হলে token সবসময় মুছে যায় না; তা storage ও browser behavior-এর ওপর নির্ভর করে। Local copy মুছে গেলেও server-side token/session স্বয়ংক্রিয়ভাবে revoke হয় না, আর persistent storage-এ token থেকে যেতে পারে.
 
 </details>
 
@@ -258,11 +260,3 @@ KenaKata-র জন্য এই অধ্যায়ের সিদ্ধান�
 
 ---
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (source-based conceptual review; no implementation/browser tests)
-- [x] Security Review (source-based threat-model review; not a production audit)
-- [ ] Published
-
-Review record: [Chapter 11 Technical ও Security Review](../../../notes/technical-review-chapter-11.md).

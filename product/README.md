@@ -14,4 +14,4 @@
 
 Feature আগে থেকে আছে কি না, তার উত্তর [timeline.md](timeline.md)। [architecture.md](architecture.md) শেষ চেহারা। প্রথম অধ্যায়ের system ওই ছবি নয়।
 
-কোনো গুরুত্বপূর্ণ তথ্য বদলালে [decision log](../notes/decision-log.md)-এ একটা লাইন রাখো।
+কোনো গুরুত্বপূর্ণ তথ্য বদলালে এই directory-র সংশ্লিষ্ট canonical document, product timeline এবং প্রভাবিত chapter-এর উদাহরণ ও cross-reference একসঙ্গে update করো।

@@ -190,11 +190,3 @@ OWASP-এর guidance এই অধ্যায়ের conceptual reference। �
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী KenaKata এখন organization, membership এবং Owner, Admin, Member, Viewer role-সহ multi-organization SaaS। এই অধ্যায় সেই product model-এ authorization failure ব্যাখ্যা করে। OAuth delegation বা external identity flow এখানে আলোচ্য নয়।
 
-## লেখার অবস্থা
-
-- [x] পূর্ণাঙ্গ Draft
-- [x] Technical Review (source-based conceptual review)
-- [x] Security Review (source-based threat-model review)
-- [ ] Published
-
-রিভিউয়ের সীমা: OWASP-এর BOLA, IDOR prevention, function-level authorization এবং authorization guidance-এর সঙ্গে মূল security claim মিলিয়ে দেখা হয়েছে। এটি production implementation audit নয়; কোনো application test suite চালানো হয়নি।

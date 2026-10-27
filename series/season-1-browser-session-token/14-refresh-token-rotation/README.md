@@ -156,7 +156,9 @@ RFC 9700 অনুযায়ী OAuth public client-এর refresh token replay �
 
 4. Family revoke করলে stolen token-এর পরবর্তী ব্যবহার বন্ধ হতে পারে, কিন্তু বৈধ user-কে আবার login করতে হতে পারে। Retry/grace policy usability বাড়াতে পারে, কিন্তু replay window-ও বাড়াতে পারে।
 
-5. OAuth public client-এর normative requirement আর KenaKata-র first-party design choice একই জিনিস নয়। Standard থেকে ধারণা নেওয়া যায়, তবে protocol scope সঠিকভাবে উল্লেখ করতে হবে.
+5. Grace window-তে পুরোনো token আবার গ্রহণ করা হলে attacker-এর হাতে থাকা একই token-ও কাজ করতে পারে। তাই retry recovery সহজ হলেও replay-এর সুযোগ বাড়তে পারে; সীমা, binding ও policy ছাড়া grace window-কে নিরাপদ ধরে নেওয়া যাবে না।
+
+6. OAuth public client-এর normative requirement আর KenaKata-র first-party design choice একই জিনিস নয়। Standard থেকে ধারণা নেওয়া যায়, তবে protocol scope সঠিকভাবে উল্লেখ করতে হবে.
 
 </details>
 
@@ -176,11 +178,3 @@ RFC 9700 হলো OAuth 2.0 Security Best Current Practice। এর OAuth-spec
 
 [Product timeline](../../../product/timeline.md) অনুযায়ী mobile app-এ access token ও refresh token অধ্যায় ১১-এর SPA আসার আগেই আছে। এই অধ্যায় সেই first-party lifecycle-এর rotation ও reuse-detection ঝুঁকি ব্যাখ্যা করে।
 
-## লেখার অবস্থা
-
-- [x] পূর্ণাঙ্গ Draft
-- [x] Technical Review (source-based conceptual review)
-- [x] Security Review (source-based threat-model review)
-- [ ] Published
-
-রিভিউয়ের সীমা: RFC 9700 ও RFC 6749-এর প্রাসঙ্গিক নিয়মের সঙ্গে মূল security claim এবং OAuth বনাম first-party scope মিলিয়ে দেখা হয়েছে। এটি production implementation audit নয়; কোনো application test suite চালানো হয়নি।

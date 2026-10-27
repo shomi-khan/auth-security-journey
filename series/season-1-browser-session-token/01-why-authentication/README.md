@@ -484,9 +484,3 @@ A কেবল URL গোপন রাখার ওপর নির্ভর ক
 - Auguste Kerckhoffs, *La cryptographie militaire* (১৮৮৩): নকশা নয়, চাবির গোপনীয়তার ওপর নির্ভরতার নীতি
 - Mermaid flowchart ও sequence diagram এই অধ্যায়ে process এবং request-এর ক্রম বোঝাতে ব্যবহৃত হয়েছে; protocol-সংক্রান্ত সিদ্ধান্তের ভিত্তি উপরের RFC-গুলো।
 
-## Status
-
-- [x] Draft
-- [ ] Technical review
-- [ ] Security review
-- [ ] Published

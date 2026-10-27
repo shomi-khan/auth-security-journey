@@ -651,9 +651,3 @@ Browser তো cookie নিজে জুড়ে দেয়। আক্র�
 - [Chrome Developers: DBSC now available on Windows](https://developer.chrome.com/blog/dbsc-windows-announcement) এবং [Chrome Developers overview](https://developer.chrome.com/blog/io26-web-identity): **browser-status source হিসেবে যাচাই করা।** Chrome Windows-এর availability এবং feature maturity আলাদা বিষয়; W3C Editor’s Draft-এ DBSC এখনও প্রাথমিক, পরিবর্তনশীল খসড়া। অন্য browser/platform-এ support আছে বলে ধরে নেওয়া যাবে না; প্রকাশের আগে status আবার যাচাই করতে হবে।
 - আগের সংস্করণে Go implementation ও automated test ছিল; সেগুলো এই diagram-first সংস্করণের অংশ নয়। এখানে কোনো application code compile বা test করা হয়নি. বাস্তব implementation audit আলাদা কাজ۔
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (source-based conceptual review; implementation audit নয়)
-- [x] Security Review (threat model, control boundaries ও failure paths পর্যালোচিত; production certification নয়)
-- [ ] Published

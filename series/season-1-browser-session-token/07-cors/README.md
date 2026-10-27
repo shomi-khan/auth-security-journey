@@ -192,11 +192,3 @@ CORS browser-এর cross-origin response sharing নিয়ে। এবার �
 - [MDN: Origin header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin)
 - [OWASP: Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review
-- [x] Security Review
-- [ ] Published
-
-Review record: [Chapter 7 Technical ও Security Review](../../../notes/technical-review-chapter-7.md).

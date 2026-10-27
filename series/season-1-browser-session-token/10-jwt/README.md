@@ -155,13 +155,15 @@ Token B-কে বিশ্বাস করা যাবে না। Payload de
 <details>
 <summary>উত্তর মিলিয়ে দেখো</summary>
 
-1. Header token-এর metadata, payload claims বহন করে, আর signature/MAC নির্দিষ্ট key ও algorithm-এর অধীনে integrity/authenticity যাচাইয়ে সাহায্য করে।
+1. না। Payload decode করলে শুধু encoded data পড়া যায়। বিশ্বাস করার আগে server-এর নির্ধারিত algorithm, trusted key, signature/MAC, issuer, audience, সময়-সংক্রান্ত claim এবং token purpose অনুযায়ী প্রয়োজনীয় validation সফল হতে হবে।
 
-2. Base64URL encoding হলো representation, encryption নয়। তাই payload সাধারণত পড়া যায়; secret বা অপ্রয়োজনীয় ব্যক্তিগত তথ্য সেখানে রাখা উচিত নয়।
+2. Signature token-এর integrity যাচাইয়ে সাহায্য করে, কিন্তু token কোন recipient-এর জন্য তৈরি তা নিশ্চিত করে না। `aud` না মিললে অন্য API-র জন্য তৈরি token ভুল resource server-এ গ্রহণ হয়ে যেতে পারে।
 
-3. Signature ঠিক থাকলেও token ভুল issuer থেকে আসতে পারে, এই API-র জন্য নাও হতে পারে, expire হয়ে থাকতে পারে, বা ভুল purpose-এর token হতে পারে। তাই policy অনুযায়ী claims-ও যাচাই করতে হয়।
+3. Access token হলো token-এর ব্যবহার বা ভূমিকা; JWT হলো claim বহনের format। Access token opaque value-ও হতে পারে, আর JWT অন্য উদ্দেশ্যেও ব্যবহার হতে পারে।
 
-4. Token-এর header-এ লেখা algorithm-কে server-এর policy বানানো যাবে না। Server আগে থেকে অনুমোদিত algorithm ও trusted key নির্ধারণ করবে।
+4. Signed JWT-এর payload সাধারণত encrypted নয়; Base64URL encoding গোপনীয়তা দেয় না। Payload গোপন রাখতে হলে উপযুক্ত encryption, যেমন JWE, এবং সঠিক key management দরকার।
+
+5. `role: Owner` claim নিজে থেকে সব resource-এ অনুমতি দেয় না। Server-কে current membership, tenant boundary, নির্দিষ্ট resource এবং requested action-এর authorization যাচাই করতে হবে.
 
 </details>
 
@@ -173,11 +175,3 @@ Token B-কে বিশ্বাস করা যাবে না। Payload de
 
 ---
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (source-based conceptual review; no implementation/browser tests)
-- [x] Security Review (source-based threat-model review; not a production audit)
-- [ ] Published
-
-Review record: [Chapter 10 Technical ও Security Review](../../../notes/technical-review-chapter-10.md).

@@ -1,8 +1,8 @@
 # Season 1 — Browser, Session এবং Token
 
-অধ্যায় ১–১৬-এর পূর্ণাঙ্গ draft আছে। সবগুলো এখনো Published নয়; chapter-এর review checkbox ও scope note আলাদাভাবে দেখো।
+অধ্যায় ১–১৬-এর draft আছে। কোনো অধ্যায় এখনো Published নয়.
 
-Product-এর তথ্য [product/](../../product/README.md)-এ। কোন অধ্যায়ে কী আগে থেকে আছে, সেটা [timeline](../../product/timeline.md)-এ।
+Product-এর তথ্য/ [product/](../../product/README.md)-এ। কোন অধ্যায়ে কী আগে থেকে আছে, সেটা [timeline](../../product/timeline.md)-এ।
 
 ## এই Season কেন পড়ব?
 
