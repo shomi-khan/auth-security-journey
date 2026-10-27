@@ -13,6 +13,12 @@ status: draft
 
 KenaKata এখনো একটা server-rendered web application। Login-এর পর browser-এ session cookie থাকে। নতুন SPA, mobile app বা token architecture এই অধ্যায়ে আসছে না।
 
+## এই অধ্যায়ে কী বুঝবে
+
+- Stored, reflected ও DOM-based XSS-এর পার্থক্য এবং তাদের overlap।
+- `HttpOnly` cookie value আড়াল করে, কিন্তু একই origin-এ চলা malicious JavaScript-কে থামায় না।
+- Context-aware output encoding, safe DOM API, sanitization ও CSP-এর আলাদা ভূমিকা।
+
 ## ১. একটা order note, আর অদ্ভুত আচরণ
 
 রাফির দোকানে কর্মীরা order-এর পাশে note লেখে। যেমন, “বিকেলের আগে পাঠাবেন”। আরিফ note-টা save করে, order page-এ দেখায়। একদিন একজন কর্মী note-এ এমন কিছু paste করল, যেটা plain text নয়, browser-এর কাছে HTML ও script হিসেবে ব্যাখ্যা হওয়ার মতো content।
