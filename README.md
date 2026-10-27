@@ -20,8 +20,9 @@
 | --- | --- |
 | অধ্যায় ১–১৬ | পূর্ণাঙ্গ draft আছে; cross-chapter consistency ও clarity review চলছে |
 | অধ্যায় ৭: CORS | Technical ও security review সম্পন্ন |
-| অধ্যায় ৯: Token | Review notes আছে; article-টি draft |
-| অধ্যায় ১৩–২৬ | Chapter plan/brief পর্যায়ে; পূর্ণাঙ্গ article নয় |
+| অধ্যায় ৯–১৬ | Draft article আছে; chapter-এ থাকা review notes ও scope আলাদাভাবে দেখো |
+| অধ্যায় ১৩–১৬ | পূর্ণাঙ্গ draft আছে; Published নয় |
+| অধ্যায় ১৭–২৬ | Chapter plan/brief পর্যায়ে; পূর্ণাঙ্গ article নয় |
 
 **Status-এর অর্থ:** কোনো অধ্যায়ের draft বা brief থাকা মানেই সেটি published নয়। Review সম্পন্ন হওয়াও publication status-এর সমান নয়।
 
