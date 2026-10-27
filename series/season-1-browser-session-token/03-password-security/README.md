@@ -600,9 +600,3 @@ Argon2id ও salt offline guessing-কে ব্যয়বহুল করে,
 - Robert Morris, Ken Thompson, *Password Security: A Case History*, Communications of the ACM, ১৯৭৯: Unix-এর password file-এ salt-এর ঐতিহাসিক উদাহরণ। (ঐতিহাসিক সূত্র, স্পেসিফিকেশন নয়। সরাসরি মেলানো হয়নি।)
 - Unicode Standard Annex #15, *Unicode Normalization Forms* (NFC): NIST-এর নির্দেশনার সূত্রে। (সরাসরি পড়া হয়নি।)
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (conceptual claims ও authoritative references পর্যালোচিত; implementation audit নয়)
-- [x] Security Review (threat model, limitations ও গুরুত্বপূর্ণ failure path পর্যালোচিত; production certification নয়)
-- [ ] Published
