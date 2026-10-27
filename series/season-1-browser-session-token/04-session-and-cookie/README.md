@@ -667,9 +667,3 @@ flowchart LR
 - IANA HTTP Authentication Scheme Registry: initial registration-এর draft (draft-ietf-httpbis-authscheme-registrations) থেকে দেখা হয়েছে যে Basic, Bearer, Digest, Negotiate নথিভুক্ত। আজকের পুরো registry এখানে মেলানো হয়নি।
 - [Wikipedia: HTTP cookie](https://en.wikipedia.org/wiki/HTTP_cookie): শুধু ১৯৯৪-এর ইতিহাসের জন্য (Montulli, MCI, shopping cart)। এটা একটা secondary source, কোনো security দাবির ভিত্তি নয়।
 
-## লেখার অবস্থা
-
-- [x] Draft (theory-first revision)
-- [x] Technical Review (conceptual claims ও authoritative references যাচাই করা হয়েছে; implementation audit নয়)
-- [x] Security Review (threat model, control boundaries ও failure paths পর্যালোচিত; production certification নয়)
-- [ ] Published
