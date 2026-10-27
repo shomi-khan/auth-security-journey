@@ -1,3 +1,10 @@
+---
+chapter: 11
+season: 1
+title: "SPA-তে Token কোথায় রাখব?"
+status: draft
+---
+
 # SPA-তে Token কোথায় রাখব?
 
 রাফির দোকানের server-rendered website আগের মতোই cookie session ব্যবহার করছে। এখন নীরা নতুন একটা **Single-Page Application (SPA)** চায়, যাতে order তালিকা দ্রুত বদলাবে, filter হবে, আর page বারবার reload করতে হবে না।

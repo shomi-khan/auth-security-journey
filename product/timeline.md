@@ -115,11 +115,11 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 
 
 
-## Chapter plan status (২০২৬-১০-২৫)
+## Chapter plan status (২০২৬-১০-২৭)
 
-অধ্যায় ১–৬-এর content এই পরিবর্তনে rewrite করা হয়নি। CORS-এর নতুন অধ্যায় ৭ যোগ হওয়ায় পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়েছে। পুরোনো অধ্যায় ১১-এর draft এখন অধ্যায় ১২; অধ্যায় ১৩–২৬-এর README-তে পূর্ণাঙ্গ content লেখার আগে ব্যবহারযোগ্য brief থাকবে।
+অধ্যায় ১–১৬-এর পূর্ণাঙ্গ draft এখন repository-তে আছে। Chapter 7 CORS যোগ হওয়ার পর পুরোনো chapter reference-গুলোর নম্বর সংশোধন করা দরকার হয়েছিল; এই review-তে সেই cross-reference-গুলোও মিলিয়ে দেখা হচ্ছে। অধ্যায় ১৭–২৬ এখনো planning পর্যায়ে, তাই তাদের README-তে brief বা outline থাকতে পারে, পূর্ণাঙ্গ article নয়।
 
-| অধ্যায় | পরিকল্পিত শিরোনাম | Brief-এর মূল ফোকাস |
+| অধ্যায় | পরিকল্পিত শিরোনাম | মূল ফোকাস |
 | --- | --- | --- |
 | ৭ | CORS: Browser কোন Response পড়তে পারবে? | Origin, same-origin policy, preflight, credentials এবং CORS-এর সীমা |
 | ১২ | Token Expiration এবং Replay Window | Token lifetime, replay window ও layered control |
@@ -138,4 +138,4 @@ Backend আর একটা process নয়। User, order, billing, আর notif
 | ২৫ | Context বদলালে Architecture কেন বদলায়? | Threat model ও architecture trade-off synthesis |
 | ২৬ | Capstone: পুরো KenaKata Security Architecture | End-to-end architecture, abuse case ও residual risk |
 
-এগুলো planning brief, পূর্ণাঙ্গ article নয়। OAuth-specific normative guidance অধ্যায় ১৭–২১-এ থাকবে। অধ্যায় ১৩–১৫-তে KenaKata-র first-party mobile refresh-token lifecycle শেখানো হবে; সেটিকে OAuth flow হিসেবে বর্ণনা করা হবে না।
+অধ্যায় ১৩–১৬-এর পূর্ণাঙ্গ draft আছে। অধ্যায় ১৭–২৬-এর সারিগুলো planning brief, পূর্ণাঙ্গ article নয়। OAuth-specific normative guidance অধ্যায় ১৭–২১-এ থাকবে। অধ্যায় ১৩–১৫-তে KenaKata-র first-party mobile refresh-token lifecycle শেখানো হবে; সেটিকে OAuth flow হিসেবে বর্ণনা করা হবে না।

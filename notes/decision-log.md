@@ -215,3 +215,12 @@
 - CSRF (অধ্যায় ৬)-এর পরে এবং XSS (নতুন অধ্যায় ৮)-এর আগে CORS-কে অধ্যায় ৭ হিসেবে যুক্ত করা হয়েছে।
 - CORS browser-এর cross-origin response sharing নিয়ন্ত্রণ করে; এটি authentication, authorization বা CSRF defense-এর বিকল্প নয়।
 - পুরোনো অধ্যায় ৭–২৫-এর নম্বর এক ধাপ এগিয়ে ৮–২৬ হয়েছে। Season 1 এখন অধ্যায় ১–১৬, Season 2 অধ্যায় ১৭–২২ এবং Season 3 অধ্যায় ২৩–২৬।
+
+## 2026-10-27 — Chapters 1–16 editorial consistency review
+
+- Created `notes/editorial-review-chapters-01-16.md` to record the scope, major consistency corrections, and verification limits.
+- Aligned chapter references to the current outline: Chapter 15 covers logout/revocation; Chapter 16 covers IDOR/BOLA and organization-level authorization; Chapter 23 covers MFA/step-up; Chapter 24 covers machine-to-machine authentication.
+- Clarified that an anonymous pre-session may exist before login, but an authenticated session is created only after successful authentication and receives a new unpredictable ID.
+- Updated root/Season 1 progress and product timeline: Chapters 1–16 have full drafts; Chapters 17–26 remain planned.
+- Moved the internal Chapter 12 editorial brief to `notes/chapter-brief-12.md`, outside the reader-facing chapter.
+- This was a content/consistency pass, not a production implementation audit or browser test.

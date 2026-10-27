@@ -1,3 +1,10 @@
+---
+chapter: 9
+season: 1
+title: "Token কেন দরকার?"
+status: draft
+---
+
 # Token কেন দরকার?
 
 রাফি এখন দোকানে বসে শুধু laptop থেকে KenaKata চালাতে চায় না। বাজারে থাকলেও ফোন থেকে order দেখতে হবে, নতুন order এলে বুঝতে হবে, দরকার হলে product-এর তথ্যও বদলাতে হবে।
