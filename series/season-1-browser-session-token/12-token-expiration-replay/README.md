@@ -257,11 +257,3 @@ Protocol বা security claim নিয়ে পরিবর্তন করা�
 
 ---
 
-## লেখার অবস্থা
-
-- [x] Draft
-- [x] Technical Review (source-based conceptual review; no implementation tests)
-- [x] Security Review (source-based threat-model review; not a production audit)
-- [ ] Published
-
-Review record: [Chapter 12 Technical ও Security Review](../../../notes/technical-review-chapter-12.md).
